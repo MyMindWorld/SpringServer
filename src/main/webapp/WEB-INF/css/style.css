@@ -1,0 +1,154 @@
+/* Styles go here */
+
+.semi {
+  opacity: 0.5;
+  color: #f7fcf9;
+  /* Полупрозрачность элемента */
+}
+
+.a:link {
+    font-size: 9pt;
+    color: #ffffff;
+}
+a:link {
+color: #ffffff;
+}
+a:visited {
+color: #ffffff;
+}
+a:hover {
+color: #ff3300;
+}
+
+.c {
+  background-color: #32CD32;
+  /* Цвет фона кнопки */
+  border: 1px solid #f7fcf9;
+  /* Рамка */
+  display: inline-block;
+  padding: 15px 25px;
+  /* Поля */
+  text-decoration: none;
+  /* Убираем подчёркивание */
+  color: #f7fcf9;
+  /* Цвет текста */
+}
+
+.c:hover {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  /* Тень */
+  background: linear-gradient(to bottom, #fcfff4, #e9e9ce);
+  /* Градиент */
+  color: #a00;
+}
+
+.d {
+  background-color: #FA8072;
+  /* Цвет фона кнопки */
+  border: 1px solid #f7fcf9;
+  /* Рамка */
+  display: inline-block;
+  padding: 15px 25px;
+  /* Поля */
+  text-decoration: none;
+  /* Убираем подчёркивание */
+  color: #f7fcf9;
+  /* Цвет текста */
+}
+.e {
+  background-color: #d4b8d6;
+  /* Цвет фона кнопки */
+  border: 1px solid #f7fcf9;
+  /* Рамка */
+  display: inline-block;
+  padding: 15px 25px;
+  /* Поля */
+  text-decoration: none;
+  /* Убираем подчёркивание */
+  color: #f7fcf9;
+  /* Цвет текста */
+}
+
+.d:hover {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  /* Тень */
+  background: linear-gradient(to bottom, #fcfff4, #e9e9ce);
+  /* Градиент */
+  color: #a00;
+}
+* {
+  font-family: sans-serif; /* Change your font family */
+}
+
+.content-table {
+  border-collapse: collapse;
+  margin: 25px 0;
+  margin-left:auto;
+  margin-right:auto;
+  font-size: 0.9em;
+  min-width: 400px;
+  border-radius: 5px 5px 0 0;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+
+}
+.content-table thead tr {
+  background-color: #009879;
+  color: #ffffff;
+  text-align: left;
+  font-weight: bold;
+}
+
+.content-table th,
+.content-table td {
+  padding: 12px 15px;
+}
+
+.content-table tbody tr {
+  border-bottom: 1px solid #dddddd;
+}
+.content-table tbody tr:hover{
+  background-color:#ece1ed;
+}
+
+.content-table tbody tr:nth-of-type(even) {
+  background-color: #f3f3f3;
+}
+
+.content-table tbody tr:nth-of-type(even):hover {
+  background-color: #ece1ed;
+}
+
+.content-table tbody tr:last-of-type {
+  border-bottom: 2px solid #009879;
+}
+
+.content-table tbody tr.active-row {
+  font-weight: bold;
+  color: #009879;
+}
+
+/* The alert message box */
+.alert {
+  padding: 20px;
+  background-color: #f44336; /* Red */
+  color: white;
+  margin-bottom: 15px;
+}
+
+/* The close button */
+.closebtn {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* When moving the mouse over the close button */
+.closebtn:hover {
+  color: black;
+}

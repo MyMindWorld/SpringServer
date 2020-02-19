@@ -30,6 +30,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/api/**").anonymous()
+                .antMatchers("/css/**").anonymous()
+                .antMatchers("/fonts/**").anonymous()
+                .antMatchers("/images/**").anonymous()
+                .antMatchers("/js/**").anonymous()  // is it ok???
+                .antMatchers("/vendor/**").anonymous()
                 .antMatchers("/login*").permitAll()
                 .anyRequest().authenticated()
                 .and()

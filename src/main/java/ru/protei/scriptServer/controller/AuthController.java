@@ -18,6 +18,6 @@ public class AuthController {
             model.addAttribute("error",true);
         }
 
-        return "login";
+        return "loginNew";
     }
 }

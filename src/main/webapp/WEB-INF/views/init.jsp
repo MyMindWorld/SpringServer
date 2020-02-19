@@ -11,17 +11,15 @@
     <!--===============================================================================================-->
     	<style><%@include file="../fonts/font-awesome-4.7.0/css/font-awesome.min.css"%></style>
     <!--===============================================================================================-->
-    	<style><%@include file="../fonts/iconic/css/material-design-iconic-font.min.css"%></style>
+    	<style><%@include file="../fonts/Linearicons-Free-v1.0.0/icon-font.min.css"%></style>
     <!--===============================================================================================-->
     	<style><%@include file="../vendor/animate/animate.css"%></style>
     <!--===============================================================================================-->
     	<style><%@include file="../vendor/css-hamburgers/hamburgers.min.css"%></style>
     <!--===============================================================================================-->
-    	<style><%@include file="../vendor/animsition/css/animsition.min.css"%></style>
+    	<style><%@include file="../vendor/animate/animate.css"%></style>
     <!--===============================================================================================-->
     	<style><%@include file="../vendor/select2/select2.min.css"%></style>
-    <!--===============================================================================================-->
-    	<style><%@include file="../vendor/daterangepicker/daterangepicker.css"%></style>
     <!--===============================================================================================-->
     <!--SCRIPTS-->
 </head>

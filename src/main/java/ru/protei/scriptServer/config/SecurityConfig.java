@@ -36,6 +36,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/js/**").anonymous()  // is it ok???
                 .antMatchers("/vendor/**").anonymous()
                 .antMatchers("/login*").permitAll()
+                .antMatchers("/index/**").hasRole("USER")
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()

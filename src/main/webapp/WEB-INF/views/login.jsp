@@ -2,6 +2,9 @@
 <head>
 <%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <meta <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>>
+<jsp:include page="init.jsp" />
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+          xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <style><%@include file="/WEB-INF/css/style.css"%></style>
 </head>
 

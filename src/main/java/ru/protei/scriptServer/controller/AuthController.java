@@ -27,8 +27,8 @@ public class AuthController {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     protected String doPost(HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException {
-        String username = request.getParameter("Username");
-        String password = request.getParameter("pass");
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
 
        logger.warn(username);
        logger.warn(password);

@@ -48,6 +48,7 @@ public class ScriptsHandler {
             try {
 
                 JsonScript jsonScript = utils.parseJsonToObject(resource.getInputStream());
+                // todo check if script (.py) exists
                 script.setName(jsonScript.name);
                 script.setParametersJson(jsonScript.paramsToJsonString());
             } catch (IOException e) {

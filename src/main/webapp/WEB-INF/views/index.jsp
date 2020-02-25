@@ -34,7 +34,7 @@
      <a href="perform_logout" class="e">Logout</a>&emsp;
 
      <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <li><a href="/users">User Management</a></li>
+            <li><a href="/admin">OnlyAdminLink</a></li>
      </sec:authorize>
 
 

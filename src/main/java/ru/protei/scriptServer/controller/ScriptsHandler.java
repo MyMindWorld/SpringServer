@@ -7,12 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 import ru.protei.scriptServer.model.JsonScript;
+import ru.protei.scriptServer.model.Parameters;
 import ru.protei.scriptServer.model.Script;
 //import ru.protei.scriptServer.repository.JsonScriptRepository;
 import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.utils.Utils;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Controller
 public class ScriptsHandler {

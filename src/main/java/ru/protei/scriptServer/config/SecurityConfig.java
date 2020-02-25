@@ -6,11 +6,15 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
-//@Configuration
-//@EnableWebSecurity
+@Configuration
+@EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
@@ -39,12 +43,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/admin/**").hasRole("ADMIN")
-                .antMatchers("/api/**").anonymous()
-                .antMatchers("/css/**").anonymous()
-                .antMatchers("/fonts/**").anonymous()
-                .antMatchers("/images/**").anonymous()
-                .antMatchers("/js/**").anonymous()  // is it ok???
-                .antMatchers("/vendor/**").anonymous()
+                .antMatchers("/api/**").permitAll()
+                .antMatchers("/css/**").permitAll()
+                .antMatchers("/fonts/**").permitAll()
+                .antMatchers("/images/**").permitAll()
+                .antMatchers("/js/**").permitAll()
+                .antMatchers("/vendor/**").permitAll()
                 .antMatchers("/login*").permitAll()
                 .antMatchers("/index/**").hasRole("USER")
                 .anyRequest().authenticated()
@@ -52,6 +56,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin()
                 .loginPage("/login")
                 .loginProcessingUrl("/perform_login")
+                .usernameParameter("username")
+                .passwordParameter("password")
                 .failureForwardUrl("/login?error=true")
                 .defaultSuccessUrl("/index", true)
                 //.failureUrl("/login.html?error=true")
@@ -67,4 +73,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }

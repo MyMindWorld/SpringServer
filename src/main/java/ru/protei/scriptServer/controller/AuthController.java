@@ -22,19 +22,19 @@ public class AuthController {
             model.addAttribute("error",true);
         }
 
-        return "loginNew";
+        return "login";
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    protected String doPost(HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException {
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
-
-       logger.warn(username);
-       logger.warn(password);
-
-       model.addAttribute("username", username);
-       return "index";
-    }
+//    @RequestMapping(value = "/login", method = RequestMethod.POST)
+//    protected String doPost(HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException {
+//        String username = request.getParameter("username");
+//        String password = request.getParameter("password");
+//
+//       logger.warn(username);
+//       logger.warn(password);
+//
+//       model.addAttribute("username", username);
+//       return "index";
+//    }
 
 }

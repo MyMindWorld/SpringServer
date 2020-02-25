@@ -2,7 +2,8 @@
  <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
  <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
  <html xmlns:th="http://www.thymeleaf.org" lang="ru">
-  <meta><%@ page contentType="text/html; charset=UTF-8" %></meta>
+ <meta><%@ page contentType="text/html; charset=UTF-8" %>
+
 <html lang="en">
 <head>
 	<style><%@include file="../css/util.css"%></style>

@@ -15,10 +15,10 @@ public class Script {
     @GeneratedValue
     private Long id;
     @NotBlank
-    private String Name;
+    private String name;
     @NotBlank
     @Column(columnDefinition = "LONGTEXT")
-    private String ParametersJson;
+    private String parametersJson;
 
 
     public Script() {
@@ -26,6 +26,6 @@ public class Script {
     }
 
     public String toString() {
-        return "Id : '" + id + "' Name : '" + Name + "'";
+        return "Id : '" + id + "' Name : '" + name + "'";
     }
 }

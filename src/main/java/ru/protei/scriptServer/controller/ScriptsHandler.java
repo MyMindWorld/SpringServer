@@ -13,7 +13,6 @@ import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.utils.Utils;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 @Controller
 public class ScriptsHandler {
@@ -46,7 +45,7 @@ public class ScriptsHandler {
 
                 JsonScript jsonScript = utils.parseJsonToObject(resource.getInputStream());
                 script.setName(jsonScript.name);
-                script.setParametersJson(jsonScript.paramsToJson());
+                script.setParametersJson(jsonScript.paramsToJsonString());
             } catch (IOException e) {
                 logger.error("Mapping json to object failed!", e);
             }

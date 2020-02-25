@@ -18,6 +18,6 @@ public class OnEventsAction {
     @EventListener(ApplicationStartedEvent.class)
     public void afterStartup() {
         logger.info("AfterStartup invocation started!");
-        scriptsHandler.updateScriptsInBd();
+        scriptsHandler.updateScriptsInDb();
     }
 }

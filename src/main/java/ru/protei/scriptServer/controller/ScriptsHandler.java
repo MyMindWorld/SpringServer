@@ -1,5 +1,6 @@
 package ru.protei.scriptServer.controller;
 
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,11 +8,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 import ru.protei.scriptServer.model.JsonScript;
 import ru.protei.scriptServer.model.Script;
+//import ru.protei.scriptServer.repository.JsonScriptRepository;
 import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.utils.Utils;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.io.InputStreamReader;
 
 @Controller
 public class ScriptsHandler {
@@ -22,7 +24,8 @@ public class ScriptsHandler {
     Utils utils;
 
 
-    public void updateScriptsInBd() {
+    @SneakyThrows
+    public void updateScriptsInDb() {
         logger.info("Database cleanup started!");
 
         if (scriptRepository.findAll().size() > 0) {
@@ -40,8 +43,10 @@ public class ScriptsHandler {
 
             Script script = new Script();
             try {
-                script.setName(utils.parseJsonToObject(resource.getInputStream()).name);
+
                 JsonScript jsonScript = utils.parseJsonToObject(resource.getInputStream());
+                script.setName(jsonScript.name);
+                script.setParametersJson(jsonScript.paramsToJson());
             } catch (IOException e) {
                 logger.error("Mapping json to object failed!", e);
             }

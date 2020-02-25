@@ -1,3 +1,66 @@
 {
-  "name" : "testBdUpdate"
+  "name": "1. Старт ES",
+  "script_path": "./scripts/start_es_server.py",
+  "description": "Скрипт запуска ES в докере. Для выбора ветки, вначале выберите тип сервера. ВНИМАНИЕ! При запуске в интерактивном режиме, контейнер будет остановлен вместе со скриптом",
+  "requires_terminal": false,
+  "parameters": [
+    {
+      "name": "Поиск",
+      "param": "--type",
+      "description": "Принимает значение Release или Custom",
+      "type": "text",
+      "required": false
+    },
+    {
+      "name": "Ветка",
+      "param": "--tag",
+      "type": "list",
+      "required": true,
+      "description": "Выпадающий список версий"
+    },
+    {
+      "name": "Порт",
+      "param": "--port",
+      "description": "Выпадающий список свободных портов из пула (5050 - 5055 + 32768)",
+      "type": "list",
+      "required": true
+    },
+    {
+      "name": "Время жизни сервера(Не реализовано)",
+      "param": "--life_span",
+      "description": "(Не реализовано)",
+      "type": "list",
+      "required": false,
+      "constant" : true
+    },
+    {
+      "name": "Настройки сервера",
+      "param": "--file_upload",
+      "type": "file_upload",
+      "description": "Сюда можно загрузить файл настроек. В противном случае будут использоваться стандартные (Они лежат на 192.168.108.94/home/support/Es_Settings_Default менять следует только если вы считаете что они несправедливо стандартные)"
+    },
+    {
+      "name": "Интерактивный режим",
+      "param": "--interactive",
+      "no_value": true,
+      "description": "При выборе этого чекбокса после запуска сервера и установки лицензии у вас в этом окне будут показаны логи."
+    },
+    {
+      "name": "Уровень логирования",
+      "param": "--log",
+      "description": "По умолчанию уровень логирования - INFO",
+      "type": "list",
+      "required": false
+    },
+    {
+      "name": "MaxExecutionTime",
+      "param": "--max_execution_time",
+      "constant" : true
+    },
+    {
+      "name": "AUTH",
+      "param": "--auth",
+      "constant" : true
+    }
+  ]
 }

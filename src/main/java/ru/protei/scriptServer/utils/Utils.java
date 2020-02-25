@@ -1,6 +1,8 @@
 package ru.protei.scriptServer.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import ru.protei.scriptServer.model.JsonScript;
+import ru.protei.scriptServer.model.Parameters;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,10 +30,20 @@ public class Utils {
     @Autowired
     private ResourceLoader resourceLoader;
 
-    public JsonScript parseJsonToObject(InputStream inputStream){
+    public Parameters[] stringToListOfParams(String source){
         ObjectMapper mapper = new ObjectMapper();
         try {
-            return mapper.readValue(inputStream, JsonScript.class);
+            return mapper.readValue(source, Parameters[].class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public JsonScript parseJsonToObject(InputStream source){
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.readValue(source, JsonScript.class);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -59,6 +72,17 @@ public class Utils {
             username = principal.toString();
         }
         return username;
+    }
+
+    public static String parametersToPojo(Parameters parameters){
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        try {
+            return mapper.writeValueAsString(parameters);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 

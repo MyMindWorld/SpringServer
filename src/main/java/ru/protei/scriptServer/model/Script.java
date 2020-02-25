@@ -3,10 +3,7 @@ package ru.protei.scriptServer.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
 @Entity
@@ -19,13 +16,16 @@ public class Script {
     private Long id;
     @NotBlank
     private String Name;
+    @NotBlank
+    @Column(columnDefinition = "LONGTEXT")
+    private String ParametersJson;
 
 
     public Script() {
         super();
     }
 
-    public String toString(){
-        return id + "_" + Name;
+    public String toString() {
+        return "Id : '" + id + "' Name : '" + Name + "'";
     }
 }

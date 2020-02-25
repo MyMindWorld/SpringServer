@@ -1,7 +1,18 @@
 package ru.protei.scriptServer.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.List;
 
+@Data
+@AllArgsConstructor
 public class JsonScript {
 
     public String name;
@@ -14,5 +25,23 @@ public class JsonScript {
     public boolean bash_formatting;
     public String include;
     public boolean hidden;
-    public List<Parameters> parameters;
+
+
+    public Parameters[] parameters;
+
+    public JsonScript() {
+        super();
+    }
+
+    public String paramsToJson(){
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        try {
+            return mapper.writeValueAsString(parameters);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

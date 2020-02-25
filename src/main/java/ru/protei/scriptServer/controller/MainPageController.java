@@ -16,7 +16,7 @@ import ru.protei.scriptServer.repository.UserRepository;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-import static ru.protei.scriptServer.Utils.getUsername;
+import static ru.protei.scriptServer.utils.Utils.getUsername;
 
 
 @Controller

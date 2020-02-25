@@ -15,6 +15,8 @@ public class ScriptServer extends SpringBootServletInitializer {
 
     public static void main(String[] args) throws Exception {
         SpringApplication.run(ScriptServer.class, args);
+
+
     }
 
 }

@@ -35,22 +35,24 @@
     <div data-v-0012d28c="" data-v-1ead196e="" class="app-layout">
         <div data-v-0012d28c="" class="app-sidebar collapsed">
             <div data-v-1ead196e="" class="main-app-sidebar" data-v-0012d28c="">
-                <div class="list-header"><h5 class="header server-header"
-                                             title="v1.15.0-HEAD@ed2009f">Hello <sec:authentication
-                        property="name"/>! </h5> <h6 You have roles : <sec:authentication
-                        property="authorities"/> ></h6>
+                <div class="list-header">
+                    <h5 class="header server-header" title="v1.15.0-HEAD@ed2009f">
+                        Hello <sec:authentication property="name"/>! </h5>
+                    <h6> You have roles : <sec:authentication property="authorities"/></h6>
 
 
                     <div data-v-3f2cf002="" class="search-panel-root">
-                        <div data-v-3f2cf002="" class="search-panel collapsed"><input data-v-3f2cf002=""
-                                                                                      autocomplete="off"
-                                                                                      name="searchField"
-                                                                                      placeholder="Search script"
-                                                                                      type="search" class="search-field"
-                                                                                      disabled="disabled"></div>
+                        <div data-v-3f2cf002="" class="search-panel collapsed"><label>
+                            <input data-v-3f2cf002=""
+                                                                                          autocomplete="off"
+                                                                                          name="searchField"
+                                                                                          placeholder="Search script"
+                                                                                          type="search" class="search-field"
+                                                                                          disabled="disabled">
+                        </label></div>
                         <input data-v-3f2cf002="" alt="Search script"
                                src="<c:url value="/images/icons/search.png"/>"
-                               type="image" class="search-button" width="45" height="45" alt="SEARCH_BUTTON"></div>
+                               type="image" class="search-button" width="45" height="45"></div>
                     <div class="header-link">
                         <sec:authorize access="hasRole('ROLE_ADMIN')">
                             <a href="<c:url value="/admin"/>">
@@ -94,9 +96,30 @@
         <%--        Содержимое скрипта --%>
         <div data-v-0012d28c="" class="app-content">
             <c:choose>
-                <c:when test="${params!=null}"> <%-- Проверка выбран ли какой-нибудь скрипт --%>
-                    ${params.name}
+                <c:when test="${script!=null}"> <%-- Проверка выбран ли какой-нибудь скрипт --%>
+                    ${script.name}
                     <br/>
+                    <table class="content-table">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                        </thead>
+                        <c:forEach items="${parameters}" var="param">
+                        <tr>
+                            <td>
+                                <c:out value="${param.name}"/>
+                            </td>
+                            <td>
+                                <c:out value="${param.type}"/>
+                            </td>
+                            <td>
+                                <c:out value="${param.description}"/>
+                            </td>
+                            </c:forEach>
+                    </table>
                 </c:when>
                 <c:otherwise> <%-- Если не выбран, дефолтная страница --%>
                     <div data-v-0012d28c="" class="app-content">

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
+import ru.protei.scriptServer.model.Parameters;
 import ru.protei.scriptServer.model.Script;
 import ru.protei.scriptServer.model.User;
 import ru.protei.scriptServer.repository.ScriptRepository;
@@ -50,11 +51,16 @@ public class MainPageController {
     public ModelAndView showScriptContent(HttpServletRequest request, @PathVariable String scriptId) {
         logger.warn("HERE!)))");
         logger.warn(scriptId);
+        Script script = scriptRepository.getOne(Long.valueOf(scriptId));
+        Parameters[] parameters = utils.stringToListOfParams(script.getParametersJson());
+        for (Parameters parametersex : parameters){
+
+            logger.warn(parametersex.name);
+        }
         ModelAndView modelAndView = showMenu();
 
 
-        return modelAndView;
-//        return new ModelAndView("index").addObject("params", scriptRepository.getOne(Long.valueOf(scriptId)));
+        return modelAndView.addObject("script", script).addObject("parameters",parameters);
     }
 
 }

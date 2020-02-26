@@ -53,17 +53,15 @@
                                type="image" class="search-button" width="45" height="45" alt="SEARCH_BUTTON"></div>
                     <div class="header-link">
                         <sec:authorize access="hasRole('ROLE_ADMIN')">
-                            <a
-                                    href="<c:url value="/admin"/>"
-                                    target="_blank">
+                            <a href="<c:url value="/admin"/>">
                                 <img src="<c:url value="/images/icons/admin.png"/>" width="45" height="45"
                                      alt="ADMIN_LINK"> </a>
 
                         </sec:authorize>
 
-                        <a href="<c:url value="/perform_logout"/>" class="e">Logout</a>
 
                     </div>
+                    <a href="<c:url value="/perform_logout"/>" class="e">Logout</a>
                 </div>
                 <%--                Таблица слева с номерами скриптов --%>
                 <div data-v-40a770e8="" class="scripts-list collection">
@@ -113,7 +111,10 @@
                                     src="<c:url value="/images/cutLogo.png"/>"
                                     alt="script server logo">
                                 <div data-v-694020c9="" class="welcome-text">
-                                    Cake is a lie!
+                                    Доступ к необходимым скриптам можно запросить у руководителя вашей группы<br>
+                                    (Cake is a lie!)
+
+
                                 </div>
                             </div>
                         </div>

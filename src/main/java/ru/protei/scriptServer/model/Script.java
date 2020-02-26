@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Script {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @NotBlank
     private String name;

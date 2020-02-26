@@ -7,6 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -45,22 +46,15 @@ public class MainPageController {
     }
 
 
-    @RequestMapping(value = "/userdelete", method = RequestMethod.POST)
-    public ModelAndView deleteUser(Model model, HttpServletRequest request) {
-        List<User> userList = userRepository.findAll();
-//        userList.sort(User::compareTo);
-        long devId = Long.parseLong(request.getParameter("id"));
-        if (devId != 0) {
+    @RequestMapping(value = "/index/{scriptId}", method = RequestMethod.GET)
+    public ModelAndView showScriptContent(HttpServletRequest request, @PathVariable String scriptId) {
+        logger.warn("HERE!)))");
+        logger.warn(scriptId);
+        ModelAndView modelAndView = showMenu();
 
-            String username = getUsername();
-            User userToDelete = userRepository.getOne(devId);
-            logger.warn("Removing user '" + userToDelete + " by request of '" + username + "'");
-            userRepository.delete(userToDelete);
-            userList.remove(userToDelete);
-            return new ModelAndView("userdelete").addObject("users", userList);
-        }
 
-        return new ModelAndView("userdelete").addObject("users", userList);
+        return modelAndView;
+//        return new ModelAndView("index").addObject("params", scriptRepository.getOne(Long.valueOf(scriptId)));
     }
 
 }

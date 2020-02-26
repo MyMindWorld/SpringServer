@@ -19,27 +19,6 @@
 
 <a href="<c:url value="/admin/update_scripts"/>" class="e">Update Scripts</a>
 
-<form name='f' action=<c:url value='/admin/invite_user'/> method='POST'>
-
-    <table>
-        <tr>
-            <td>Ldap:</td>
-            <td><input type='text' name='ldapName'/></td>
-        </tr>
-<%--        TODO ROLES LIST HERE--%>
-        <tr>
-            <td><input name="submit" type="submit" value="Add user"/></td>
-        </tr>
-    </table>
-
-</form>
-<c:if test="${error}">
-    <div class="alert">
-        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-        Login or password is incorrect!
-    </div>
-</c:if>
-
 <table class="content-table">
     <thead>
     <tr>
@@ -65,6 +44,21 @@
         </td>
         </c:forEach>
 </table>
+
+<form name='f' class="addUserForm" action=<c:url value='/admin/invite_user'/> method='POST'>
+
+    <table>
+        <tr>
+            <td>Ldap:</td>
+            <td><input type='text' name='ldapName'/></td>
+        </tr>
+        <%--        TODO ROLES LIST HERE--%>
+        <tr>
+            <td><input name="submit" type="submit" value="Add user"/></td>
+        </tr>
+    </table>
+
+</form>
 
 
 </body>

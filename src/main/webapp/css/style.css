@@ -129,10 +129,10 @@ color: #ff3300;
 }
 
 /* The alert message box */
-.alert {
+.alertLogin {
   padding: 20px;
   background-color: #f44336; /* Red */
-  color: white;
+  color: #ff0002;
   margin-bottom: 15px;
 }
 

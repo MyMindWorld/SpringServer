@@ -60,7 +60,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .passwordParameter("password")
                 .failureForwardUrl("/login?error=true")
                 .defaultSuccessUrl("/index", true)
-                //.failureUrl("/login.html?error=true")
+                .failureUrl("/login?error=true")
 //                .failureHandler(authenticationFailureHandler())
                 .and()
                 .logout()

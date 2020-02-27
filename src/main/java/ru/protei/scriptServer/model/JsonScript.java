@@ -12,9 +12,10 @@ import java.util.List;
 @AllArgsConstructor
 public class JsonScript {
 
-    public String name;
+    public String name; // unique
     public String script_path;
     public String description;
+    // add display name
     public String working_directory;
     public List<String> allowed_users;
     public List<String> output_files;

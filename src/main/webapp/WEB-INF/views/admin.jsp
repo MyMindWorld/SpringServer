@@ -45,7 +45,7 @@
         </c:forEach>
 </table>
 
-<form name='f' class="addUserForm" action=<c:url value='/admin/invite_user'/> method='POST'>
+<form name='f' class="adminForm" action=<c:url value='/admin/invite_user'/> method='POST'>
 
     <table>
         <tr>

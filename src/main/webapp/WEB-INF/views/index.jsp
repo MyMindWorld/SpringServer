@@ -14,6 +14,7 @@
     <link rel="stylesheet" type="text/css" href="<c:url value="/vendor/bootstrap/css/bootstrap.min.css"/>">
     <!--=======================================================================================-->
     <link rel="stylesheet" type="text/css" href="<c:url value="/fonts/font-awesome-4.7.0/css/font-awesome.min.css"/>">
+    <link rel="stylesheet" type="text/css" href="<c:url value="/fonts/font-awesome-5.12.1/css/all.css"/>">
     <!--=======================================================================================-->
     <link rel="stylesheet" type="text/css" href="<c:url value="/fonts/Linearicons-Free-v1.0.0/icon-font.min.css"/>">
     <!--=======================================================================================-->
@@ -44,20 +45,20 @@
                     <div data-v-3f2cf002="" class="search-panel-root">
                         <div data-v-3f2cf002="" class="search-panel collapsed"><label>
                             <input data-v-3f2cf002=""
-                                                                                          autocomplete="off"
-                                                                                          name="searchField"
-                                                                                          placeholder="Search script"
-                                                                                          type="search" class="search-field"
-                                                                                          disabled="disabled">
-                        </label></div>
-                        <input data-v-3f2cf002="" alt="Search script"
-                               src="<c:url value="/images/icons/search.png"/>"
-                               type="image" class="search-button" width="45" height="45"></div>
+                                   autocomplete="off"
+                                   name="searchField"
+                                   placeholder="Search script"
+                                   type="search" class="search-field"
+                                   disabled="disabled">
+                        </label>
+                        </div>
+                        <i class="fas fa-search fa-2x "></i>
+                    </div>
                     <div class="header-link">
                         <sec:authorize access="hasRole('ROLE_ADMIN')">
                             <a href="<c:url value="/admin"/>">
-                                <img src="<c:url value="/images/icons/admin.png"/>" width="45" height="45"
-                                     alt="ADMIN_LINK"> </a>
+                                <i class="fas fa-user-shield fa-2x"></i>
+                            </a>
 
                         </sec:authorize>
 

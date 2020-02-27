@@ -49,14 +49,9 @@ public class MainPageController {
 
     @RequestMapping(value = "/index/{scriptId}", method = RequestMethod.GET)
     public ModelAndView showScriptContent(HttpServletRequest request, @PathVariable String scriptId) {
-        logger.warn("HERE!)))");
-        logger.warn(scriptId);
         Script script = scriptRepository.getOne(Long.valueOf(scriptId));
+        logger.warn("User '" + getUsername() + "' requested script with id : " + scriptId + ", and name : " + script.getName());
         Parameters[] parameters = utils.stringToListOfParams(script.getParametersJson());
-        for (Parameters parametersex : parameters){
-
-            logger.warn(parametersex.name);
-        }
         ModelAndView modelAndView = showMenu();
 
 

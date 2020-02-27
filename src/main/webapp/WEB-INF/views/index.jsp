@@ -97,7 +97,7 @@
         <div data-v-0012d28c="" class="app-content">
             <c:choose>
                 <c:when test="${script!=null}"> <%-- Проверка выбран ли какой-нибудь скрипт --%>
-                    ${script.name}
+                    <h4>${script.name}</h4>
                     <br/>
                     <table class="content-table">
                         <thead>
@@ -107,16 +107,16 @@
                             <th>Description</th>
                         </tr>
                         </thead>
-                        <c:forEach items="${parameters}" var="param">
+                        <c:forEach items="${parameters}" var="parameter">
                         <tr>
                             <td>
-                                <c:out value="${param.name}"/>
+                                <c:out value="${parameter.name}"/>
                             </td>
                             <td>
-                                <c:out value="${param.type}"/>
+                                <c:out value="${parameter.type}"/>
                             </td>
                             <td>
-                                <c:out value="${param.description}"/>
+                                <c:out value="${parameter.description}"/>
                             </td>
                             </c:forEach>
                     </table>

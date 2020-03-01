@@ -55,6 +55,10 @@ public class ScriptsHandler {
             } catch (IOException e) {
                 logger.error("Mapping json to object failed!", e);
             }
+            if (scriptRepository.findByNameEquals(script.getName()) != null) {
+                logger.error("Script with name '" +script.getName() + "' already exists! It won't be saved.");
+                continue;
+            }
             scriptRepository.save(script);
 
         }

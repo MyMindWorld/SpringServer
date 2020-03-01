@@ -1,5 +1,6 @@
 {
-  "name": "Тест Параметров",
+  "name": "0 ParameterTest",
+  "display_name": "Тест Параметров",
   "script_path": "scripts/parameterized.sh",
   "working_directory": "./samples",
   "description": "This script does nothing except accepting a lot of parameters and printing them",

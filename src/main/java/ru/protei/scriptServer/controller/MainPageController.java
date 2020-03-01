@@ -47,10 +47,10 @@ public class MainPageController {
     }
 
 
-    @RequestMapping(value = "/index/{scriptId}", method = RequestMethod.GET)
-    public ModelAndView showScriptContent(HttpServletRequest request, @PathVariable String scriptId) {
-        Script script = scriptRepository.getOne(Long.valueOf(scriptId));
-        logger.warn("User '" + getUsername() + "' requested script with id : " + scriptId + ", and name : " + script.getName());
+    @RequestMapping(value = "/index/{scriptName}", method = RequestMethod.GET)
+    public ModelAndView showScriptContent(HttpServletRequest request, @PathVariable String scriptName) {
+        Script script = scriptRepository.findByNameEquals(scriptName);
+        logger.warn("User '" + getUsername() + "' requested script '" + scriptName + "', and displayName : " + script.getDisplay_name());
         Parameters[] parameters = utils.stringToListOfParams(script.getParametersJson());
         ModelAndView modelAndView = showMenu();
 

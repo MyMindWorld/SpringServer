@@ -70,9 +70,9 @@
                 <div data-v-40a770e8="" class="scripts-list collection">
                     <c:forEach items="${list}" var="item">
                         <a data-v-40a770e8=""
-                           href="<c:url value="/index/${item.id}"/>"
+                           href="<c:url value="/index/${item.name}"/>"
                            class="collection-item waves-effect waves-teal">
-                                ${item.name}
+                                ${item.display_name}
 
                             <div data-v-40a770e8="" class="menu-item-state idle"><i data-v-40a770e8=""
                                                                                     class="material-icons check-icon">check</i>
@@ -98,7 +98,7 @@
         <div data-v-0012d28c="" class="app-content">
             <c:choose>
                 <c:when test="${script!=null}"> <%-- Проверка выбран ли какой-нибудь скрипт --%>
-                    <h4>${script.name}</h4>
+                    <h4>${script.display_name}</h4>
                     <br/>
                     <table class="content-table">
                         <thead>

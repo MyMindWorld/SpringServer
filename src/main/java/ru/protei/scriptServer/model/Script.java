@@ -2,6 +2,7 @@ package ru.protei.scriptServer.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -13,11 +14,14 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class Script {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.AUTO)
+//    private Long id;
     @NotBlank
+    @Id
     private String name;
+    @NotBlank
+    private String display_name;
     @NotBlank
     @Column(columnDefinition = "LONGTEXT")
     private String parametersJson;
@@ -28,6 +32,6 @@ public class Script {
     }
 
     public String toString() {
-        return "Id : '" + id + "' Name : '" + name + "'";
+        return "display_name : '" + display_name + "' Name : '" + name + "'";
     }
 }

@@ -13,6 +13,7 @@ import java.util.List;
 public class JsonScript {
 
     public String name; // unique
+    public String display_name;
     public String script_path;
     public String description;
     // add display name

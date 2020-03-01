@@ -19,6 +19,7 @@ public class Script {
 //    private Long id;
     @NotBlank
     @Id
+    //@Column(nullable = false, unique = true) // ????
     private String name;
     @NotBlank
     private String display_name;

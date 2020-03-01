@@ -3,11 +3,10 @@ package ru.protei.scriptServer.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import javax.naming.ldap.LdapName;
 import javax.persistence.*;
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import java.sql.Date;
+import java.util.Collection;
 
 @Entity
 @Table(name = "Users")
@@ -18,11 +17,25 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @NotBlank
-    private String Username;
+    private String username;
     @NotBlank
     private String ldapName; // replace with LdapName?
     @NotBlank
     private String email;
+    @NotBlank
+    private String password;
+    private boolean enabled = true;
+    private Date lastLogin;
+
+    @ManyToMany
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(
+                    name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(
+                    name = "role_id", referencedColumnName = "id"))
+    private Collection<Role> roles;
+
 
     public User() {
         super();
@@ -32,7 +45,7 @@ public class User {
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", Username='" + Username + '\'' +
+                ", Username='" + username + '\'' +
                 ", ldapName='" + ldapName + '\'' +
                 ", email='" + email + '\'' +
                 '}';

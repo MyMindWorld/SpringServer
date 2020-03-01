@@ -55,7 +55,7 @@
                         <i class="fas fa-search fa-2x "></i>
                     </div>
                     <div class="header-link">
-                        <sec:authorize access="hasRole('ROLE_ADMIN')">
+                        <sec:authorize access="hasAuthority('ADMIN_PAGE_USAGE')">
                             <a href="<c:url value="/admin"/>">
                                 <i class="fas fa-user-shield fa-2x"></i>
                             </a>

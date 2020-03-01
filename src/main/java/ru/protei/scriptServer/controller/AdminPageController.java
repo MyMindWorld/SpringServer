@@ -3,11 +3,11 @@ package ru.protei.scriptServer.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
-import ru.protei.scriptServer.model.Script;
 import ru.protei.scriptServer.model.User;
 import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.repository.UserRepository;
@@ -19,7 +19,7 @@ import static ru.protei.scriptServer.utils.Utils.getUsername;
 
 @Controller
 public class AdminPageController {
-    Logger logger = LoggerFactory.getLogger(ru.protei.scriptServer.controller.MainPageController.class);
+    Logger logger = LoggerFactory.getLogger(AdminPageController.class);
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -28,6 +28,11 @@ public class AdminPageController {
     Utils utils;
     @Autowired
     ScriptsHandler scriptsHandler;
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    // todo Метод, который меняет все роли использующие это название скрипта на новые - для миграции названия
+
 
     @RequestMapping("/admin")
     public ModelAndView adminPage() {
@@ -45,10 +50,13 @@ public class AdminPageController {
 
         user.setEmail(user.getLdapName() + "@protei.ru");
         user.setUsername(user.getLdapName());
-
-        logger.debug("Received add user request from : '" + getUsername() + "' adding " + user.toString());
-        userRepository.save(user);
+        String newPassword = utils.generateSecurePassword();
+        user.setPassword(passwordEncoder.encode(newPassword));
         // send invite link
+
+        logger.info("Received add user request from : '" + getUsername() + "' adding " + user.toString());
+        logger.info("password is set to :" + newPassword); // obv needs to be deleted
+        userRepository.save(user); // prop register method
 
 
         return "redirect:/admin";

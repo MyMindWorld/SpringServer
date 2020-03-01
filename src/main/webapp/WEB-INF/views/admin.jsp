@@ -40,7 +40,9 @@
             <c:out value="${user.email}"/>
         </td>
         <td>
-            <c:out value="RoleWOULDbeHere"/>
+            <c:forEach items="${user.roles}" var="role">
+                ${role.name}
+            </c:forEach>
         </td>
         </c:forEach>
 </table>

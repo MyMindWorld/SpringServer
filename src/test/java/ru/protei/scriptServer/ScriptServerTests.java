@@ -11,8 +11,6 @@ import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
 import ru.protei.scriptServer.model.User;
 
-import javax.naming.ldap.LdapName;
-
 @SpringBootTest(classes = ScriptServer.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ScriptServerTests {
 

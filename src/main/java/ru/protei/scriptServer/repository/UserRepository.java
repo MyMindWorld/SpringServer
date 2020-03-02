@@ -6,6 +6,5 @@ import ru.protei.scriptServer.model.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-
     User findByUsernameEquals(String username);
 }

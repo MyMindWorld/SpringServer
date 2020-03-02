@@ -18,7 +18,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Component
-public class testLoginDataLoader implements
+public class TestLoginDataLoader implements
         ApplicationListener<ContextRefreshedEvent> {
 
     // Находится в отдельном классе тк под вопросом. Нужно ли по умолчанию иметь пользователя или захардкодить на Ldap?

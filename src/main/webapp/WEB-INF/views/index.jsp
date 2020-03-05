@@ -40,31 +40,47 @@
                     <h5 class="header server-header" title="v1.15.0-HEAD@ed2009f">
                         Hello <sec:authentication property="name"/>! </h5>
                     <h6> You have roles : <sec:authentication property="authorities"/></h6>
+                    <table>
+                        <thead>
+                        <tr>
+                            <td>
+                                <div data-v-3f2cf002="" class="search-panel-root">
+                                    <div data-v-3f2cf002="" class="search-panel collapsed"><label>
+                                        <input data-v-3f2cf002=""
+                                               autocomplete="off"
+                                               name="searchField"
+                                               placeholder="Search script"
+                                               type="search" class="search-field"
+                                               disabled="disabled">
+                                    </label>
+                                    </div>
+                                    <i class="fas fa-search fa-2x "></i>
+                                </div>
 
 
-                    <div data-v-3f2cf002="" class="search-panel-root">
-                        <div data-v-3f2cf002="" class="search-panel collapsed"><label>
-                            <input data-v-3f2cf002=""
-                                   autocomplete="off"
-                                   name="searchField"
-                                   placeholder="Search script"
-                                   type="search" class="search-field"
-                                   disabled="disabled">
-                        </label>
-                        </div>
-                        <i class="fas fa-search fa-2x "></i>
-                    </div>
-                    <div class="header-link">
-                        <sec:authorize access="hasAuthority('ADMIN_PAGE_USAGE')">
-                            <a href="<c:url value="/admin"/>">
-                                <i class="fas fa-user-shield fa-2x"></i>
-                            </a>
+                            </td>
+                            <td>
+                                <div class="header-link">
+                                    <sec:authorize access="hasAuthority('ADMIN_PAGE_USAGE')">
+                                        <a href="<c:url value="/admin"/>">
+                                            <i class="fas fa-user-shield fa-2x"></i>
+                                        </a>
 
-                        </sec:authorize>
+                                    </sec:authorize>
 
 
-                    </div>
-                    <a href="<c:url value="/perform_logout"/>" class="e">Logout</a>
+                                </div>
+
+                            </td>
+                            <td>
+                                <a href="<c:url value="/perform_logout"/>" class="e">Logout</a>
+                            </td>
+                        </tr>
+                        </thead>
+
+                    </table>
+
+
                 </div>
                 <%--                Таблица слева с номерами скриптов --%>
                 <div data-v-40a770e8="" class="scripts-list collection">

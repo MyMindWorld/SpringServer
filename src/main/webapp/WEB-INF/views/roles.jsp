@@ -36,12 +36,12 @@
         </td>
         <td>
             <c:forEach items="${role.privileges}" var="role_privelege">
-                [ ${role_privelege.name} ]
+                [ <c:out value="${role_privelege.name}"/> ]
             </c:forEach>
         </td>
         <td>
             <c:forEach items="${role.users}" var="role_user">
-                [ ${role_user.username} ]
+                [ <c:out value="${role_user.username}"/> ]
             </c:forEach>
         </td>
         </c:forEach>
@@ -58,7 +58,7 @@
         <%--        <select name="category">--%>
         <%--            <option value="${privilege.name}">${privilege.name}</option>--%>
         <input type="checkbox" name="privileges" id="${privilege.id}" value="${privilege.id}"/>
-        <label for="${privilege.id}">${privilege.name}</label>
+        <label for="${privilege.id}"><c:out value="${privilege.name}"/></label>
         <br/><br/>
         <%--        </select>--%>
     </c:forEach>

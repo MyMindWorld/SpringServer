@@ -1,5 +1,7 @@
 package ru.protei.scriptServer.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -8,31 +10,35 @@ import org.springframework.stereotype.Component;
 import ru.protei.scriptServer.model.Privilege;
 import ru.protei.scriptServer.model.Role;
 import ru.protei.scriptServer.model.User;
-import ru.protei.scriptServer.repository.PrivilegeRepository;
 import ru.protei.scriptServer.repository.RoleRepository;
-import ru.protei.scriptServer.repository.UserRepository;
+import ru.protei.scriptServer.service.PrivilegeService;
+import ru.protei.scriptServer.service.RoleService;
+import ru.protei.scriptServer.service.UserService;
 
 import javax.transaction.Transactional;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 @Component
 public class TestLoginDataLoader implements
         ApplicationListener<ContextRefreshedEvent> {
+    Logger logger = LoggerFactory.getLogger(TestLoginDataLoader.class);
 
     // Находится в отдельном классе тк под вопросом. Нужно ли по умолчанию иметь пользователя или захардкодить на Ldap?
 
     boolean alreadySetup = false;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Autowired
-    private RoleRepository roleRepository;
+    private RoleService roleService;
 
     @Autowired
-    private PrivilegeRepository privilegeRepository;
+    public RoleRepository roleRepository;
+
+    @Autowired
+    private PrivilegeService privilegeService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -41,17 +47,19 @@ public class TestLoginDataLoader implements
     @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
 
+        userService.deleteAll();
+
         if (alreadySetup)
             return;
         Privilege scripts_view
-                = createPrivilegeIfNotFound("SCRIPTS_VIEW");
+                = privilegeService.createPrivilegeIfNotFound("SCRIPTS_VIEW");
         Privilege admin_page_usage
-                = createPrivilegeIfNotFound("ADMIN_PAGE_USAGE");
+                = privilegeService.createPrivilegeIfNotFound("ADMIN_PAGE_USAGE");
 
         List<Privilege> adminPrivileges = Arrays.asList(
                 scripts_view, admin_page_usage);
-        createRoleIfNotFound("ROLE_ADMIN", adminPrivileges);
-        createRoleIfNotFound("ROLE_USER", Arrays.asList(scripts_view));
+        roleService.createRoleIfNotFound("ROLE_ADMIN", adminPrivileges);
+        roleService.createRoleIfNotFound("ROLE_USER", Arrays.asList(scripts_view));
 
         Role adminRole = roleRepository.findByNameEquals("ROLE_ADMIN");
         Role userRole = roleRepository.findByNameEquals("ROLE_USER");
@@ -73,43 +81,11 @@ public class TestLoginDataLoader implements
         user.setEnabled(true);
 
 
-        createUserIfNotFound(admin);
-        createUserIfNotFound(user);
+        userService.createUserIfNotFound(admin);
+        userService.createUserIfNotFound(user);
 
         alreadySetup = true;
     }
 
-    @Transactional
-    Privilege createPrivilegeIfNotFound(String name) {
 
-        Privilege privilege = privilegeRepository.findByNameEquals(name);
-        if (privilege == null) {
-            privilege = new Privilege(name);
-            privilegeRepository.save(privilege);
-        }
-        return privilege;
-    }
-
-    @Transactional
-    Role createRoleIfNotFound(
-            String name, Collection<Privilege> privileges) {
-
-        Role role = roleRepository.findByNameEquals(name);
-        if (role == null) {
-            role = new Role(name);
-            role.setPrivileges(privileges);
-            roleRepository.save(role);
-        }
-        return role;
-    }
-
-    @Transactional
-    void createUserIfNotFound(
-            User user) {
-
-        User userFromRepo = userRepository.findByUsernameEquals(user.getUsername());
-        if (userFromRepo == null) {
-            userRepository.save(user);
-        }
-    }
 }

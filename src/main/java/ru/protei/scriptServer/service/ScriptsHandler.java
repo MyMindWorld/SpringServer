@@ -1,28 +1,27 @@
-package ru.protei.scriptServer.controller;
+package ru.protei.scriptServer.service;
 
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 import ru.protei.scriptServer.model.JsonScript;
-import ru.protei.scriptServer.model.Parameters;
 import ru.protei.scriptServer.model.Script;
-//import ru.protei.scriptServer.repository.JsonScriptRepository;
 import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.utils.Utils;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
-@Controller
+//import ru.protei.scriptServer.repository.JsonScriptRepository;
+
+@Service
 public class ScriptsHandler {
     Logger logger = LoggerFactory.getLogger(ScriptsHandler.class);
     @Autowired
     ScriptRepository scriptRepository;
+    @Autowired
+    private PrivilegeService privilegeService;
     @Autowired
     Utils utils;
 
@@ -56,10 +55,12 @@ public class ScriptsHandler {
                 logger.error("Mapping json to object failed!", e);
             }
             if (scriptRepository.findByNameEquals(script.getName()) != null) {
-                logger.error("Script with name '" +script.getName() + "' already exists! It won't be saved.");
+                logger.error("Script with name '" + script.getName() + "' already exists! It won't be saved.");
                 continue;
             }
             scriptRepository.save(script);
+            privilegeService.createPrivilegeIfNotFound(script.getName());
+
 
         }
 
@@ -67,4 +68,6 @@ public class ScriptsHandler {
 
 
     }
+
+
 }

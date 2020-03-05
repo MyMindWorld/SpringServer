@@ -7,4 +7,5 @@ import ru.protei.scriptServer.model.Privilege;
 @Repository
 public interface PrivilegeRepository extends JpaRepository<Privilege, Long> {
     Privilege findByNameEquals(String name);
+    Privilege findByIdEquals(Long id);
 }

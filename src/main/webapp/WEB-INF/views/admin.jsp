@@ -18,6 +18,7 @@
 </div>
 
 <a href="<c:url value="/admin/update_scripts"/>" class="e">Update Scripts</a>
+<a href="<c:url value="/admin/roles"/>" class="e">Create Role</a>
 
 <table class="content-table">
     <thead>
@@ -40,25 +41,29 @@
             <c:out value="${user.email}"/>
         </td>
         <td>
-            <c:forEach items="${user.roles}" var="role">
-                ${role.name}
+            <c:forEach items="${user.roles}" var="user_role">
+               [ ${user_role.name} ]
             </c:forEach>
         </td>
         </c:forEach>
 </table>
 
-<form name='f' class="adminForm" action=<c:url value='/admin/invite_user'/> method='POST'>
+<form name='f' class="form__group field" action=<c:url value='/admin/invite_user'/> method='POST'>
 
-    <table>
-        <tr>
-            <td>Ldap:</td>
-            <td><input type='text' name='ldapName'/></td>
-        </tr>
-        <%--        TODO ROLES LIST HERE--%>
-        <tr>
-            <td><input name="submit" type="submit" value="Add user"/></td>
-        </tr>
-    </table>
+    <input type="text" class="form__field" placeholder="Name" name="username" id='name' required/>
+    <label for="name" class="form__label">Username</label>
+
+    <c:forEach items="${roles}" var="role">
+        <%--        <select name="category">--%>
+        <%--            <option value="${privilege.name}">${privilege.name}</option>--%>
+        <input type="checkbox" name="roleVar" id="${role.id}" value="${role.id}"/>
+        <label for="${role.id}">${role.name}</label>
+        <br/><br/>
+        <%--        </select>--%>
+    </c:forEach>
+
+    <input name="submit" type="submit" value="Add user \ update roles"/>
+
 
 </form>
 

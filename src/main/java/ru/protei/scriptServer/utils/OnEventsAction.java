@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Controller;
-import ru.protei.scriptServer.controller.ScriptsHandler;
+import ru.protei.scriptServer.service.ScriptsHandler;
 
 @Controller
 public class OnEventsAction {

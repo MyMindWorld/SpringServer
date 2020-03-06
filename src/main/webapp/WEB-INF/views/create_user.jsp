@@ -23,7 +23,7 @@
         <c:out value="${successMessage}"/>
     </div>
 </c:if>
-<h1>Roles</h1>
+<h1>Creating User</h1>
 <div class="header-link">
     <a href="<c:url value="/admin"/>"> <img src="<c:url value="/images/icons/back.png"/>" width="50" height="58"
                                             alt="ADMIN_LINK"></a>
@@ -36,7 +36,7 @@
 <form name='f' onsubmit="return validateAddUserForm()" class="form__group field" action=<c:url value='/admin/invite_user'/> method='POST' >
 
 
-    <input type="text" class="form__field" placeholder="Name" name="username" id='name' required/>
+    <input type="text" class="form__field" placeholder="Name" name="username" id='name' required maxlength="20"/>
     <label for="name" class="form__label">Username</label>
 
     <c:forEach items="${roles}" var="role">

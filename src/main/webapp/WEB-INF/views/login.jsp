@@ -27,13 +27,14 @@
     <link rel="stylesheet" type="text/css" href="<c:url value="/css/main.css"/>">
     <!--===============================================================================================-->
 </head>
-<body>
 <c:if test="${error}">
-    <div class="alertLogin">
+    <div class="alertError">
         <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
         Login or password is incorrect!
     </div>
 </c:if>
+<body>
+
 
 <div class="limiter">
 

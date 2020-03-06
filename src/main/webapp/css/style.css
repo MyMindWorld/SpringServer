@@ -43,7 +43,7 @@ color: #ff3300;
 }
 
 .d {
-  background-color: #FA8072;
+  background-color: #56c9c1;
   /* Цвет фона кнопки */
   border: 1px solid #f7fcf9;
   /* Рамка */
@@ -56,7 +56,7 @@ color: #ff3300;
   /* Цвет текста */
 }
 .e {
-  background-color: #d4b8d6;
+  background-color: #1ECBE1;
   /* Цвет фона кнопки */
   border: 1px solid #f7fcf9;
   /* Рамка */
@@ -66,6 +66,19 @@ color: #ff3300;
   text-decoration: none;
   /* Убираем подчёркивание */
   color: #f7fcf9;
+  /* Цвет текста */
+}
+.e:hover {
+  background-color: #56c9c1;
+  /* Цвет фона кнопки */
+  border: 1px solid #f7fcf9;
+  /* Рамка */
+  display: inline-block;
+  padding: 15px 25px;
+  /* Поля */
+  text-decoration: none;
+  /* Убираем подчёркивание */
+  color: #1E6AE1;
   /* Цвет текста */
 }
 
@@ -91,7 +104,7 @@ color: #ff3300;
 
 }
 .content-table thead tr {
-  background-color: #009879;
+  background-color: #56c9c1;
   color: #ffffff;
   text-align: left;
   font-weight: bold;
@@ -108,7 +121,6 @@ color: #ff3300;
 .content-table tbody tr:hover{
   background-color:#ece1ed;
 }
-/*// TODO НУЖНО ЛИ РАЗДЕЛЕНИЕ ПО ЧЕТНЫМ?*/
 
 .content-table tbody tr:nth-of-type(even) {
   background-color: #f3f3f3;
@@ -128,10 +140,16 @@ color: #ff3300;
 }
 
 /* The alert message box */
-.alertLogin {
+.alertError {
   padding: 20px;
   background-color: #f44336; /* Red */
-  color: #ff0002;
+  color: #ffffff;
+  margin-bottom: 15px;
+}
+.alertSuccess{
+  padding: 20px;
+  background-color: #4caf50; /* Red */
+  color: #ffffff;
   margin-bottom: 15px;
 }
 
@@ -195,7 +213,7 @@ color: #ff3300;
   padding-bottom: 6px;
   font-weight: 700;
   border-width: 3px;
-  border-image: linear-gradient(to right, #11998e, #38ef7d);
+  border-image: linear-gradient(to right, #37D5D6, #36096D);  /* Градиент называется - Putins Training)) */
   border-image-slice: 1;
 }
 .form__field:focus ~ .form__label {
@@ -204,7 +222,7 @@ color: #ff3300;
   display: block;
   transition: 0.2s;
   font-size: 1rem;
-  color: #11998e;
+  color: #37D5D6;
   font-weight: 700;
 }
 

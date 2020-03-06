@@ -11,6 +11,18 @@
 </head>
 
 <body>
+<c:if test="${error}">
+    <div class="alertError">
+        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+        <c:out value="${errorMessage}"/>
+    </div>
+</c:if>
+<c:if test="${success}">
+    <div class="alertSuccess">
+        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+        <c:out value="${successMessage}"/>
+    </div>
+</c:if>
 <h1>Roles</h1>
 <div class="header-link">
     <a href="<c:url value="/admin"/>"> <img src="<c:url value="/images/icons/back.png"/>" width="50" height="58"
@@ -63,7 +75,7 @@
         <%--        </select>--%>
     </c:forEach>
 
-    <input name="submit" type="submit" class="btn-light" value="Add Role"/>
+    <input name="submit" type="submit" class="e" value="Add Role"/>
 
 </form>
 

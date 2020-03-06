@@ -62,7 +62,9 @@ public class AdminPageController {
     }
 
     @RequestMapping(value = "/admin/invite_user", method = RequestMethod.POST)
-    public String sendInvite(User user,@RequestParam("roleVar") List<Long> rolesRaw) {
+    public ModelAndView sendInvite(User user, @RequestParam("roleVar") List<Long> rolesRaw, Model model) {
+
+        user.setUsername(user.getUsername().trim());
 
         Iterable<Long> iterable = rolesRaw;
 
@@ -71,10 +73,9 @@ public class AdminPageController {
         User userFromRepo = userRepository.findByUsernameEquals(user.getUsername());
 
         if (userFromRepo!=null){
-            logger.info("Received role update from : '" + getUsername() + "' updating user " + user.toString());
-            userFromRepo.setRoles(roles);
-            userRepository.save(userFromRepo);
-            return "redirect:/admin";
+            model.addAttribute("error",true);
+            model.addAttribute("errorMessage","User already exists! If you want to update roles, please refer to Update User Roles page.");
+            return createUser(model);
         }
 
 
@@ -91,12 +92,15 @@ public class AdminPageController {
         logger.info("password is set to :" + newPassword); // obv needs to be deleted
         userRepository.save(user); // prop register method
 
+        model.addAttribute("success",true);
+        model.addAttribute("successMessage","User '" + user.getUsername() + "' is successfully created!");
 
-        return "redirect:/admin";
+
+        return createUser(model);
     }
 
     @RequestMapping(value = "/admin/update_scripts", method = RequestMethod.GET)
-    public String updateScripts(User user) {
+    public String updateScripts() {
         scriptsHandler.updateScriptsInDb();
 
 
@@ -114,7 +118,8 @@ public class AdminPageController {
     }
 
     @RequestMapping(value = "/admin/create_role", method = RequestMethod.POST)
-    public String createRole(@ModelAttribute("name") String roleName, @RequestParam("privileges") List<Long> privileges_raw) {
+    public String createRole(@ModelAttribute("name") String roleName, @RequestParam("privileges") List<Long> privileges_raw, Model model) {
+        roleName = roleName.trim();
 
 
         Iterable<Long> iterable = privileges_raw;
@@ -127,12 +132,65 @@ public class AdminPageController {
         Role createdRole = roleService.createRoleIfNotFound(roleName, privileges);
         if (createdRole != null) {
             logger.info("Role created");
-        } else
+            model.addAttribute("success",true);
+            model.addAttribute("successMessage","Role '" + roleName + "' is successfully created!");
+        } else {
             logger.warn("Role with this name exists!");
-//        // todo redirect with params (error)
+            model.addAttribute("error", true);
+            model.addAttribute("errorMessage", "Role '" + roleName + "' is already exists! Updating roles is not a thing here.");
+        }
 
 
-        return "redirect:/admin/roles";
+        return roles(model);
+    }
+
+    @RequestMapping(value = "/admin/create_user", method = RequestMethod.GET)
+    public ModelAndView createUser(Model model) {
+
+        model.addAttribute("roles", roleRepository.findAll());
+        model.addAttribute("privileges", privilegeRepository.findAll());
+        model.addAttribute("users", userRepository.findAll());
+
+
+        return new ModelAndView("create_user");
+    }
+
+    @RequestMapping(value = "/admin/update_user", method = RequestMethod.GET)
+    public ModelAndView updateUser(Model model) {
+
+        model.addAttribute("roles", roleRepository.findAll());
+        model.addAttribute("privileges", privilegeRepository.findAll());
+        model.addAttribute("users", userRepository.findAll());
+
+
+        return new ModelAndView("update_user");
+    }
+
+    @RequestMapping(value = "/admin/update_user", method = RequestMethod.POST)
+    public ModelAndView updateUserPost(User user, @RequestParam("roleVar") List<Long> rolesRaw,Model model) {
+
+        logger.info("Received role update from : '" + getUsername() + "' updating user " + user.toString());
+
+        Iterable<Long> iterable = rolesRaw;
+
+        List<Role> roles = roleRepository.findAllById(iterable);
+
+        User userFromRepo = userRepository.findByUsernameEquals(user.getUsername());
+
+        if (userFromRepo!=null){
+            logger.info("Received role update from : '" + getUsername() + "' updating user " + user.toString());
+            userFromRepo.setRoles(roles);
+            userRepository.save(userFromRepo);
+            model.addAttribute("success",true);
+            model.addAttribute("successMessage","Updated user roles successfully!");
+            return updateUser(model);
+        }
+
+        model.addAttribute("error",true);
+        model.addAttribute("errorMessage","User with username '" + user.getUsername() + "' not found!!! Please send logs to admin");
+
+
+        return updateUser(model);
     }
 
 

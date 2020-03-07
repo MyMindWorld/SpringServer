@@ -44,4 +44,8 @@ public class LogService {
 
         logRepository.save(logEntity);
     }
+
+    public int logSize() {
+        return logRepository.findAll().size();
+    }
 }

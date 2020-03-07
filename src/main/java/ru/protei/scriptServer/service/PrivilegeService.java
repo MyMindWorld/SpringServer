@@ -8,6 +8,7 @@ import ru.protei.scriptServer.repository.RoleRepository;
 import ru.protei.scriptServer.repository.UserRepository;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 public class PrivilegeService {
@@ -31,5 +32,10 @@ public class PrivilegeService {
             privilegeRepository.save(privilege);
         }
         return privilege;
+    }
+
+    @Transactional
+    public List<Privilege> returnAllPrivileges() {
+        return privilegeRepository.findAll();
     }
 }

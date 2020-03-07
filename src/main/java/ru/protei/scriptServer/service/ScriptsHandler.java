@@ -7,11 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import ru.protei.scriptServer.model.JsonScript;
+import ru.protei.scriptServer.model.Privilege;
+import ru.protei.scriptServer.model.Role;
 import ru.protei.scriptServer.model.Script;
 import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.utils.Utils;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 public class ScriptsHandler {
@@ -20,6 +23,8 @@ public class ScriptsHandler {
     ScriptRepository scriptRepository;
     @Autowired
     private PrivilegeService privilegeService;
+    @Autowired
+    private RoleService roleService;
     @Autowired
     Utils utils;
 
@@ -61,6 +66,13 @@ public class ScriptsHandler {
 
 
         }
+
+
+        List<Privilege> allPrivilege = privilegeService.returnAllPrivileges();
+
+        Role role_all = roleService.createRoleIfNotFound("ROLE_ALL", allPrivilege);
+        if (role_all == null)
+            roleService.updateRole("ROLE_ALL", allPrivilege);
 
         logger.warn(scriptRepository.findAll().toString());
 

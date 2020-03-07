@@ -43,5 +43,20 @@ public class RoleService {
         return null;
     }
 
+    @Transactional
+    public Role updateRole(
+            String name, List<Privilege> privileges) {
+
+        Role role = roleRepository.findByNameEquals(name);
+        if (role == null) {
+            logger.warn("Role '" + name + "' not found!");
+            return null;
+        }
+        role.setPrivileges(privileges);
+        roleRepository.save(role);
+        logger.info("Role '" + name + "' updated");
+        return role;
+    }
+
 
 }

@@ -1,0 +1,28 @@
+{
+  "name": "TestList",
+  "display_name": "Тест листаAAAAAA",
+  "script_path": "./scripts/start_es_server.py",
+  "description": "Тестим лист",
+  "requires_terminal": false,
+  "parameters": [
+    {
+      "name": "Я ЛИИИИИИИИИИИИИИСТ",
+      "param": "--hella_list",
+      "description": "У него есть текст в подсказке",
+      "type": "list",
+      "required": false,
+      "values": [
+        "value 1",
+        "value 2",
+        "value 3",
+        "value 4"
+      ],
+      "file_extensions": [
+        "fi_value 1",
+        "fi_value 2",
+        "fi_value 3",
+        "fi_value 4"
+      ]
+    }
+  ]
+}

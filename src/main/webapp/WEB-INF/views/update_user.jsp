@@ -66,8 +66,7 @@
 </c:if>
 <h1>Update User Roles</h1>
 <div class="header-link">
-    <a href="<c:url value="/admin"/>"> <img src="<c:url value="/images/icons/back.png"/>" width="50" height="58"
-                                            alt="ADMIN_LINK"></a>
+    <a href="<c:url value="/admin"/>" class="e"><i class="far fa-arrow-alt-circle-left"></i> Back </a>
 </div>
 
 <div class="search-box">

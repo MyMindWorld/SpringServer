@@ -3,19 +3,18 @@
 <head>
     <title>Admin</title>
     <%@taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
-        <meta <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>>
+    <meta <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>>
     <jsp:include page="init.jsp"/>
     <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
     <style>
         <%@include file="/css/style.css" %>
     </style>
-    </head>
+</head>
 
 <body>
 <h1>Admin Page</h1>
 <div class="header-link">
-<a href="<c:url value="/index"/>"> <img src="<c:url value="/images/icons/back.png"/>" width="50" height="58"
-                                       alt="ADMIN_LINK"></a>
+    <a href="<c:url value="/index"/>" class="e"><i class="far fa-arrow-alt-circle-left"></i> Home </a>
 </div>
 <sec:authorize access="hasAuthority('SCRIPTS_UPDATE')">
     <a href="<c:url value="/admin/update_scripts"/>" class="e">Update Scripts</a>
@@ -47,7 +46,6 @@
 </div>
 
 
-
 <table class="content-table" id="SearchableTable">
     <thead>
     <tr>
@@ -60,45 +58,45 @@
     </tr>
     </thead>
     <c:forEach items="${log}" var="logEntity">
-    <tr>
-        <td>
-            <c:out value="${logEntity.triggeredBy}"/>
-        </td>
-        <td>
-            <c:out value="${logEntity.date}"/>
-        </td>
-        <td>
-            <c:out value="${logEntity.ip}"/>
-        </td>
-        <td>
-            <c:out value="${logEntity.action}"/>
-        </td>
-        <td>
-            <c:out value="${logEntity.params}"/>
-        </td>
-        <td>
-            <c:out value="${logEntity.errorLog}"/>
-        </td>
-    </tr>
+        <tr>
+            <td>
+                <c:out value="${logEntity.triggeredBy}"/>
+            </td>
+            <td>
+                <c:out value="${logEntity.date}"/>
+            </td>
+            <td>
+                <c:out value="${logEntity.ip}"/>
+            </td>
+            <td>
+                <c:out value="${logEntity.action}"/>
+            </td>
+            <td>
+                <c:out value="${logEntity.params}"/>
+            </td>
+            <td>
+                <c:out value="${logEntity.errorLog}"/>
+            </td>
+        </tr>
 
-        </c:forEach>
+    </c:forEach>
 </table>
 
 <script type="text/javascript">
-        console.log("Sort enabling start");
-        const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
+    console.log("Sort enabling start");
+    const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
 
-        const comparer = (idx, asc) => (a, b) => ((v1, v2) =>
-                v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
-        )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
+    const comparer = (idx, asc) => (a, b) => ((v1, v2) =>
+            v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
+    )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
 
-        document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
-            const table = th.closest('table');
-            Array.from(table.querySelectorAll('tr:nth-child(n+2)'))
-                .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
-                .forEach(tr => table.appendChild(tr) );
-        })));
-        console.log("Sort Enable Done!");
+    document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
+        const table = th.closest('table');
+        Array.from(table.querySelectorAll('tr:nth-child(n+2)'))
+            .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
+            .forEach(tr => table.appendChild(tr));
+    })));
+    console.log("Sort Enable Done!");
 
 </script>
 <script type="text/javascript">

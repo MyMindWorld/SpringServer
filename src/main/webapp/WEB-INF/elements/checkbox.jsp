@@ -1,16 +1,10 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: VelvetPc
-  Date: 01.03.2020
-  Time: 14:29
-  To change this template use File | Settings | File Templates.
---%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<html>
-<head>
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>
+<%@taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%--<jsp:include page="../views/init.jsp"/>--%>
+<%--<style>--%>
+<%--    <%@include file="/css/elements.css" %>--%>
+<%--/*</style>*/--%>
+<form name='f' class="form__group field">
+<input type="checkbox" name="params" id="${param.id}" value="${param.id}"/>
+<label for="${param.id}"><c:out value="${param.name}"/></label>
+</form>

@@ -118,30 +118,56 @@
                 <c:when test="${script!=null}"> <%-- Проверка выбран ли какой-нибудь скрипт --%>
                     <%--                    Показывается только если есть необходимая роль --%>
                     <sec:authorize access="hasAuthority('${script.name}')">
-
                         <h4>${script.display_name}</h4>
                         <br/>
-                        <table class="content-table">
-                            <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Type</th>
-                                <th>Description</th>
-                            </tr>
-                            </thead>
-                            <c:forEach items="${parameters}" var="parameter">
-                            <tr>
-                                <td>
-                                    <c:out value="${parameter.name}"/>
-                                </td>
-                                <td>
-                                    <c:out value="${parameter.type}"/>
-                                </td>
-                                <td>
-                                    <c:out value="${parameter.description}"/>
-                                </td>
-                                </c:forEach>
-                        </table>
+
+                        <%--                        <table class="content-table">--%>
+                        <%--                            <thead>--%>
+                        <%--                            <tr>--%>
+                        <%--                                <th>Name</th>--%>
+                        <%--                                <th>Type</th>--%>
+                        <%--                                <th>Description</th>--%>
+                        <%--                            </tr>--%>
+                        <%--                            </thead>--%>
+                        <%--                            <c:forEach items="${parameters}" var="parameter">--%>
+                        <%--                            <tr>--%>
+                        <%--                                <td>--%>
+                        <%--                                    <c:out value="${parameter.name}"/>--%>
+                        <%--                                </td>--%>
+                        <%--                                <td>--%>
+                        <%--                                    <c:out value="${parameter.type}"/>--%>
+                        <%--                                </td>--%>
+                        <%--                                <td>--%>
+                        <%--                                    <c:out value="${parameter.description}"/>--%>
+                        <%--                                </td>--%>
+                        <%--                            </tr>--%>
+                        <%--                                </c:forEach>--%>
+                        <%--                        </table>--%>
+
+                        <c:forEach items="${parameters}" var="parameter">
+                            <c:choose>
+                                <c:when test="${parameter.type == 'list'}">
+                                        <select id="${parameter.name}" class="custom-select" style="width:200px;">
+                                            <c:forEach items="${parameter.values}" var="listValue">
+                                                <option value="${listValue}">${listValue}</option>
+                                            </c:forEach>
+                                        </select>
+                                </c:when>
+                                <c:when test="${parameter.type == 'text'}">
+                                    <input type="text" class="form__field" placeholder="${parameter.name}"
+                                           name="${parameter.name}" id='${parameter.name}' required maxlength="15"/>
+                                    <label for="${parameter.name}" class="form__label">${parameter.name}</label>
+                                    <br/><br/>
+                                </c:when>
+
+
+                                <c:otherwise>
+                                    UNKNOWN TYPE
+                                    <br/><br/>
+                                </c:otherwise>
+                            </c:choose>
+                        </c:forEach>
+
 
                     </sec:authorize>
                     <%--                   Показывается только если НЕТ необходимой роли --%>
@@ -200,7 +226,7 @@
 <script type="text/javascript">
     function SetMenuVisible() {
         let e = document.getElementById("sidebar");
-        e.style.display='none'
+        e.style.display = 'none'
         console.log("Done2")
 
     }

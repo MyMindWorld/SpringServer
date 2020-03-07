@@ -70,9 +70,9 @@ public class ScriptsHandler {
 
         List<Privilege> allPrivilege = privilegeService.returnAllPrivileges();
 
-        Role role_all = roleService.createRoleIfNotFound("ROLE_ALL", allPrivilege);
+        Role role_all = roleService.createRoleIfNotFound("ROLE_ALL_SCRIPTS", allPrivilege);
         if (role_all == null)
-            roleService.updateRole("ROLE_ALL", allPrivilege);
+            roleService.updateRole("ROLE_ALL_SCRIPTS", allPrivilege);
 
         logger.warn(scriptRepository.findAll().toString());
 

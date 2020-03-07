@@ -5,6 +5,7 @@
     <%@taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
         <meta <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>>
     <jsp:include page="init.jsp"/>
+    <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
     <style>
         <%@include file="/css/style.css" %>
     </style>
@@ -16,11 +17,15 @@
 <a href="<c:url value="/index"/>"> <img src="<c:url value="/images/icons/back.png"/>" width="50" height="58"
                                        alt="ADMIN_LINK"></a>
 </div>
+<sec:authorize access="hasAuthority('SCRIPTS_UPDATE')">
+    <a href="<c:url value="/admin/update_scripts"/>" class="e">Update Scripts</a>
+</sec:authorize>
+<sec:authorize access="hasAuthority('ROLES_SETTING')">
+    <a href="<c:url value="/admin/create_role"/>" class="e">Create Role</a>
+    <a href="<c:url value="/admin/create_user"/>" class="e">Create User</a>
+    <a href="<c:url value="/admin/update_user"/>" class="e">Update User Role</a>
+</sec:authorize>
 
-<a href="<c:url value="/admin/update_scripts"/>" class="e">Update Scripts</a>
-<a href="<c:url value="/admin/roles"/>" class="e">Create Role</a>
-<a href="<c:url value="/admin/create_user"/>" class="e">Create User</a>
-<a href="<c:url value="/admin/update_user"/>" class="e">Update User Role</a>
 
 <div class="search-box">
     <input

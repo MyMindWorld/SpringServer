@@ -23,7 +23,7 @@
         <c:out value="${successMessage}"/>
     </div>
 </c:if>
-<h1>Roles</h1>
+<h1>Create Role</h1>
 <div class="header-link">
     <a href="<c:url value="/admin"/>"> <img src="<c:url value="/images/icons/back.png"/>" width="50" height="58"
                                             alt="ADMIN_LINK"></a>

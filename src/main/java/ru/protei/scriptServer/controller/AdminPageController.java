@@ -3,6 +3,7 @@ package ru.protei.scriptServer.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +23,7 @@ import ru.protei.scriptServer.service.ScriptsHandler;
 import ru.protei.scriptServer.utils.Utils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 import java.util.List;
 
 import static ru.protei.scriptServer.utils.Utils.getUsername;
@@ -111,20 +113,18 @@ public class AdminPageController {
     @RequestMapping(value = "/admin/update_scripts", method = RequestMethod.GET)
     public String updateScripts(HttpServletRequest request) {
         logService.logAction(request.getRemoteUser(),request.getRemoteAddr(),"SCRIPTS UPDATE","");
-        scriptsHandler.updateScriptsInDb();
-
 
         return "redirect:/admin";
     }
 
-    @RequestMapping(value = "/admin/roles", method = RequestMethod.GET)
+    @RequestMapping(value = "/admin/create_role", method = RequestMethod.GET)
     public String roles(Model model) {
 
         model.addAttribute("roles", roleRepository.findAll());
         model.addAttribute("privileges", privilegeRepository.findAll());
 
 
-        return "roles";
+        return "create_role";
     }
 
     @RequestMapping(value = "/admin/create_role", method = RequestMethod.POST)

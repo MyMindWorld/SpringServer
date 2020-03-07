@@ -84,7 +84,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 .logoutUrl("/perform_logout")
-                .deleteCookies("JSESSIONID");
+                .deleteCookies("JSESSIONID")
+                .and()
+                .exceptionHandling()
+                .accessDeniedPage("/ErrorCodes/403");
 //                .logoutSuccessHandler(logoutSuccessHandler());
     }
 

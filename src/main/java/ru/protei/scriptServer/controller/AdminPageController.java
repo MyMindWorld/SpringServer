@@ -92,12 +92,13 @@ public class AdminPageController {
 
         user.setEmail(user.getUsername() + "@protei.ru");
         user.setLdapName(user.getUsername());
-        String newPassword = utils.generateSecurePassword();
+//        String newPassword = utils.generateSecurePassword(); // Do not forget to bring this baby back)
+        String newPassword = user.getUsername();
         user.setPassword(passwordEncoder.encode(newPassword));
         user.setRoles(roles);
         // send invite link
 
-        logger.info("password is set to :" + newPassword); // obv needs to be deleted
+        logger.info("password for " + user.getUsername() + " is set to '" + newPassword + "'"); // obv needs to be deleted
         userRepository.save(user); // prop register method
 
         model.addAttribute("success",true);

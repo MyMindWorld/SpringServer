@@ -38,8 +38,8 @@
             <div data-v-1ead196e="" class="main-app-sidebar" data-v-0012d28c="">
                 <div class="list-header">
                     <h5 class="header server-header" title="v1.15.0-HEAD@ed2009f">
-                        Hello <sec:authentication property="name"/>! </h5>
-                    <h6> You have roles : <sec:authentication property="authorities"/></h6>
+                        Hello, <sec:authentication property="name"/>! </h5>
+<%--                    <h6> You have roles : <sec:authentication property="roles"/></h6>--%>
                     <table>
                         <thead>
                         <tr>

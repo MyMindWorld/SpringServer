@@ -20,9 +20,11 @@ public class LogEntity {
     @NotBlank
     private String ip;
     @NotBlank
+    @Column(columnDefinition = "LONGTEXT")
     private String action;
+    @Column(columnDefinition = "LONGTEXT")
     private String params;
-
+    @Column(columnDefinition = "LONGTEXT")
     private String errorLog;
 
     @Override

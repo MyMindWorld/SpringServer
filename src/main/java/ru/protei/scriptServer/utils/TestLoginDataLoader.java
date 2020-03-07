@@ -11,6 +11,7 @@ import ru.protei.scriptServer.model.Privilege;
 import ru.protei.scriptServer.model.Role;
 import ru.protei.scriptServer.model.User;
 import ru.protei.scriptServer.repository.RoleRepository;
+import ru.protei.scriptServer.service.LogService;
 import ru.protei.scriptServer.service.PrivilegeService;
 import ru.protei.scriptServer.service.RoleService;
 import ru.protei.scriptServer.service.UserService;
@@ -18,6 +19,7 @@ import ru.protei.scriptServer.service.UserService;
 import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 @Component
 public class TestLoginDataLoader implements
@@ -33,6 +35,8 @@ public class TestLoginDataLoader implements
 
     @Autowired
     private RoleService roleService;
+    @Autowired
+    private LogService logService;
 
     @Autowired
     public RoleRepository roleRepository;
@@ -83,6 +87,30 @@ public class TestLoginDataLoader implements
 
         userService.createUserIfNotFound(admin);
         userService.createUserIfNotFound(user);
+
+        for (int count = 0; count<500; count++){
+            int leftLimit = 97; // letter 'a'
+            int rightLimit = 122; // letter 'z'
+            int paramsLength = 500;
+            int errorLength = 500;
+            Random random = new Random();
+            StringBuilder bufferError = new StringBuilder(errorLength);
+            StringBuilder bufferParams = new StringBuilder(errorLength);
+            for (int i = 0; i < errorLength; i++) {
+                int randomLimitedInt = leftLimit + (int)
+                        (random.nextFloat() * (rightLimit - leftLimit + 1));
+                bufferError.append((char) randomLimitedInt);
+            }
+            for (int i = 0; i < paramsLength; i++) {
+                int randomLimitedInt = leftLimit + (int)
+                        (random.nextFloat() * (rightLimit - leftLimit + 1));
+                bufferParams.append((char) randomLimitedInt);
+            }
+            String genError = bufferError.toString();
+            String genParams = bufferParams.toString();
+
+            logService.logAction("Test","127.5.5.5","TestNumber " + count,genParams,genError);
+        }
 
         alreadySetup = true;
     }

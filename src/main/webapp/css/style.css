@@ -113,6 +113,13 @@ color: #ff3300;
 .content-table th,
 .content-table td {
   padding: 12px 15px;
+  max-width:400px;
+  text-overflow:ellipsis;
+  overflow:hidden;
+  white-space:nowrap;
+}
+.content-table th{
+  cursor: pointer;
 }
 
 .content-table tbody tr {
@@ -130,9 +137,9 @@ color: #ff3300;
   background-color: #ece1ed;
 }
 
-.content-table tbody tr:last-of-type {
-  border-bottom: 2px solid #009879;
-}
+/*.content-table tbody tr:last-of-type {*/
+/*  border-bottom: 2px solid #009879;*/
+/*}*/
 
 .content-table tbody tr.active-row {
   font-weight: bold;
@@ -229,4 +236,33 @@ color: #ff3300;
 /* reset input */
 .form__field:required, .form__field:invalid {
   box-shadow: none;
+}
+
+.search-box {
+  width: 50%;
+  margin-bottom: 30px;
+  margin-top: 30px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.search-box .search-bar {
+  display: block;
+  width: 100%;
+  padding: 15px;
+
+  color: #313131;
+  font-size: 20px;
+  appearance: none;
+  border:none;
+  outline: none;
+  background: none;
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.25);
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 0px 16px 0px 16px;
+  transition: 0.4s;
+}
+.search-box .search-bar:focus {
+  box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.25);
+  background-color: rgba(255, 255, 255, 0.75);
+  border-radius: 16px 0px 16px 0px;
 }

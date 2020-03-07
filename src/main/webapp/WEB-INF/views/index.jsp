@@ -32,26 +32,26 @@
 <body>
 
 
-<div data-v-1ead196e="">
-    <div data-v-0012d28c="" data-v-1ead196e="" class="app-layout">
-        <div data-v-0012d28c="" class="app-sidebar collapsed">
-            <div data-v-1ead196e="" class="main-app-sidebar" data-v-0012d28c="">
+<div>
+    <div class="app-layout">
+        <div class="app-sidebar collapsed">
+            <div class="main-app-sidebar">
                 <div class="list-header">
                     <h5 class="header server-header" title="v1.15.0-HEAD@ed2009f">
                         Hello, <sec:authentication property="name"/>! </h5>
-<%--                    <h6> You have roles : <sec:authentication property="roles"/></h6>--%>
+                    <%--                    <h6> You have roles : <sec:authentication property="roles"/></h6>--%>
                     <table>
                         <thead>
                         <tr>
                             <td>
-                                <div data-v-3f2cf002="" class="search-panel-root">
-                                    <div data-v-3f2cf002="" class="search-panel collapsed"><label>
-                                        <input data-v-3f2cf002=""
-                                               autocomplete="off"
-                                               name="searchField"
-                                               placeholder="Search script"
-                                               type="search" class="search-field"
-                                               disabled="disabled">
+                                <div class="search-panel-root">
+                                    <div class="search-panel collapsed"><label>
+                                        <input
+                                                autocomplete="off"
+                                                name="searchField"
+                                                placeholder="Search script"
+                                                type="search" class="search-field"
+                                                disabled="disabled">
                                     </label>
                                     </div>
                                     <i class="fas fa-search fa-2x "></i>
@@ -83,26 +83,26 @@
 
                 </div>
                 <%--                Таблица слева с номерами скриптов --%>
-                <div data-v-40a770e8="" class="scripts-list collection">
+                <div class="scripts-list collection">
                     <c:forEach items="${list}" var="item">
                         <sec:authorize access="hasAuthority('${item.name}')">
-                            <a data-v-40a770e8=""
-                               href="<c:url value="/index/${item.name}"/>"
-                               class="collection-item waves-effect waves-teal">
+                            <a
+                                    href="<c:url value="/index/${item.name}"/>"
+                                    class="collection-item waves-effect waves-teal">
                                     ${item.display_name}
 
-                                <div data-v-40a770e8="" class="menu-item-state idle"><i data-v-40a770e8=""
-                                                                                        class="material-icons check-icon">check</i>
-                                    <div data-v-40a770e8="" class="preloader-wrapper active">
-                                        <div data-v-40a770e8="" class="spinner-layer">
-                                            <div data-v-40a770e8="" class="circle-clipper left">
-                                                <div data-v-40a770e8="" class="circle"></div>
+                                <div class="menu-item-state idle"><i
+                                        class="material-icons check-icon">check</i>
+                                    <div class="preloader-wrapper active">
+                                        <div class="spinner-layer">
+                                            <div class="circle-clipper left">
+                                                <div class="circle"></div>
                                             </div>
-                                            <div data-v-40a770e8="" class="gap-patch">
-                                                <div data-v-40a770e8="" class="circle"></div>
+                                            <div class="gap-patch">
+                                                <div class="circle"></div>
                                             </div>
-                                            <div data-v-40a770e8="" class="circle-clipper right">
-                                                <div data-v-40a770e8="" class="circle"></div>
+                                            <div class="circle-clipper right">
+                                                <div class="circle"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -113,7 +113,7 @@
                 </div> <!----></div>
         </div>
         <%--        Содержимое скрипта --%>
-        <div data-v-0012d28c="" class="app-content">
+        <div class="app-content">
             <c:choose>
                 <c:when test="${script!=null}"> <%-- Проверка выбран ли какой-нибудь скрипт --%>
                     <%--                    Показывается только если есть необходимая роль --%>
@@ -146,15 +146,15 @@
                     </sec:authorize>
                     <%--                   Показывается только если НЕТ необходимой роли --%>
                     <sec:authorize access="!hasAuthority('${script.name}')">
-                        <div data-v-0012d28c="" class="app-content">
-                            <div data-v-0012d28c="" class="content-header emptyHeader"><a data-v-0012d28c=""
-                                                                                          class="btn-flat app-menu-button"><i
-                                    data-v-0012d28c="" class="material-icons">menu</i></a>
-                                <h2 data-v-1ead196e="" data-v-0012d28c="" class="script-header header"
+                        <div class="app-content">
+                            <div class="content-header emptyHeader"><a
+                                    class="btn-flat app-menu-button"><i
+                                    class="material-icons">menu</i></a>
+                                <h2 class="script-header header"
                                     style="display: none;"></h2></div>
-                            <div data-v-0012d28c="" class="content-panel">
-                                <div data-v-694020c9="" data-v-1ead196e="" class="welcome-panel" data-v-0012d28c="">
-                                    <div data-v-694020c9="" class="welcome-text">
+                            <div class="content-panel">
+                                <div class="welcome-panel">
+                                    <div class="welcome-text">
                                         У вас отсутсвуют права на выполнение запрошенного скрипта.
                                         <br>
                                         Обратитесь к руководителю вашей группы.
@@ -168,19 +168,19 @@
 
                 </c:when>
                 <c:otherwise> <%-- Если не выбран, дефолтная страница --%>
-                    <div data-v-0012d28c="" class="app-content">
-                        <div data-v-0012d28c="" class="content-header emptyHeader"><a data-v-0012d28c=""
-                                                                                      class="btn-flat app-menu-button"><i
-                                data-v-0012d28c="" class="material-icons">menu</i></a>
-                            <h2 data-v-1ead196e="" data-v-0012d28c="" class="script-header header"
+                    <div class="app-content">
+                        <div class="content-header emptyHeader"><a
+                                class="btn-flat app-menu-button"><i
+                                class="material-icons">menu</i></a>
+                            <h2 class="script-header header"
                                 style="display: none;"></h2></div>
-                        <div data-v-0012d28c="" class="content-panel">
-                            <div data-v-694020c9="" data-v-1ead196e="" class="welcome-panel" data-v-0012d28c="">
+                        <div class="content-panel">
+                            <div class="welcome-panel">
                                 <img
-                                        data-v-694020c9=""
+
                                         src="<c:url value="/images/cutLogo.png"/>"
                                         alt="script server logo">
-                                <div data-v-694020c9="" class="welcome-text">
+                                <div class="welcome-text">
                                     Доступ к необходимым скриптам можно запросить у руководителя вашей группы<br>
                                     (Cake is a lie!)
 

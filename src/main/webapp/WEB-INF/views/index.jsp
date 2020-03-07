@@ -54,7 +54,8 @@
                                                disabled="disabled">
                                     </label>
                                     </div>
-                                    <i class="fas fa-search fa-2x "></i>
+                                    <i class="fas fa-search fa-2x " style="color: grey"></i>
+<%--                                    <i class="fas fa-search fa-2x " style="color: deepskyblue"></i>--%>
                                 </div>
 
 
@@ -62,7 +63,7 @@
                             <td>
                                 <div class="header-link">
                                     <sec:authorize access="hasAuthority('ADMIN_PAGE_USAGE')">
-                                        <a href="<c:url value="/admin"/>">
+                                        <a href="<c:url value="/admin"/>" style="color: grey">
                                             <i class="fas fa-user-shield fa-2x"></i>
                                         </a>
 
@@ -73,7 +74,7 @@
 
                             </td>
                             <td>
-                                <a href="<c:url value="/perform_logout"/>" class="e">Logout</a>
+                                <a href="<c:url value="/perform_logout"/>" class="e" style="color: grey">Logout</a>
                             </td>
                         </tr>
                         </thead>

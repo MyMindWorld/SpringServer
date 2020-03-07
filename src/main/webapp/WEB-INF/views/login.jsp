@@ -66,6 +66,7 @@
                 </div>
 
                 <div class="container-login100-form-btn p-t-10">
+<%--                    <td>Remember Me: <input type="checkbox" name="remember-me"/></td>--%>
                     <button class="login100-form-btn" type="submit">
 
                         Login

@@ -35,7 +35,7 @@
 <div>
     <div data-v-0012d28c="" class="app-layout">
         <div data-v-0012d28c="" class="app-sidebar collapsed">
-            <div class="main-app-sidebar" data-v-0012d28c="">
+            <div class="main-app-sidebar" data-v-0012d28c="" id="sidebar">
                 <div class="list-header">
                     <h5 class="header server-header" title="v1.15.0-HEAD@ed2009f">
                         Hello, <sec:authentication property="name"/>! </h5>
@@ -169,9 +169,10 @@
                 </c:when>
                 <c:otherwise> <%-- Если не выбран, дефолтная страница --%>
                     <div data-v-0012d28c="" class="app-content">
-                        <div data-v-0012d28c="" class="content-header emptyHeader"><a data-v-0012d28c=""
-                                                                                      class="btn-flat app-menu-button"><i
-                                data-v-0012d28c="" class="material-icons">menu</i></a>
+                        <div data-v-0012d28c="" class="content-header emptyHeader">
+                            <a data-v-0012d28c="" class="btn-flat app-menu-button" onclick="SetMenuVisible()">
+                                <i data-v-0012d28c="" class="material-icons">menu</i>
+                            </a>
                             <h2 data-v-0012d28c="" class="script-header header"
                                 style="display: none;"></h2></div>
                         <div data-v-0012d28c="" class="content-panel">
@@ -195,6 +196,15 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    function SetMenuVisible() {
+        let e = document.getElementById("sidebar");
+        e.style.display='none'
+        console.log("Done2")
+
+    }
+</script>
 
 
 <!--===============================================================================================-->

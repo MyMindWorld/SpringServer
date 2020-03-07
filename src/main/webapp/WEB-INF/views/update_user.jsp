@@ -70,7 +70,48 @@
                                             alt="ADMIN_LINK"></a>
 </div>
 
-<table class="content-table">
+<div class="search-box">
+    <input
+            id="SearchInput"
+            type="text"
+            class="search-bar"
+            placeholder="Search..."
+            onkeyup="Search()"
+    />
+    <label for="tableHeaderSearch">Search by column :</label>
+    <select id="tableHeaderSearch">
+        <option value="0">ID</option>
+        <option value="1">Name</option>
+        <option value="2">Email</option>
+        <option value="3">Roles</option>
+    </select>
+</div>
+
+<script type="text/javascript">
+    function Search() {
+        let input, filter, table, tr, td, i, txtValue;
+        let e = document.getElementById("tableHeaderSearch");
+        let searchBy = e.options[e.selectedIndex].value;
+
+        input = document.getElementById("SearchInput");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("SearchableTable");
+        tr = table.getElementsByTagName("tr");
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[searchBy];
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+</script>
+
+<table class="content-table" id="SearchableTable">
     <thead>
     <tr>
         <th>ID</th>

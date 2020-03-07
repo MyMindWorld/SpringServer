@@ -13,8 +13,6 @@ import ru.protei.scriptServer.utils.Utils;
 
 import java.io.IOException;
 
-//import ru.protei.scriptServer.repository.JsonScriptRepository;
-
 @Service
 public class ScriptsHandler {
     Logger logger = LoggerFactory.getLogger(ScriptsHandler.class);

@@ -24,6 +24,41 @@
 
 <%--TODO logs table--%>
 
+<table class="content-table">
+    <thead>
+    <tr>
+        <th>Triggered By</th>
+        <th>Date</th>
+        <th>Ip</th>
+        <th>Action</th>
+        <th>Params</th>
+        <th>Error Log</th>
+    </tr>
+    </thead>
+    <c:forEach items="${log}" var="logEntity">
+    <tr>
+        <td>
+            <c:out value="${logEntity.triggeredBy}"/>
+        </td>
+        <td>
+            <c:out value="${logEntity.date}"/>
+        </td>
+        <td>
+            <c:out value="${logEntity.ip}"/>
+        </td>
+        <td>
+            <c:out value="${logEntity.action}"/>
+        </td>
+        <td>
+            <c:out value="${logEntity.params}"/>
+        </td>
+        <td>
+            <c:out value="${logEntity.errorLog}"/>
+        </td>
+
+        </c:forEach>
+</table>
+
 
 </body>
 </html>

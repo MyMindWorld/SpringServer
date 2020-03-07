@@ -11,17 +11,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import ru.protei.scriptServer.model.LogEntity;
 import ru.protei.scriptServer.model.Privilege;
 import ru.protei.scriptServer.model.Role;
 import ru.protei.scriptServer.model.User;
-import ru.protei.scriptServer.repository.PrivilegeRepository;
-import ru.protei.scriptServer.repository.RoleRepository;
-import ru.protei.scriptServer.repository.ScriptRepository;
-import ru.protei.scriptServer.repository.UserRepository;
+import ru.protei.scriptServer.repository.*;
+import ru.protei.scriptServer.service.LogService;
 import ru.protei.scriptServer.service.RoleService;
 import ru.protei.scriptServer.service.ScriptsHandler;
 import ru.protei.scriptServer.utils.Utils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 import static ru.protei.scriptServer.utils.Utils.getUsername;
@@ -36,6 +36,8 @@ public class AdminPageController {
     @Autowired
     RoleRepository roleRepository;
     @Autowired
+    LogRepository logRepository;
+    @Autowired
     RoleService roleService;
     @Autowired
     PrivilegeRepository privilegeRepository;
@@ -44,25 +46,30 @@ public class AdminPageController {
     @Autowired
     ScriptsHandler scriptsHandler;
     @Autowired
+    LogService logService;
+    @Autowired
     PasswordEncoder passwordEncoder;
 
     // todo Метод, который меняет все роли использующие это название скрипта на новые - для миграции названия
-
+    // todo Фикс пустого вфбора чекбоксов в модалках (Js валидация)
+    // todo GET-POST-GET в редиректах, чтобы можно было нажать назад?
 
     @RequestMapping("/admin")
     public ModelAndView adminPage() {
         ModelAndView modelAndView = new ModelAndView("admin");
         List<User> userList = userRepository.findAll();
         List<Role> roleList = roleRepository.findAll();
+        List<LogEntity> logEntities = logRepository.findAllByOrderByDateDesc();
 
         modelAndView.addObject("users", userList);
         modelAndView.addObject("roles", roleList);
+        modelAndView.addObject("log", logEntities);
 
         return modelAndView;
     }
 
     @RequestMapping(value = "/admin/invite_user", method = RequestMethod.POST)
-    public ModelAndView sendInvite(User user, @RequestParam("roleVar") List<Long> rolesRaw, Model model) {
+    public ModelAndView sendInvite(User user, @RequestParam("roleVar") List<Long> rolesRaw, Model model,HttpServletRequest request) {
 
         user.setUsername(user.getUsername().trim());
 
@@ -81,6 +88,7 @@ public class AdminPageController {
 
 
         logger.info("Received add user request from : '" + getUsername() + "' adding " + user.toString());
+        logService.logAction(request.getRemoteUser(),request.getRemoteAddr(),"User add",user.toString());
 
         user.setEmail(user.getUsername() + "@protei.ru");
         user.setLdapName(user.getUsername());
@@ -100,7 +108,8 @@ public class AdminPageController {
     }
 
     @RequestMapping(value = "/admin/update_scripts", method = RequestMethod.GET)
-    public String updateScripts() {
+    public String updateScripts(HttpServletRequest request) {
+        logService.logAction(request.getRemoteUser(),request.getRemoteAddr(),"SCRIPTS UPDATE","");
         scriptsHandler.updateScriptsInDb();
 
 
@@ -118,7 +127,7 @@ public class AdminPageController {
     }
 
     @RequestMapping(value = "/admin/create_role", method = RequestMethod.POST)
-    public String createRole(@ModelAttribute("name") String roleName, @RequestParam("privileges") List<Long> privileges_raw, Model model) {
+    public String createRole(@ModelAttribute("name") String roleName, @RequestParam("privileges") List<Long> privileges_raw, Model model,HttpServletRequest request) {
         roleName = roleName.trim();
 
 
@@ -128,6 +137,7 @@ public class AdminPageController {
 
 
         logger.info("Received create role request from : '" + getUsername() + "' adding " + roleName);
+        logService.logAction(request.getRemoteUser(),request.getRemoteAddr(),"Role add",roleName);
 
         Role createdRole = roleService.createRoleIfNotFound(roleName, privileges);
         if (createdRole != null) {
@@ -167,9 +177,11 @@ public class AdminPageController {
     }
 
     @RequestMapping(value = "/admin/update_user", method = RequestMethod.POST)
-    public ModelAndView updateUserPost(User user, @RequestParam("roleVar") List<Long> rolesRaw,Model model) {
+    public ModelAndView updateUserPost(User user, @RequestParam("roleVar") List<Long> rolesRaw,Model model,HttpServletRequest request) {
 
         logger.info("Received role update from : '" + getUsername() + "' updating user " + user.toString());
+        logService.logAction(request.getRemoteUser(),request.getRemoteAddr(),"User role update",user.toString());
+        // todo log update to which roles
 
         Iterable<Long> iterable = rolesRaw;
 
@@ -187,8 +199,8 @@ public class AdminPageController {
         }
 
         model.addAttribute("error",true);
-        model.addAttribute("errorMessage","User with username '" + user.getUsername() + "' not found!!! Please send logs to admin");
-
+        model.addAttribute("errorMessage","User with username '" + user.getUsername() + "' not found!!! Please contact admin");
+        logService.logAction(request.getRemoteUser(),request.getRemoteAddr(),"User add",user.toString(),"USER NOT FOUND!");
 
         return updateUser(model);
     }

@@ -85,28 +85,30 @@
                 <%--                Таблица слева с номерами скриптов --%>
                 <div data-v-40a770e8="" class="scripts-list collection">
                     <c:forEach items="${list}" var="item">
-                        <a data-v-40a770e8=""
-                           href="<c:url value="/index/${item.name}"/>"
-                           class="collection-item waves-effect waves-teal">
-                                ${item.display_name}
+                        <sec:authorize access="hasAuthority('${item.name}')">
+                            <a data-v-40a770e8=""
+                               href="<c:url value="/index/${item.name}"/>"
+                               class="collection-item waves-effect waves-teal">
+                                    ${item.display_name}
 
-                            <div data-v-40a770e8="" class="menu-item-state idle"><i data-v-40a770e8=""
-                                                                                    class="material-icons check-icon">check</i>
-                                <div data-v-40a770e8="" class="preloader-wrapper active">
-                                    <div data-v-40a770e8="" class="spinner-layer">
-                                        <div data-v-40a770e8="" class="circle-clipper left">
-                                            <div data-v-40a770e8="" class="circle"></div>
-                                        </div>
-                                        <div data-v-40a770e8="" class="gap-patch">
-                                            <div data-v-40a770e8="" class="circle"></div>
-                                        </div>
-                                        <div data-v-40a770e8="" class="circle-clipper right">
-                                            <div data-v-40a770e8="" class="circle"></div>
+                                <div data-v-40a770e8="" class="menu-item-state idle"><i data-v-40a770e8=""
+                                                                                        class="material-icons check-icon">check</i>
+                                    <div data-v-40a770e8="" class="preloader-wrapper active">
+                                        <div data-v-40a770e8="" class="spinner-layer">
+                                            <div data-v-40a770e8="" class="circle-clipper left">
+                                                <div data-v-40a770e8="" class="circle"></div>
+                                            </div>
+                                            <div data-v-40a770e8="" class="gap-patch">
+                                                <div data-v-40a770e8="" class="circle"></div>
+                                            </div>
+                                            <div data-v-40a770e8="" class="circle-clipper right">
+                                                <div data-v-40a770e8="" class="circle"></div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </a>
+                            </a>
+                        </sec:authorize>
                     </c:forEach>
                 </div> <!----></div>
         </div>
@@ -114,29 +116,56 @@
         <div data-v-0012d28c="" class="app-content">
             <c:choose>
                 <c:when test="${script!=null}"> <%-- Проверка выбран ли какой-нибудь скрипт --%>
-                    <h4>${script.display_name}</h4>
-                    <br/>
-                    <table class="content-table">
-                        <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Type</th>
-                            <th>Description</th>
-                        </tr>
-                        </thead>
-                        <c:forEach items="${parameters}" var="parameter">
-                        <tr>
-                            <td>
-                                <c:out value="${parameter.name}"/>
-                            </td>
-                            <td>
-                                <c:out value="${parameter.type}"/>
-                            </td>
-                            <td>
-                                <c:out value="${parameter.description}"/>
-                            </td>
-                            </c:forEach>
-                    </table>
+                    <%--                    Показывается только если есть необходимая роль --%>
+                    <sec:authorize access="hasAuthority('${script.name}')">
+
+                        <h4>${script.display_name}</h4>
+                        <br/>
+                        <table class="content-table">
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                            </thead>
+                            <c:forEach items="${parameters}" var="parameter">
+                            <tr>
+                                <td>
+                                    <c:out value="${parameter.name}"/>
+                                </td>
+                                <td>
+                                    <c:out value="${parameter.type}"/>
+                                </td>
+                                <td>
+                                    <c:out value="${parameter.description}"/>
+                                </td>
+                                </c:forEach>
+                        </table>
+
+                    </sec:authorize>
+                    <%--                   Показывается только если НЕТ необходимой роли --%>
+                    <sec:authorize access="!hasAuthority('${script.name}')">
+                        <div data-v-0012d28c="" class="app-content">
+                            <div data-v-0012d28c="" class="content-header emptyHeader"><a data-v-0012d28c=""
+                                                                                          class="btn-flat app-menu-button"><i
+                                    data-v-0012d28c="" class="material-icons">menu</i></a>
+                                <h2 data-v-1ead196e="" data-v-0012d28c="" class="script-header header"
+                                    style="display: none;"></h2></div>
+                            <div data-v-0012d28c="" class="content-panel">
+                                <div data-v-694020c9="" data-v-1ead196e="" class="welcome-panel" data-v-0012d28c="">
+                                    <div data-v-694020c9="" class="welcome-text">
+                                        У вас отсутсвуют права на выполнение запрошенного скрипта.
+                                        <br>
+                                        Обратитесь к руководителю вашей группы.
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </sec:authorize>
+
                 </c:when>
                 <c:otherwise> <%-- Если не выбран, дефолтная страница --%>
                     <div data-v-0012d28c="" class="app-content">
@@ -146,10 +175,11 @@
                             <h2 data-v-1ead196e="" data-v-0012d28c="" class="script-header header"
                                 style="display: none;"></h2></div>
                         <div data-v-0012d28c="" class="content-panel">
-                            <div data-v-694020c9="" data-v-1ead196e="" class="welcome-panel" data-v-0012d28c=""><img
-                                    data-v-694020c9=""
-                                    src="<c:url value="/images/cutLogo.png"/>"
-                                    alt="script server logo">
+                            <div data-v-694020c9="" data-v-1ead196e="" class="welcome-panel" data-v-0012d28c="">
+                                <img
+                                        data-v-694020c9=""
+                                        src="<c:url value="/images/cutLogo.png"/>"
+                                        alt="script server logo">
                                 <div data-v-694020c9="" class="welcome-text">
                                     Доступ к необходимым скриптам можно запросить у руководителя вашей группы<br>
                                     (Cake is a lie!)

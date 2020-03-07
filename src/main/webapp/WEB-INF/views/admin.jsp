@@ -20,7 +20,7 @@
 <a href="<c:url value="/admin/update_scripts"/>" class="e">Update Scripts</a>
 <a href="<c:url value="/admin/roles"/>" class="e">Create Role</a>
 <a href="<c:url value="/admin/create_user"/>" class="e">Create User</a>
-<a href="<c:url value="/admin/update_user"/>" class="e">Update User</a>
+<a href="<c:url value="/admin/update_user"/>" class="e">Update User Role</a>
 
 <div class="search-box">
     <input

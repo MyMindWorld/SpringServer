@@ -6,8 +6,8 @@
     <jsp:include page="init.jsp"/>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" >
-    <meta xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3" >
+    <meta xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+    <meta xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
     <!--===============================================================================================-->
     <link rel="icon" type="image/png" href="<c:url value="/images/icons/favicon.ico"/>"/>
     <!--===============================================================================================-->
@@ -73,7 +73,7 @@
                 </div>
 
                 <div class="text-center w-full p-t-25 p-b-230">
-                    <a href="#" class="txt1">
+                    <a onclick="openModal()">
                         Forgot Username / Password?
                     </a>
                 </div>
@@ -88,6 +88,64 @@
         </div>
     </div>
 </div>
+
+<div id="updateUserModal" class="modal">
+
+    <!-- Modal content -->
+    <div class="modal-content">
+        <span class="close">&times;</span>
+<%--        <h3><i class="fa fa-lock fa-4x"></i></h3>--%>
+        <h2 class="text-center">Forgot Password?</h2>
+        <p>You can reset your password here.</p>
+
+        <form name='forgotPassword' class="form__group field" action=
+        <c:url value='/forgotPassword'/> method='POST'>
+
+            <fieldset>
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-envelope color-blue"></i></span>
+
+                        <input id="emailInput" placeholder="email address" class="form-control" type="email"
+                               oninvalid="setCustomValidity('Please enter a valid email address!')"
+                               onchange="try{setCustomValidity('')}catch(e){}" required="">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input class="btn btn-lg btn-primary btn-block" value="Send My Password" type="submit">
+                </div>
+            </fieldset>
+
+        </form>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    // Get the modal
+    const modal = document.getElementById("updateUserModal");
+
+    // Get the <span> element that closes the modal
+    const span = document.getElementsByClassName("close")[0];
+
+
+    function openModal(e) {
+        modal.style.display = "block";
+
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function () {
+        modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+</script>
 
 
 <!--===============================================================================================-->

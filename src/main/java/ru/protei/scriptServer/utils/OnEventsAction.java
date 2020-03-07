@@ -17,10 +17,13 @@ public class OnEventsAction {
     ScriptsHandler scriptsHandler;
     @Autowired
     LogService logService;
+    @Autowired
+    TestLoginDataLoader testLoginDataLoader;
 
     @EventListener(ApplicationStartedEvent.class)
     public void afterStartup() {
         logger.info("AfterStartup invocation started!");
         scriptsHandler.updateScriptsInDb();
+        testLoginDataLoader.fillTestData();
     }
 }

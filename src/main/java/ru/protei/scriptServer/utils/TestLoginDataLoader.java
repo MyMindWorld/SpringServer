@@ -22,8 +22,7 @@ import java.util.List;
 import java.util.Random;
 
 @Component
-public class TestLoginDataLoader implements
-        ApplicationListener<ContextRefreshedEvent> {
+public class TestLoginDataLoader {
     Logger logger = LoggerFactory.getLogger(TestLoginDataLoader.class);
 
     // Находится в отдельном классе тк под вопросом. Нужно ли по умолчанию иметь пользователя или захардкодить на Ldap?
@@ -47,9 +46,7 @@ public class TestLoginDataLoader implements
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Override
-    @Transactional
-    public void onApplicationEvent(ContextRefreshedEvent event) {
+    public void fillTestData() {
 
         userService.deleteAll();
 
@@ -67,13 +64,14 @@ public class TestLoginDataLoader implements
 
         Role adminRole = roleRepository.findByNameEquals("ROLE_ADMIN");
         Role userRole = roleRepository.findByNameEquals("ROLE_USER");
+        Role roleAll = roleRepository.findByNameEquals("ROLE_ALL");
 
         User admin = new User();
         admin.setUsername("admin");
         admin.setLdapName("admin_admin");
         admin.setPassword(passwordEncoder.encode("admin"));
         admin.setEmail("admin@admin.com");
-        admin.setRoles(Arrays.asList(adminRole, userRole));
+        admin.setRoles(Arrays.asList(adminRole, userRole,roleAll));
         admin.setEnabled(true);
 
         User user = new User();
@@ -88,29 +86,35 @@ public class TestLoginDataLoader implements
         userService.createUserIfNotFound(admin);
         userService.createUserIfNotFound(user);
 
-        for (int count = 0; count<500; count++){
-            int leftLimit = 97; // letter 'a'
-            int rightLimit = 122; // letter 'z'
-            int paramsLength = 500;
-            int errorLength = 500;
-            Random random = new Random();
-            StringBuilder bufferError = new StringBuilder(errorLength);
-            StringBuilder bufferParams = new StringBuilder(errorLength);
-            for (int i = 0; i < errorLength; i++) {
-                int randomLimitedInt = leftLimit + (int)
-                        (random.nextFloat() * (rightLimit - leftLimit + 1));
-                bufferError.append((char) randomLimitedInt);
-            }
-            for (int i = 0; i < paramsLength; i++) {
-                int randomLimitedInt = leftLimit + (int)
-                        (random.nextFloat() * (rightLimit - leftLimit + 1));
-                bufferParams.append((char) randomLimitedInt);
-            }
-            String genError = bufferError.toString();
-            String genParams = bufferParams.toString();
+        Integer logRepSizeForTest = 500;
 
-            logService.logAction("Test","127.5.5.5","TestNumber " + count,genParams,genError);
+        if (logService.logSize() < logRepSizeForTest) {
+            for (int count = 0; count < 500; count++) {
+                int leftLimit = 97; // letter 'a'
+                int rightLimit = 122; // letter 'z'
+                int paramsLength = 500;
+                int errorLength = 500;
+                Random random = new Random();
+                StringBuilder bufferError = new StringBuilder(errorLength);
+                StringBuilder bufferParams = new StringBuilder(errorLength);
+                for (int i = 0; i < errorLength; i++) {
+                    int randomLimitedInt = leftLimit + (int)
+                            (random.nextFloat() * (rightLimit - leftLimit + 1));
+                    bufferError.append((char) randomLimitedInt);
+                }
+                for (int i = 0; i < paramsLength; i++) {
+                    int randomLimitedInt = leftLimit + (int)
+                            (random.nextFloat() * (rightLimit - leftLimit + 1));
+                    bufferParams.append((char) randomLimitedInt);
+                }
+                String genError = bufferError.toString();
+                String genParams = bufferParams.toString();
+
+                logService.logAction("Test", "127.5.5.5", "TestNumber " + count, genParams, genError);
+            }
+
         }
+
 
         alreadySetup = true;
     }

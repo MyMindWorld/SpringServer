@@ -101,6 +101,7 @@ color: #ff3300;
   border-radius: 5px 5px 0 0;
   overflow: visible;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+  width: 100%;
 
 }
 .content-table thead tr {
@@ -113,7 +114,7 @@ color: #ff3300;
 .content-table th,
 .content-table td {
   padding: 12px 15px;
-  max-width:400px;
+  max-width:250px;
   text-overflow:ellipsis;
   overflow:hidden;
   white-space:nowrap;

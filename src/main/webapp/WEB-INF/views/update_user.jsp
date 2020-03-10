@@ -137,8 +137,8 @@
             </c:forEach>
         </td>
         <td>
-            <button id="updateUserButton" class="e" onclick="openModal(${user.id},[
-            <c:forEach items="${user.roles}" var="user_role">${user_role.id},</c:forEach>],'${user.username}');">Update roles</button>
+            <button id="updateUserButton" class="e" onclick="openModal(${user.id},
+                    [<c:forEach items="${user.roles}" var="user_role">${user_role.id},</c:forEach>],'${user.username}');">Update roles</button>
         </td>
         </c:forEach>
 </table>
@@ -188,7 +188,7 @@
         for (const role of roles) {
             document.getElementById(role).checked = true;
         }
-        document.getElementById('ModalWindowUsername').innerHTML = "Updating <b>" + username + "</b> roles";
+        document.getElementById('ModalWindowUsername').innerHTML = "Updating <b>" + username.toString() + "</b> roles";
         document.getElementById('username').value = username;
 
     }

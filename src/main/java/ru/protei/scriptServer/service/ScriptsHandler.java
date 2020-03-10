@@ -50,7 +50,6 @@ public class ScriptsHandler {
             try {
 
                 JsonScript jsonScript = utils.parseJsonToObject(resource.getInputStream());
-                // todo check if script (.py) exists
                 script.setName(jsonScript.name);
                 script.setDisplay_name(jsonScript.display_name);
                 script.setParametersJson(jsonScript.paramsToJsonString());

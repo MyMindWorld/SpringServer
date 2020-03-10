@@ -6,7 +6,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.Collection;
 @Entity
 @Data
 public class LogEntity {
@@ -30,8 +29,7 @@ public class LogEntity {
     @Override
     public String toString() {
         return "LogEntity{" +
-                "id=" + id +
-                ", triggeredBy='" + triggeredBy + '\'' +
+                "triggeredBy='" + triggeredBy + '\'' +
                 ", date=" + date +
                 ", ip='" + ip + '\'' +
                 ", action='" + action + '\'' +

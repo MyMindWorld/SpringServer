@@ -50,9 +50,8 @@ public class AdminPageController {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    // todo Метод, который меняет все роли использующие это название скрипта на новые - для миграции названия
     // todo Фикс пустого вфбора чекбоксов в модалках (Js валидация)
-    // todo GET-POST-GET в редиректах, чтобы можно было нажать назад?
+    // GET-POST-GET в редиректах, чтобы можно было нажать назад
 
     @RequestMapping("/admin")
     public ModelAndView adminPage() {
@@ -137,7 +136,7 @@ public class AdminPageController {
 
 
         logger.info("Received create role request from : '" + getUsername() + "' adding " + roleName);
-        logService.logAction(request.getRemoteUser(),request.getRemoteAddr(),"Role add",roleName);
+        logService.logAction(request.getRemoteUser(),request.getRemoteAddr(),"Role add","Privilege name : '" + roleName + "'" + privileges);
 
         Role createdRole = roleService.createRoleIfNotFound(roleName, privileges);
         if (createdRole != null) {

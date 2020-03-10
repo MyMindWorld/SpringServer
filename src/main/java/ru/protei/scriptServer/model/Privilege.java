@@ -22,4 +22,12 @@ public class Privilege {
     public Privilege(String name) {
         this.setName(name);
     }
+
+    @Override
+    public String toString() {
+        return "Privilege{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

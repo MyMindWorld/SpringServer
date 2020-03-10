@@ -31,7 +31,7 @@
 <form name='f' class="form__group field" action=
 <c:url value='/admin/create_role'/> method='POST' onsubmit="return validateAddRoleForm()">
 
-    <input type="input" class="form__field" placeholder="Name" name="name" id='name' required maxlength="15"/>
+    <input type="input" class="form__field" placeholder="Name" name="name" id='name' required maxlength="20" pattern="^[a-z0-9_-]{3,20}$" title="3-20 characters, underscore or dash"/>
     <label for="name" class="form__label">Role Name</label>
     <br/><br/>
 

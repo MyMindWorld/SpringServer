@@ -136,7 +136,7 @@ public class AdminPageController {
 
 
         logger.info("Received create role request from : '" + getUsername() + "' adding " + roleName);
-        logService.logAction(request.getRemoteUser(),request.getRemoteAddr(),"Role add","Privilege name : '" + roleName + "'" + privileges);
+        logService.logAction(request.getRemoteUser(),request.getRemoteAddr(),"Role add","Role name : '" + roleName + "', Privileges : " + privileges);
 
         Role createdRole = roleService.createRoleIfNotFound(roleName, privileges);
         if (createdRole != null) {

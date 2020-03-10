@@ -37,7 +37,7 @@
 <form name='f' onsubmit="return validateAddUserForm()" class="form__group field" action=<c:url value='/admin/invite_user'/> method='POST' >
 
 
-    <input type="text" class="form__field" placeholder="Name" name="username" id='name' required maxlength="20"/>
+    <input type="text" class="form__field" placeholder="Name" name="username" id='name' required maxlength="20" pattern="^[a-z0-9_-]{3,20}$" title="3-20 characters, underscore or dash"/>
     <label for="name" class="form__label">Username</label>
 
     <c:forEach items="${roles}" var="role">

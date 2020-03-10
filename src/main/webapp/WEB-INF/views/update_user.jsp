@@ -23,6 +23,8 @@
             overflow: auto; /* Enable scroll if needed */
             background-color: rgb(0,0,0); /* Fallback color */
             background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            overflow-x: hidden;
+            overflow-x: auto;
         }
 
         /* Modal Content */
@@ -32,6 +34,10 @@
             padding: 20px;
             border: 1px solid #888;
             width: 80%;
+            height: 80%;
+            overflow: auto;
+            overflow-y: scroll;
+            text-align:justify;
         }
 
         /* The Close Button */

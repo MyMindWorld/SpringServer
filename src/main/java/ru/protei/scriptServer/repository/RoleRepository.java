@@ -11,5 +11,4 @@ import java.util.List;
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long> {
     Role findByNameEquals(String name);
-    List<Role> findAllByPrivilegesContains(List<Privilege> privileges);
 }

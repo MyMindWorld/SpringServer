@@ -30,6 +30,7 @@ public class RoleService {
     @Transactional
     public Role createRoleIfNotFound(
             String name, List<Privilege> privileges) {
+        // TODO Search for role with same privileges!
 
 
         Role role = roleRepository.findByNameEquals(name);
@@ -56,6 +57,35 @@ public class RoleService {
         roleRepository.save(role);
         logger.info("Role '" + name + "' updated");
         return role;
+    }
+
+    @Transactional
+    public Role findRoleByPrivileges(List<Privilege> privileges) {
+        logger.info("Finding roles");
+
+        logger.info("Privileges size : '" + privileges.size() + "'");
+
+        List<Role> resultList = roleRepository.findAll();
+
+        logger.info("Found roles : '" + resultList.size() + "'");
+
+        for (Role contestant : resultList) {
+            if (contestant.getPrivileges().size() == privileges.size() & contestant.getPrivileges().containsAll(privileges)) {
+                logger.info("Contestant found! _ "+ contestant.getName() + " ___ " + contestant.getPrivileges());
+//                List<Privilege> contPriv = (List<Privilege>) contestant.getPrivileges();
+//
+//                logger.info("equality : " + contPriv.equals(privileges));
+//                logger.info("contains : " + contPriv.contains(privileges));
+//                logger.info("contains All: " + contPriv.containsAll(privileges));
+                return contestant;
+            }
+            else {
+                logger.info("Fail ! " + contestant.getPrivileges().size() + " __ " + contestant.getName());
+            }
+
+        }
+        logger.info("Returning null");
+        return null;
     }
 
 

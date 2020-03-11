@@ -68,7 +68,7 @@ public class AdminPageController {
     }
 
     @RequestMapping(value = "/admin/invite_user", method = RequestMethod.POST)
-    public ModelAndView sendInvite(User user, @RequestParam("roleVar") List<Long> rolesRaw, Model model,HttpServletRequest request) {
+    public ModelAndView sendInvite(User user, @RequestParam("roleVar") List<Long> rolesRaw, Model model, HttpServletRequest request) {
 
         user.setUsername(user.getUsername().trim());
 
@@ -78,16 +78,15 @@ public class AdminPageController {
 
         User userFromRepo = userRepository.findByUsernameEquals(user.getUsername());
 
-        if (userFromRepo!=null){
-            model.addAttribute("error",true);
-            model.addAttribute("errorMessage","User already exists! If you want to update roles, please refer to Update User Roles page.");
+        if (userFromRepo != null) {
+            model.addAttribute("error", true);
+            model.addAttribute("errorMessage", "User already exists! If you want to update roles, please refer to Update User Roles page.");
             return createUser(model);
         }
 
 
-
         logger.info("Received add user request from : '" + getUsername() + "' adding " + user.toString());
-        logService.logAction(request.getRemoteUser(),request.getRemoteAddr(),"User add",user.toString());
+        logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "User add", user.toString());
 
         user.setEmail(user.getUsername() + "@protei.ru");
         user.setLdapName(user.getUsername());
@@ -100,8 +99,8 @@ public class AdminPageController {
         logger.info("password for " + user.getUsername() + " is set to '" + newPassword + "'"); // obv needs to be deleted
         userRepository.save(user); // prop register method
 
-        model.addAttribute("success",true);
-        model.addAttribute("successMessage","User '" + user.getUsername() + "' is successfully created!");
+        model.addAttribute("success", true);
+        model.addAttribute("successMessage", "User '" + user.getUsername() + "' is successfully created!");
 
 
         return createUser(model);
@@ -110,7 +109,7 @@ public class AdminPageController {
     @RequestMapping(value = "/admin/update_scripts", method = RequestMethod.GET)
     public String updateScripts(HttpServletRequest request) {
         scriptsHandler.updateScriptsInDb();
-        logService.logAction(request.getRemoteUser(),request.getRemoteAddr(),"SCRIPTS UPDATE","");
+        logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "SCRIPTS UPDATE", "");
 
         return "redirect:/admin";
     }
@@ -126,7 +125,7 @@ public class AdminPageController {
     }
 
     @RequestMapping(value = "/admin/create_role", method = RequestMethod.POST)
-    public String createRole(@ModelAttribute("name") String roleName, @RequestParam("privileges") List<Long> privileges_raw, Model model,HttpServletRequest request) {
+    public String createRole(@ModelAttribute("name") String roleName, @RequestParam("privileges") List<Long> privileges_raw, Model model, HttpServletRequest request) {
         roleName = roleName.trim();
 
 
@@ -136,18 +135,27 @@ public class AdminPageController {
 
 
         logger.info("Received create role request from : '" + getUsername() + "' adding " + roleName);
-        logService.logAction(request.getRemoteUser(),request.getRemoteAddr(),"Role add","Role name : '" + roleName + "', Privileges : " + privileges);
+        logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Role add", "Role name : '" + roleName + "', Privileges : " + privileges);
 
-        Role createdRole = roleService.createRoleIfNotFound(roleName, privileges);
-        if (createdRole != null) {
-            logger.info("Role created");
-            model.addAttribute("success",true);
-            model.addAttribute("successMessage","Role '" + roleName + "' is successfully created!");
-        } else {
-            logger.warn("Role with this name exists!");
+        Role sameRole = roleService.findRoleByPrivileges(privileges);
+        if (sameRole != null) {
+            logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Attempt of creating already existing role ", "Role name : '" + roleName + "', Privileges : " + privileges);
             model.addAttribute("error", true);
-            model.addAttribute("errorMessage", "Role '" + roleName + "' is already exists! Updating roles is not a thing here.");
+            model.addAttribute("errorMessage", "Role with this privileges already exists, it's called '" + sameRole.getName() + "' Try using it for your purposes.");
+        } else {
+            Role createdRole = roleService.createRoleIfNotFound(roleName, privileges);
+            if (createdRole != null) {
+                logger.info("Role created");
+                model.addAttribute("success", true);
+                model.addAttribute("successMessage", "Role '" + roleName + "' is successfully created!");
+            } else {
+                logger.warn("Role with this name exists!");
+                model.addAttribute("error", true);
+                model.addAttribute("errorMessage", "Role '" + roleName + "' is already exists! Updating roles is not a thing here.");
+            }
+
         }
+
 
 
         return roles(model);
@@ -176,10 +184,10 @@ public class AdminPageController {
     }
 
     @RequestMapping(value = "/admin/update_user", method = RequestMethod.POST)
-    public ModelAndView updateUserPost(User user, @RequestParam("roleVar") List<Long> rolesRaw,Model model,HttpServletRequest request) {
+    public ModelAndView updateUserPost(User user, @RequestParam("roleVar") List<Long> rolesRaw, Model model, HttpServletRequest request) {
 
         logger.info("Received role update from : '" + getUsername() + "' updating user " + user.toString());
-        logService.logAction(request.getRemoteUser(),request.getRemoteAddr(),"User role update",user.toString());
+        logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "User role update", user.toString());
         // todo log update to which roles
 
         Iterable<Long> iterable = rolesRaw;
@@ -188,18 +196,18 @@ public class AdminPageController {
 
         User userFromRepo = userRepository.findByUsernameEquals(user.getUsername());
 
-        if (userFromRepo!=null){
+        if (userFromRepo != null) {
             logger.info("Received role update from : '" + getUsername() + "' updating user " + user.toString());
             userFromRepo.setRoles(roles);
             userRepository.save(userFromRepo);
-            model.addAttribute("success",true);
-            model.addAttribute("successMessage","Updated user roles successfully!");
+            model.addAttribute("success", true);
+            model.addAttribute("successMessage", "Updated user roles successfully!");
             return updateUser(model);
         }
 
-        model.addAttribute("error",true);
-        model.addAttribute("errorMessage","User with username '" + user.getUsername() + "' not found!!! Please contact admin");
-        logService.logAction(request.getRemoteUser(),request.getRemoteAddr(),"User add",user.toString(),"USER NOT FOUND!");
+        model.addAttribute("error", true);
+        model.addAttribute("errorMessage", "User with username '" + user.getUsername() + "' not found!!! Please contact admin");
+        logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "User add", user.toString(), "USER NOT FOUND!");
 
         return updateUser(model);
     }

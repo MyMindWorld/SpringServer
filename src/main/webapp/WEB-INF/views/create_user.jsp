@@ -40,11 +40,16 @@
     <input type="text" class="form__field" placeholder="Name" name="username" id='name' required maxlength="20" pattern="^[a-z0-9_-]{3,20}$" title="3-20 characters, underscore or dash"/>
     <label for="name" class="form__label">Username</label>
 
-    <c:forEach items="${roles}" var="role">
-        <input type="checkbox" name="roleVar" id="${role.id}" value="${role.id}"/>
-        <label for="${role.id}"><c:out value="${role.name}"/></label>
-        <br/><br/>
-    </c:forEach>
+    <fieldset class="group">
+        <legend>Select Roles</legend>
+        <ul class="checkbox">
+            <c:forEach items="${roles}" var="role">
+                <li><input type="checkbox" name="roleVar" id="${role.id}" value="${role.id}"/>
+                    <label for="${role.id}"><c:out value="${role.name}"/></label></li>
+            </c:forEach>
+
+        </ul>
+    </fieldset>
 
     <input name="submit" type="submit" class="e" value="Add user"/>
 

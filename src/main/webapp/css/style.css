@@ -184,7 +184,7 @@ color: #ff3300;
   position: relative;
   padding: 15px 0 0;
   margin-top: 10px;
-  width: 50%;
+  width: 100%;
 }
 
 .form__field {
@@ -266,4 +266,47 @@ color: #ff3300;
   box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.25);
   background-color: rgba(255, 255, 255, 0.75);
   border-radius: 16px 0px 16px 0px;
+}
+
+fieldset.group  {
+  padding: 0;
+  margin: 0 0 1.25em;
+  padding: .125em;
+}
+
+fieldset.group legend {
+  margin: 0;
+  padding: 0;
+  font-weight: bold;
+  /*margin-left: 20px;*/
+  font-size: 100%;
+  color: black;
+}
+
+
+ul.checkbox  {
+  margin: 0;
+  padding: 0;
+  margin-left: 20px;
+  list-style: none;
+}
+
+ul.checkbox li input {
+  margin-right: .25em;
+}
+
+ul.checkbox li {
+  border: 1px transparent solid;
+  display:inline-block;
+  width:13em;
+}
+
+ul.checkbox li label {
+  margin-left: ;
+}
+ul.checkbox li:hover,
+ul.checkbox li.focus  {
+  background-color: lightyellow;
+  border: 1px gray solid;
+  width: 13em;
 }

@@ -163,11 +163,22 @@
 
             <input name="username" id='username' type="hidden" value=""/>
 
-            <c:forEach items="${roles}" var="role">
-                <input type="checkbox" name="roleVar" id="${role.id}" value="${role.id}"/>
-                <label for="${role.id}"><c:out value="${role.name}"/></label>
-                <br/><br/>
-            </c:forEach>
+            <fieldset class="group">
+                <legend>Select Roles</legend>
+                <ul class="checkbox">
+                    <c:forEach items="${roles}" var="role">
+                        <li><input type="checkbox" name="roleVar" id="${role.id}" value="${role.id}"/>
+                            <label for="${role.id}"><c:out value="${role.name}"/></label></li>
+                    </c:forEach>
+
+                </ul>
+            </fieldset>
+
+<%--            <c:forEach items="${roles}" var="role">--%>
+<%--                <input type="checkbox" name="roleVar" id="${role.id}" value="${role.id}"/>--%>
+<%--                <label for="${role.id}"><c:out value="${role.name}"/></label>--%>
+<%--                <br/><br/>--%>
+<%--            </c:forEach>--%>
 
             <input name="submit" type="submit" class="e" value="Update Roles"/>
 

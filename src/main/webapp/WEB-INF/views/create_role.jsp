@@ -31,15 +31,23 @@
 <form name='f' class="form__group field" action=
 <c:url value='/admin/create_role'/> method='POST' onsubmit="return validateAddRoleForm()">
 
-    <input type="input" class="form__field" placeholder="Name" name="name" id='name' required maxlength="20" pattern="^[a-z0-9_-]{3,20}$" title="3-20 characters, underscore or dash"/>
+    <input type="input" class="form__field" placeholder="Name" name="name" id='name' required maxlength="20"
+           pattern="^[a-zA-Z0-9_-]{3,20}$" title="ONLY 3-20 characters, underscore or dash"/>
     <label for="name" class="form__label">Role Name</label>
     <br/><br/>
+    <fieldset class="group">
+        <legend>Select Priveleges</legend>
+        <ul class="checkbox">
+            <c:forEach items="${privileges}" var="privilege">
+                <li><input type="checkbox" name="privileges" id="${privilege.id}" value="${privilege.id}"/>
+                    <label for="${privilege.id}"><c:out value="${privilege.name}"/></label></li>
 
-    <c:forEach items="${privileges}" var="privilege">
-        <input type="checkbox" name="privileges" id="${privilege.id}" value="${privilege.id}"/>
-        <label for="${privilege.id}"><c:out value="${privilege.name}"/></label>
-        <br/><br/>
-    </c:forEach>
+                <%--        <input type="checkbox" name="privileges" id="${privilege.id}" value="${privilege.id}"/>--%>
+                <%--        <label for="${privilege.id}"><c:out value="${privilege.name}"/></label>--%>
+            </c:forEach>
+
+        </ul>
+    </fieldset>
 
     <input name="submit" type="submit" class="e" value="Add Role"/>
 
@@ -81,7 +89,7 @@
     function validateAddRoleForm() {
         let roleCheckboxes = document.getElementsByName("privileges");
         for (const roleCheckbox of roleCheckboxes) {
-            if (roleCheckbox.checked == true){
+            if (roleCheckbox.checked == true) {
                 return true
             }
         }

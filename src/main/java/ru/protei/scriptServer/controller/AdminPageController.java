@@ -186,9 +186,8 @@ public class AdminPageController {
     @RequestMapping(value = "/admin/update_user", method = RequestMethod.POST)
     public ModelAndView updateUserPost(User user, @RequestParam("roleVar") List<Long> rolesRaw, Model model, HttpServletRequest request) {
 
-        logger.info("Received role update from : '" + getUsername() + "' updating user " + user.toString());
-        logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "User role update", user.toString());
-        // todo log update to which roles
+        logger.info("Received role update from : '" + getUsername() + "' updating user " + user.getUsername());
+
 
         Iterable<Long> iterable = rolesRaw;
 
@@ -196,12 +195,13 @@ public class AdminPageController {
 
         User userFromRepo = userRepository.findByUsernameEquals(user.getUsername());
 
+        logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "User role update", userFromRepo.toString() + " New roles : " + roles.toString());
+
         if (userFromRepo != null) {
-            logger.info("Received role update from : '" + getUsername() + "' updating user " + user.toString());
             userFromRepo.setRoles(roles);
             userRepository.save(userFromRepo);
             model.addAttribute("success", true);
-            model.addAttribute("successMessage", "Updated user roles successfully!");
+            model.addAttribute("successMessage", "Updated user '"  + userFromRepo.getUsername() +  "' roles successfully!");
             return updateUser(model);
         }
 

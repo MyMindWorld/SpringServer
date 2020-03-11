@@ -17,20 +17,14 @@ import java.util.List;
 public class RoleService {
     Logger logger = LoggerFactory.getLogger(RoleService.class);
 
-    @Autowired
-    private UserRepository userRepository;
 
     @Autowired
     public RoleRepository roleRepository;
-
-    @Autowired
-    private PrivilegeRepository privilegeRepository;
 
 
     @Transactional
     public Role createRoleIfNotFound(
             String name, List<Privilege> privileges) {
-        // TODO Search for role with same privileges!
 
 
         Role role = roleRepository.findByNameEquals(name);
@@ -61,22 +55,15 @@ public class RoleService {
 
     @Transactional
     public Role findRoleByPrivileges(List<Privilege> privileges) {
-        logger.info("Finding roles");
-
-        logger.info("Privileges size : '" + privileges.size() + "'");
-
         List<Role> resultList = roleRepository.findAll();
-
-        logger.info("Found roles : '" + resultList.size() + "'");
 
         for (Role contestant : resultList) {
             if (contestant.getPrivileges().size() == privileges.size() & contestant.getPrivileges().containsAll(privileges)) {
-                logger.info("Role with same privileges  found! '"+ contestant.getName() + "'  " + contestant.getPrivileges());
+                logger.info("Role with same privileges  found! '" + contestant.getName() + "'  " + contestant.getPrivileges());
                 return contestant;
             }
 
         }
-        logger.info("Returning null");
         return null;
     }
 

@@ -147,6 +147,58 @@ color: #ff3300;
   color: #009879;
 }
 
+.content-table-logs {
+  border-collapse: collapse;
+  margin: 25px auto;
+  font-size: 0.9em;
+  min-width: 400px;
+  border-radius: 5px 5px 0 0;
+  overflow: visible;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+  width: 100%;
+
+}
+.content-table-logs thead tr {
+  background-color: #56c9c1;
+  color: #ffffff;
+  text-align: left;
+  font-weight: bold;
+}
+
+.content-table-logs th,
+.content-table-logs td {
+  padding: 12px 15px;
+  max-width:250px;
+  overflow-wrap: break-word;
+  text-align: unset;
+}
+.content-table-logs th{
+  cursor: pointer;
+}
+
+.content-table-logs tbody tr {
+  border-bottom: 1px solid #dddddd;
+}
+
+.content-table-logs tbody tr:nth-of-type(even) {
+  background-color: #f3f3f3;
+}
+
+.content-table-logs tbody tr:nth-of-type(even):hover {
+  background-color: #ece1ed;
+}
+
+/*.content-table tbody tr:last-of-type {*/
+/*  border-bottom: 2px solid #009879;*/
+/*}*/
+
+.content-table-logs tbody tr.active-row {
+  font-weight: bold;
+  color: #009879;
+}
+
+
+
 /* The alert message box */
 .alertError {
   padding: 20px;
@@ -309,4 +361,48 @@ ul.checkbox li.focus  {
   background-color: lightyellow;
   border: 1px gray solid;
   width: 14em;
+}
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0, 0, 0); /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+  overflow-x: hidden;
+  overflow-x: auto;
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  height: 80%;
+  overflow: auto;
+  overflow-y: scroll;
+  text-align: justify;
+}
+
+/* The Close Button */
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
 }

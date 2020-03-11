@@ -59,7 +59,7 @@
     </thead>
     <c:forEach items="${log}" var="logEntity">
         <tr>
-            <td>
+            <td id="triggeredBy">
                 <c:out value="${logEntity.triggeredBy}"/>
             </td>
             <td>
@@ -81,6 +81,58 @@
 
     </c:forEach>
 </table>
+<div id="logActionViewModal" class="modal">
+
+    <!-- Modal content -->
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <table class="content-table-logs" id="toSet">
+            <thead>
+            <tr>
+                <th>Triggered By</th>
+                <th>Date</th>
+                <th>Ip</th>
+                <th>Action</th>
+                <th>Params</th>
+                <th>Error Log</th>
+            </tr>
+            </thead>
+            <tr>
+
+            </tr>
+
+        </table>
+
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    // Get the modal
+    const modal = document.getElementById("logActionViewModal");
+
+    // Get the <span> element that closes the modal
+    const span = document.getElementsByClassName("close")[0];
+
+
+    function openModal() {
+        modal.style.display = "block";
+        console.log("Opened Modal")
+
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function () {
+        modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+</script>
 
 <script type="text/javascript">
     console.log("Sort enabling start");
@@ -100,6 +152,17 @@
 
 </script>
 <script type="text/javascript">
+
+    var table = document.getElementById("SearchableTable");
+    if (table != null) {
+        for (var i = 1; i < table.rows.length; i++) {
+            for (var j = 1; j < table.rows[i].cells.length; j++)
+                table.rows[i].onclick = function () {
+                    tableText(this);
+                };
+        }
+    }
+
     function Search() {
         let input, filter, table, tr, td, i, txtValue;
         let e = document.getElementById("tableHeaderSearch");
@@ -121,6 +184,31 @@
             }
         }
     }
+
+    function tableText(tableRowElement) {
+        let cells = tableRowElement.cells;
+
+        var tableRef = document.getElementById("toSet");
+
+        // Clear first row
+        var firstRow = tableRef.rows[1];
+        while (firstRow.hasChildNodes()) {
+            firstRow.removeChild(firstRow.lastChild);
+        }
+        // Iterate through all cells and insert new content
+        for (var i = 0, cell; cell = cells[i]; i++) {
+            // Insert a cell in the corresponding column
+            let newCell = firstRow.insertCell(i);
+
+            // Append a text node to the cell
+            let newText = document.createTextNode(cell.textContent);
+            newCell.appendChild(newText);
+        }
+
+        openModal()
+    }
+
+
 </script>
 
 

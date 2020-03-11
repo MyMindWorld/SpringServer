@@ -71,16 +71,8 @@ public class RoleService {
 
         for (Role contestant : resultList) {
             if (contestant.getPrivileges().size() == privileges.size() & contestant.getPrivileges().containsAll(privileges)) {
-                logger.info("Contestant found! _ "+ contestant.getName() + " ___ " + contestant.getPrivileges());
-//                List<Privilege> contPriv = (List<Privilege>) contestant.getPrivileges();
-//
-//                logger.info("equality : " + contPriv.equals(privileges));
-//                logger.info("contains : " + contPriv.contains(privileges));
-//                logger.info("contains All: " + contPriv.containsAll(privileges));
+                logger.info("Role with same privileges  found! '"+ contestant.getName() + "'  " + contestant.getPrivileges());
                 return contestant;
-            }
-            else {
-                logger.info("Fail ! " + contestant.getPrivileges().size() + " __ " + contestant.getName());
             }
 
         }

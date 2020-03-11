@@ -298,7 +298,7 @@ ul.checkbox li input {
 ul.checkbox li {
   border: 1px transparent solid;
   display:inline-block;
-  width:13em;
+  width:14em;
 }
 
 ul.checkbox li label {
@@ -308,5 +308,5 @@ ul.checkbox li:hover,
 ul.checkbox li.focus  {
   background-color: lightyellow;
   border: 1px gray solid;
-  width: 13em;
+  width: 14em;
 }

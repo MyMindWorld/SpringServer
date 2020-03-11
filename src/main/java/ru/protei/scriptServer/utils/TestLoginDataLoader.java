@@ -91,9 +91,10 @@ public class TestLoginDataLoader {
         userService.createUserIfNotFound(user);
 
         Integer logRepSizeForTest = 500;
+        Integer privilegeRepSizeForTest = 70;
 
         if (logService.logSize() < logRepSizeForTest) {
-            for (int count = 0; count < 500; count++) {
+            for (int count = 0; count < logRepSizeForTest; count++) {
                 int leftLimit = 97; // letter 'a'
                 int rightLimit = 122; // letter 'z'
                 int paramsLength = 500;
@@ -115,6 +116,26 @@ public class TestLoginDataLoader {
                 String genParams = bufferParams.toString();
 
                 logService.logAction("Test", "127.5.5.5", "TestNumber " + count, genParams, genError);
+            }
+
+        }
+
+        if (privilegeService.returnAllPrivileges().size() < privilegeRepSizeForTest) {
+            for (int count = 0; count < privilegeRepSizeForTest; count++) {
+                int leftLimit = 97; // letter 'a'
+                int rightLimit = 122; // letter 'z'
+                int privilegeNameLength = 20;
+                Random random = new Random();
+                StringBuilder privilegeName = new StringBuilder(privilegeNameLength);
+                for (int i = 0; i < privilegeNameLength; i++) {
+                    int randomLimitedInt = leftLimit + (int)
+                            (random.nextFloat() * (rightLimit - leftLimit + 1));
+                    privilegeName.append((char) randomLimitedInt);
+                }
+
+                String genName = privilegeName.toString();
+
+                privilegeService.createPrivilegeIfNotFound(genName);
             }
 
         }

@@ -36,6 +36,16 @@ public class MainPageController {
     @Autowired
     Utils utils;
 
+    @RequestMapping("/TestPage")
+    public ModelAndView  testPage() {
+        return new ModelAndView("TestPage");
+    }
+
+    @RequestMapping("/")
+    public ModelAndView  redirectToIndex() {
+        return showMenu();
+    }
+
     @RequestMapping("/index")
     public ModelAndView  showMenu() {
         ModelAndView modelAndView = new ModelAndView("index");

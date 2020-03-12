@@ -110,7 +110,7 @@
 <div id="updateUserModal" class="modal">
 
     <!-- Modal content -->
-    <div class="modal-content">
+    <div class="modal-content" style="height: auto">
         <span class="close">&times;</span>
         <p style="font-size:235%;text-align:center;"id="ModalWindowUsername">Updating HERE SHOULD BE USERNAME roles</p>
         <form name='f' class="form__group field" action=

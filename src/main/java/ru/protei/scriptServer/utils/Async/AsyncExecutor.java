@@ -7,12 +7,14 @@ import ru.protei.scriptServer.service.ScriptsHandler;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class AsyncExecutor extends Thread {
     Logger logger = LoggerFactory.getLogger(AsyncExecutor.class);
 
 
     private String executable;
+    private String scriptName;
     private String[] commandParams;
     private File directory;
     public ArrayList<String> linesSoFarStdout = new ArrayList<>();
@@ -21,12 +23,13 @@ public class AsyncExecutor extends Thread {
     public int processExitcode = -1;
     private boolean passCommandsAsLinesToShellExecutableAfterStartup = false;
 
-    public AsyncExecutor(String executable, String[] commandParams, File directory) {
+    public AsyncExecutor(String executable, String[] commandParams, File directory,String scriptName) {
         this.executable = executable;
         this.commandParams = commandParams;
         this.runstate = Runstate.CREATED;
         this.directory = directory;
         this.passCommandsAsLinesToShellExecutableAfterStartup = false;
+        this.scriptName = scriptName;
     }
 
     /**
@@ -38,12 +41,13 @@ public class AsyncExecutor extends Thread {
      * @param commandParams
      * @param passCommandsAsLinesToShellExecutableAfterStartup
      */
-    public AsyncExecutor(String executable, String[] commandParams, File directory, boolean passCommandsAsLinesToShellExecutableAfterStartup) {
+    public AsyncExecutor(String executable, String[] commandParams, File directory, boolean passCommandsAsLinesToShellExecutableAfterStartup,String scriptName) {
         this.executable = executable;
         this.commandParams = commandParams;
         this.runstate = Runstate.CREATED;
         this.directory = directory;
         this.passCommandsAsLinesToShellExecutableAfterStartup = passCommandsAsLinesToShellExecutableAfterStartup;
+        this.scriptName = scriptName;
     }
 
     @Override
@@ -69,11 +73,11 @@ public class AsyncExecutor extends Thread {
                 // pass the arguments directly during startup to the process
                 // * example:
                 // * run 'java -jar myexecutable.jar arg0 arg1 ...'
-                String[] execWithArgs = new String[commandParams.length + 1];
-                execWithArgs[0] = executable;
-                for (int i = 1; i <= commandParams.length; i++) {
-                    execWithArgs[i] = commandParams[i - 1];
-                }
+                String[] args = new String[]{executable,scriptName};
+                String[] execWithArgs = new String[args.length + commandParams.length];
+                System.arraycopy(args, 0, execWithArgs, 0, args.length);
+                System.arraycopy(commandParams, 0, execWithArgs, args.length, commandParams.length);
+                logger.info(Arrays.toString(execWithArgs));
                 p = Runtime.getRuntime().exec(execWithArgs,null,directory);
             }
             // 2 print the output

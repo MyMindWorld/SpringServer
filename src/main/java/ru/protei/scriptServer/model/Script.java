@@ -24,6 +24,8 @@ public class Script {
     @NotBlank
     private String display_name;
     @NotBlank
+    private String script_path;
+    @NotBlank
     @Column(columnDefinition = "LONGTEXT")
     private String parametersJson;
 

@@ -59,6 +59,7 @@ public class ScriptsHandler {
                 JsonScript jsonScript = utils.parseJsonToObject(config.getInputStream());
                 script.setName(jsonScript.name);
                 script.setDisplay_name(jsonScript.display_name);
+                script.setScript_path(jsonScript.script_path);
                 script.setParametersJson(jsonScript.paramsToJsonString());
             } catch (IOException e) {
                 logger.error("Mapping json to object failed!", e);
@@ -86,11 +87,11 @@ public class ScriptsHandler {
     }
 
     @SneakyThrows
-    public void runPythonScript(String[] params) {
+    public void runPythonScript(String[] params,String scriptName) {
         String executable = "python";
 //        String[] commandParams = {"import os","print(os.getcwd())","exit()"};
         logger.info(String.valueOf(utils.getScriptsDirectory().isDirectory()));
-        AsyncExecutor asyncExecutor = new AsyncExecutor(executable, params, utils.getScriptsDirectory(), false);
+        AsyncExecutor asyncExecutor = new AsyncExecutor(executable, params, utils.getScriptsDirectory(), false,scriptName);
         logger.info("x" + "/x\tsecs in main thread \t\t status:" + asyncExecutor.runstate + " of async thread that monitors the process");
         asyncExecutor.start();//start() invokes the run() method as a detached thread
 //        Thread.sleep(1000);

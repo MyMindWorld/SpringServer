@@ -129,6 +129,8 @@
                 <table>
                     <thead>
                     <form name='f' onsubmit="return validateAddUserForm()" class="form__group field" action=<c:url value='/scripts/run_script'/> method='GET' >
+                        <input name="scriptPath" id='scriptPath' type="hidden" value="${script.script_path}"/>
+
                     <c:forEach items="${parameters}" var="parameter">
                     <tr>
                         <c:choose>

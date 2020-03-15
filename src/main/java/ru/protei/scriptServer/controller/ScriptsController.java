@@ -33,11 +33,11 @@ public class ScriptsController {
     LogService logService;
 
     @RequestMapping(value = "/scripts/run_script", method = RequestMethod.GET)
-    public String runScript(@RequestParam String[] commandParams, HttpServletRequest req) {
-        logService.logAction(req.getRemoteUser(),"Script run",req.getRequestURL().toString(), Arrays.toString(commandParams));
+    public String runScript(@RequestParam String[] commandParams,@RequestParam String scriptPath, HttpServletRequest req) {
+        logService.logAction(req.getRemoteUser(),req.getRemoteAddr(),"Run script '" + scriptPath + "'", Arrays.toString(commandParams));
         logger.info("Received params : " + Arrays.toString(commandParams));
 
-        scriptsHandler.runPythonScript(commandParams);
+        scriptsHandler.runPythonScript(commandParams,scriptPath);
 
 
         return "redirect:" + req.getHeader("Referer");

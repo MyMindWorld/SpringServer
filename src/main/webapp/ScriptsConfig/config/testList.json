@@ -1,7 +1,7 @@
 {
   "name": "TestList",
   "display_name": "Тест листаAAAAAA",
-  "script_path": "start_es_server.py",
+  "script_path": "bdupdate.py",
   "description": "Тестим лист",
   "requires_terminal": false,
   "parameters": [

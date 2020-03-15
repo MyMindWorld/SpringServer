@@ -1,7 +1,7 @@
 {
   "name": "testscriptRun",
   "display_name": "Тест Рана",
-  "script_path": "start_es_server.py",
+  "script_path": "test.py",
   "description": "Тестим лист",
   "requires_terminal": false,
   "parameters": [

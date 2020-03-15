@@ -16,6 +16,7 @@ import ru.protei.scriptServer.utils.Async.AsyncExecutor;
 import ru.protei.scriptServer.utils.Utils;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -29,6 +30,8 @@ public class ScriptsHandler {
     private PrivilegeService privilegeService;
     @Autowired
     private RoleService roleService;
+    @Autowired
+    LogService logService;
     @Autowired
     Utils utils;
 
@@ -83,16 +86,12 @@ public class ScriptsHandler {
     }
 
     @SneakyThrows
-    public void runPythonScript(String[] params){
-        logger.info(servletContextPath);
-        logger.info("Requested  script");
+    public void runPythonScript(String[] params) {
         String executable = "python";
-//        String[] commandParams = {"@ping -n 5 localhost","echo \"hello world\"","exit 123"};
 //        String[] commandParams = {"import os","print(os.getcwd())","exit()"};
-//        String[] commandParams = {"test.py"};
         logger.info(String.valueOf(utils.getScriptsDirectory().isDirectory()));
-        AsyncExecutor asyncExecutor = new AsyncExecutor(executable, params,utils.getScriptsDirectory(), false);
-        logger.info("x"+"/x\tsecs in main thread \t\t status:"+asyncExecutor.runstate+" of async thread that monitors the process");
+        AsyncExecutor asyncExecutor = new AsyncExecutor(executable, params, utils.getScriptsDirectory(), false);
+        logger.info("x" + "/x\tsecs in main thread \t\t status:" + asyncExecutor.runstate + " of async thread that monitors the process");
         asyncExecutor.start();//start() invokes the run() method as a detached thread
 //        Thread.sleep(1000);
 //        asyncExecutor.terminate();
@@ -103,12 +102,11 @@ public class ScriptsHandler {
 //        }
 //
         asyncExecutor.join(); // main thread has nothing to do anymore, wait till other thread that monitor other process finishes as well
-        logger.info("END OWN-PROGRAMM: 0 , END OTHER PROCESS:"+asyncExecutor.processExitcode);
+        logger.info("Exit code : " + asyncExecutor.processExitcode);
 //        System.exit(0);
         logger.info("Done.");
 
     }
-
 
 
 }

@@ -15,6 +15,7 @@ import ru.protei.scriptServer.service.UserService;
 import ru.protei.scriptServer.utils.Utils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 
 @Controller
 public class ScriptsController {
@@ -32,15 +33,13 @@ public class ScriptsController {
     LogService logService;
 
     @RequestMapping(value = "/scripts/run_script", method = RequestMethod.GET)
-    public String runScript(@RequestParam String[] commandParams, HttpServletRequest request) {
-        logger.info("Received params : ");
-        for (String param : commandParams) {
-            logger.info(param);
-        }
+    public String runScript(@RequestParam String[] commandParams, HttpServletRequest req) {
+        logService.logAction(req.getRemoteUser(),"Script run",req.getRequestURL().toString(), Arrays.toString(commandParams));
+        logger.info("Received params : " + Arrays.toString(commandParams));
 
         scriptsHandler.runPythonScript(commandParams);
 
 
-        return "redirect:" + request.getHeader("Referer");
+        return "redirect:" + req.getHeader("Referer");
     }
 }

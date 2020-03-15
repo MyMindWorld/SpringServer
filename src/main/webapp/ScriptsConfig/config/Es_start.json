@@ -1,7 +1,7 @@
 {
   "name": "ES_Start",
   "display_name": "Старт ES",
-  "script_path": "./scripts/start_es_server.py",
+  "script_path": "start_es_server.py",
   "description": "Скрипт запуска ES в докере. Для выбора ветки, вначале выберите тип сервера. ВНИМАНИЕ! При запуске в интерактивном режиме, контейнер будет остановлен вместе со скриптом",
   "requires_terminal": false,
   "parameters": [

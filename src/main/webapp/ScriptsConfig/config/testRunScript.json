@@ -1,15 +1,15 @@
 {
-  "name": "TestList",
-  "display_name": "Тест листаAAAAAA",
+  "name": "testscriptRun",
+  "display_name": "Тест Рана",
   "script_path": "start_es_server.py",
   "description": "Тестим лист",
   "requires_terminal": false,
   "parameters": [
     {
-      "name": "Я ЛИИИИИИИИИИИИИИСТ",
-      "param": "--hella_list",
+      "name": "Название инпута",
+      "param": "--test",
       "description": "У него есть текст в подсказке",
-      "type": "list",
+      "type": "text",
       "required": false,
       "values": [
         "value 1",

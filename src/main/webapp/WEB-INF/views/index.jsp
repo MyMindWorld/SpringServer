@@ -128,11 +128,12 @@
                 <h4>${script.display_name}</h4>
                 <table>
                     <thead>
+                    <form name='f' onsubmit="return validateAddUserForm()" class="form__group field" action=<c:url value='/scripts/run_script'/> method='GET' >
                     <c:forEach items="${parameters}" var="parameter">
                     <tr>
                         <c:choose>
                             <c:when test="${parameter.type == 'list'}">
-                                <select id="${parameter.name}" class="custom-select" style="width:200px;">
+                                <select name="commandParams" id="${parameter.name}" class="custom-select" style="width:200px;">
                                     <c:forEach items="${parameter.values}" var="listValue">
                                         <option value="${listValue}">${listValue}</option>
                                     </c:forEach>
@@ -140,7 +141,7 @@
                             </c:when>
                             <c:when test="${parameter.type == 'text'}">
                                 <input type="text" class="form__field" placeholder="${parameter.name}"
-                                       name="${parameter.name}" id='${parameter.name}' required maxlength="15"/>
+                                       name="commandParams" id='${parameter.name}' required maxlength="15"/>
                                 <label for="${parameter.name}" class="form__label">${parameter.name}</label>
                             </c:when>
 
@@ -151,6 +152,9 @@
                         </c:choose>
                     </tr>
                     </c:forEach>
+                        <input name="submit" type="submit" class="e" value="Run Script"/>
+
+                    </form>
                     </thead>
                 </table>
 

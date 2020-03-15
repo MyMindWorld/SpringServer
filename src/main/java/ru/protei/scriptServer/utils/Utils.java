@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import ru.protei.scriptServer.model.JsonScript;
 import ru.protei.scriptServer.model.Parameters;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -31,10 +32,20 @@ import static org.passay.DictionaryRule.ERROR_CODE;
 public class Utils {
     Logger logger = LoggerFactory.getLogger(Utils.class);
 
-    @Value("${scriptsPath:aDefaultUrl}")
+    @Value("${scriptServerResourcesPath:/ScriptsConfig}")
+    private String scriptServerResourcesPath;
+    @Value("${configPath:/config}")
+    private String configPath;
+    @Value("${scriptsPath:/scripts}")
     private String scriptsPath;
     @Autowired
     private ResourceLoader resourceLoader;
+
+    public File getScriptsDirectory(){
+        String webappFolder = "/src/main/webapp";  // todo Handle webaps folder
+        logger.info(System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + scriptsPath);
+        return new File(System.getProperty("user.dir") +webappFolder + scriptServerResourcesPath + scriptsPath + "/");
+    }
 
     public Parameters[] stringToListOfParams(String source) {
         ObjectMapper mapper = new ObjectMapper();
@@ -56,10 +67,10 @@ public class Utils {
         return null;
     }
 
-    public Resource[] getScriptsPath() {
-        final Path rootPath = Paths.get(scriptsPath);
+    public Resource[] getConfigs() {
+        final Path rootPath = Paths.get(scriptServerResourcesPath);
         try {
-            Resource[] resources = ResourcePatternUtils.getResourcePatternResolver(resourceLoader).getResources(scriptsPath + "/config/*.json");
+            Resource[] resources = ResourcePatternUtils.getResourcePatternResolver(resourceLoader).getResources(scriptServerResourcesPath + configPath +"/*.json");
             logger.info("Found : '" + resources.length + "' json configs");
             return resources;
 

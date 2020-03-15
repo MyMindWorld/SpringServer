@@ -389,7 +389,7 @@ ul.checkbox li.focus  {
   height: 80%;
   overflow: auto;
   overflow-y: scroll;
-  text-align: justify;
+  /*text-align: justify;*/
 }
 
 /* The Close Button */

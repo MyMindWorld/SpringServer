@@ -53,6 +53,7 @@ public class AsyncExecutor extends Thread {
         this.runstate = Runstate.RUNNING;
         // 1 start the process
         Process p = null;
+        // todo build params refactor
         try {
             if (passCommandsAsLinesToShellExecutableAfterStartup) {
                 // open a shell-like process like cmd and pass the arguments/command after opening it

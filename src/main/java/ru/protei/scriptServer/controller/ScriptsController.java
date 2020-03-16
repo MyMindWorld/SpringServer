@@ -37,14 +37,16 @@ public class ScriptsController {
     @RequestMapping(value = "/scripts/run_script", method = RequestMethod.GET)
     public String runScript(@RequestParam String[] commandParams, Script scriptObject, HttpServletRequest req) {
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!Arrays.toString(principal.getAuthorities().toArray()).contains(scriptObject.getName())) {
-            logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "RUNNING SCRIPT WITHOUT ROLE! '" + scriptObject.getName() + "'", Arrays.toString(commandParams));
+        Script script = scriptRepository.findByNameEquals(scriptObject.getName());
+        String[] resultRunString = utils.createParamsString(script,commandParams);
+        if (!Arrays.toString(principal.getAuthorities().toArray()).contains(script.getName())) {
+            logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "RUNNING SCRIPT WITHOUT ROLE! '" + script.getName() + "'", Arrays.toString(commandParams));
             return "ErrorCodes/403";
         }
-        logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "Run script '" + scriptObject.getName() + "'", Arrays.toString(commandParams));
+        logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "Run script '" + script.getName() + "'", Arrays.toString(resultRunString));
         logger.info("Received params : " + Arrays.toString(commandParams));
 
-        scriptsHandler.runPythonScript(commandParams, scriptObject.getScript_path());
+        scriptsHandler.runPythonScript(resultRunString, script.getScript_path());
 
 
         return "redirect:" + req.getHeader("Referer");

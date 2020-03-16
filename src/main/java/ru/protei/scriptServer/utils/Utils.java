@@ -19,12 +19,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import ru.protei.scriptServer.model.JsonScript;
 import ru.protei.scriptServer.model.Parameters;
+import ru.protei.scriptServer.model.Script;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 import static org.passay.DictionaryRule.ERROR_CODE;
 
@@ -41,10 +43,10 @@ public class Utils {
     @Autowired
     private ResourceLoader resourceLoader;
 
-    public File getScriptsDirectory(){
+    public File getScriptsDirectory() {
         String webappFolder = "/src/main/webapp";  // todo Handle webaps folder
         logger.info(System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + scriptsPath);
-        return new File(System.getProperty("user.dir") +webappFolder + scriptServerResourcesPath + scriptsPath + "/");
+        return new File(System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + scriptsPath + "/");
     }
 
     public Parameters[] stringToListOfParams(String source) {
@@ -70,7 +72,7 @@ public class Utils {
     public Resource[] getConfigs() {
         final Path rootPath = Paths.get(scriptServerResourcesPath);
         try {
-            Resource[] resources = ResourcePatternUtils.getResourcePatternResolver(resourceLoader).getResources(scriptServerResourcesPath + configPath +"/*.json");
+            Resource[] resources = ResourcePatternUtils.getResourcePatternResolver(resourceLoader).getResources(scriptServerResourcesPath + configPath + "/*.json");
             logger.info("Found : '" + resources.length + "' json configs");
             return resources;
 
@@ -133,5 +135,31 @@ public class Utils {
         return password;
     }
 
+    public String[] createParamsString(Script script, String[] params) {
+        // todo refactor to array mb?
+        Parameters[] parametersKeys = stringToListOfParams(script.getParametersJson());
+        int mapped = 0;
+        int length = 0;
+        ArrayList<String> resultArray = new ArrayList<String>();
+        for (Parameters paramKey : parametersKeys) {
+            if (paramKey.constant) {
+//                if (paramKey.values) // продумать как назвать параметр для скритта в конфиге
+                resultArray.add(paramKey.getParam());
+                resultArray.add(paramKey.getDefaultConstant());
+            } else {
+                resultArray.add(paramKey.getParam());
+                resultArray.add(params[mapped]);
+                mapped++;
+            }
+            length = length + 2;
+        }
+//        paramsString.delete(paramsString.length() - 2, paramsString.length()); // НаQa?
+        String[] resultString = new String[length];
+        for (int i = 0; i < resultArray.size(); i++) {
+            resultString[i] = resultArray.get(i);
+        }
+//        return paramsString.toString();
+        return resultString;
+    }
 
 }

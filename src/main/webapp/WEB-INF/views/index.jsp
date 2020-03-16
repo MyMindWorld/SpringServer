@@ -131,10 +131,6 @@
                     <form name='f' onsubmit="return validateAddUserForm()" class="form__group field" action=
                         <c:url value='/scripts/run_script'/> method='GET'>
                         <input name="name" id='name' type="hidden" value="${script.name}"/>
-                        <input name="display_name" id='display_name' type="hidden" value="${script.display_name}"/>
-                        <input name="script_path" id='script_path' type="hidden" value="${script.script_path}"/>
-                        <input name="parametersJson" id='parametersJson' type="hidden"
-                               value="${script.parametersJson}"/>
 
                         <c:forEach items="${parameters}" var="parameter">
                             <tr>

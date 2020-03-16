@@ -23,6 +23,13 @@
         "fi_value 3",
         "fi_value 4"
       ]
+    },
+    {
+      "name": "TEST",
+      "param": "--testCostant",
+      "type": "hidden",
+      "constant": true,
+      "default": "IMCONSTANT"
     }
   ]
 }

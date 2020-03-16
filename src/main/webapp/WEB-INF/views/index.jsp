@@ -31,6 +31,9 @@
     <%--    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>--%>
     <%--        <script type="text/javascript" src="<c:url value="/vendor/jquery/jquery-2.1.3.min.js"/>"/>--%>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet"/>
+    <%--    TODO MOVE THEM TO LOCAL INSTALL??--%>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
     <%--    <script--%>
     <%--            src="https://code.jquery.com/jquery-2.1.3.min.js"--%>
     <%--            integrity="sha256-ivk71nXhz9nsyFDoYoGf2sbjrR9ddh+XDkCcfZxjvcM="--%>
@@ -136,8 +139,15 @@
                             <tr>
                                 <c:choose>
                                     <c:when test="${parameter.type == 'list'}">
-                                        <select name="commandParams" id="${parameter.name}" class="custom-select"
-                                                style="width:200px;">
+                                        <select name="commandParams" class="single" name="${parameter.name}[]" style="width: 200px" <c:if test="${parameter.required}">required</c:if>>
+                                            <c:forEach items="${parameter.values}" var="listValue">
+                                                <option value="${listValue}">${listValue}</option>
+                                            </c:forEach>
+                                        </select>
+                                    </c:when>
+                                    <c:when test="${parameter.type == 'multiselect'}">
+                                        <select name="commandParams" class="multy" name="${parameter.name}[]" multiple="multiple"
+                                                style="width: 200px" <c:if test="${parameter.required}">required</c:if>>
                                             <c:forEach items="${parameter.values}" var="listValue">
                                                 <option value="${listValue}">${listValue}</option>
                                             </c:forEach>
@@ -145,8 +155,22 @@
                                     </c:when>
                                     <c:when test="${parameter.type == 'text'}">
                                         <input type="text" class="form__field" placeholder="${parameter.name}"
-                                               name="commandParams" id='${parameter.name}' required maxlength="15"/>
-                                        <label for="${parameter.name}" class="form__label">${parameter.name}</label>
+                                               name="commandParams" id='${parameter.name}' maxlength="${parameter.max}"<c:if test="${parameter.required}">required</c:if>/>
+                                    </c:when>
+                                    <c:when test="${parameter.type == 'hidden'}">
+                                        <%--                                        Параметр типа HIDDEN обрабатывается на стороне сервера, либо дефолтное значение, либо результат работы скрипта--%>
+                                    </c:when>
+                                    <c:when test="${parameter.type == 'boolean'}">
+                                        <input name="commandParams" class="tgl tgl-light" id="${parameter.name}" type="checkbox" <c:if test="${parameter.required}">required</c:if>/>
+                                        <label class="tgl-btn" for="${parameter.name}">${parameter.name}</label>
+                                    </c:when>
+                                    <c:when test="${parameter.type == 'int'}">
+                                        <input name="commandParams" type="number" id="${parameter.name}" name="${parameter.name}"
+                                               min=${parameter.min} max=${parameter.max} <c:if test="${parameter.required}">required</c:if>>
+                                        <label for="${parameter.name}">${parameter.name}</label>
+                                    </c:when>
+                                    <c:when test="${parameter.type == 'file_upload'}">
+                                        <input name="commandParams" type="file" name="${parameter.name}" size="50" <c:if test="${parameter.required}">required</c:if>/>
                                     </c:when>
 
 
@@ -191,6 +215,11 @@
         console.log("Done2")
 
     }
+
+    $(document).ready(function () {
+        $('.multy').select2();
+        $('.single').select2();
+    });
 </script>
 
 

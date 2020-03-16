@@ -28,7 +28,7 @@ public class Parameters {
     public boolean file_recursive;
     public String[] values;
 
-    public String toJson(){
+    public String toJson() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
         try {

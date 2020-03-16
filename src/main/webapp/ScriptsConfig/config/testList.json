@@ -6,11 +6,18 @@
   "requires_terminal": false,
   "parameters": [
     {
+      "name": "Поиск",
+      "param": "--type",
+      "description": "Принимает значение Release или Custom",
+      "type": "text",
+      "required": false
+    },
+    {
       "name": "Я ЛИИИИИИИИИИИИИИСТ",
       "param": "--hella_list",
       "description": "У него есть текст в подсказке",
       "type": "list",
-      "required": false,
+      "required": true,
       "values": [
         "value 1",
         "value 2",

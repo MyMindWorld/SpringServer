@@ -43,7 +43,7 @@
     {
       "name": "Интерактивный режим",
       "param": "--interactive",
-      "no_value": true,
+      "type": "boolean",
       "description": "При выборе этого чекбокса после запуска сервера и установки лицензии у вас в этом окне будут показаны логи."
     },
     {
@@ -56,11 +56,13 @@
     {
       "name": "MaxExecutionTime",
       "param": "--max_execution_time",
+      "type": "hidden",
       "constant" : true
     },
     {
       "name": "AUTH",
       "param": "--auth",
+      "type": "hidden",
       "constant" : true
     }
   ]

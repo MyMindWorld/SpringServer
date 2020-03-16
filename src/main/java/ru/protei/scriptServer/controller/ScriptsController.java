@@ -38,6 +38,7 @@ public class ScriptsController {
     public String runScript(@RequestParam String[] commandParams, Script scriptObject, HttpServletRequest req) {
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Script script = scriptRepository.findByNameEquals(scriptObject.getName());
+        logger.info("Raw params : " + Arrays.toString(commandParams));
         String[] resultRunString = utils.createParamsString(script,commandParams);
         if (!Arrays.toString(principal.getAuthorities().toArray()).contains(script.getName())) {
             logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "RUNNING SCRIPT WITHOUT ROLE! '" + script.getName() + "'", Arrays.toString(commandParams));

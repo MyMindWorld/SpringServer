@@ -2,8 +2,6 @@ package ru.protei.scriptServer.utils.Async;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-import ru.protei.scriptServer.service.ScriptsHandler;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -52,7 +50,6 @@ public class AsyncExecutor extends Thread {
 
     @Override
     public void run() {
-        logger.info("IM ASYNC IM RUNNERD!");
         this.runstate = Runstate.RUNNING;
         // 1 start the process
         Process p = null;

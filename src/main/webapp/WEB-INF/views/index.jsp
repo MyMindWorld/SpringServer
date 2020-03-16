@@ -29,12 +29,12 @@
     <link rel="stylesheet" type="text/css" href="<c:url value="/css/Newindex.css"/>">
     <!--===============================================================================================-->
     <%--    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>--%>
-<%--        <script type="text/javascript" src="<c:url value="/vendor/jquery/jquery-2.1.3.min.js"/>"/>--%>
+    <%--        <script type="text/javascript" src="<c:url value="/vendor/jquery/jquery-2.1.3.min.js"/>"/>--%>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-<%--    <script--%>
-<%--            src="https://code.jquery.com/jquery-2.1.3.min.js"--%>
-<%--            integrity="sha256-ivk71nXhz9nsyFDoYoGf2sbjrR9ddh+XDkCcfZxjvcM="--%>
-<%--            crossorigin="anonymous"></script>--%>
+    <%--    <script--%>
+    <%--            src="https://code.jquery.com/jquery-2.1.3.min.js"--%>
+    <%--            integrity="sha256-ivk71nXhz9nsyFDoYoGf2sbjrR9ddh+XDkCcfZxjvcM="--%>
+    <%--            crossorigin="anonymous"></script>--%>
 </head>
 <body>
 
@@ -128,32 +128,38 @@
                 <h4>${script.display_name}</h4>
                 <table>
                     <thead>
-                    <form name='f' onsubmit="return validateAddUserForm()" class="form__group field" action=<c:url value='/scripts/run_script'/> method='GET' >
-                        <input name="scriptPath" id='scriptPath' type="hidden" value="${script.script_path}"/>
+                    <form name='f' onsubmit="return validateAddUserForm()" class="form__group field" action=
+                        <c:url value='/scripts/run_script'/> method='GET'>
+                        <input name="name" id='name' type="hidden" value="${script.name}"/>
+                        <input name="display_name" id='display_name' type="hidden" value="${script.display_name}"/>
+                        <input name="script_path" id='script_path' type="hidden" value="${script.script_path}"/>
+                        <input name="parametersJson" id='parametersJson' type="hidden"
+                               value="${script.parametersJson}"/>
 
-                    <c:forEach items="${parameters}" var="parameter">
-                    <tr>
-                        <c:choose>
-                            <c:when test="${parameter.type == 'list'}">
-                                <select name="commandParams" id="${parameter.name}" class="custom-select" style="width:200px;">
-                                    <c:forEach items="${parameter.values}" var="listValue">
-                                        <option value="${listValue}">${listValue}</option>
-                                    </c:forEach>
-                                </select>
-                            </c:when>
-                            <c:when test="${parameter.type == 'text'}">
-                                <input type="text" class="form__field" placeholder="${parameter.name}"
-                                       name="commandParams" id='${parameter.name}' required maxlength="15"/>
-                                <label for="${parameter.name}" class="form__label">${parameter.name}</label>
-                            </c:when>
+                        <c:forEach items="${parameters}" var="parameter">
+                            <tr>
+                                <c:choose>
+                                    <c:when test="${parameter.type == 'list'}">
+                                        <select name="commandParams" id="${parameter.name}" class="custom-select"
+                                                style="width:200px;">
+                                            <c:forEach items="${parameter.values}" var="listValue">
+                                                <option value="${listValue}">${listValue}</option>
+                                            </c:forEach>
+                                        </select>
+                                    </c:when>
+                                    <c:when test="${parameter.type == 'text'}">
+                                        <input type="text" class="form__field" placeholder="${parameter.name}"
+                                               name="commandParams" id='${parameter.name}' required maxlength="15"/>
+                                        <label for="${parameter.name}" class="form__label">${parameter.name}</label>
+                                    </c:when>
 
 
-                            <c:otherwise>
-                                UNKNOWN TYPE
-                            </c:otherwise>
-                        </c:choose>
-                    </tr>
-                    </c:forEach>
+                                    <c:otherwise>
+                                        UNKNOWN TYPE
+                                    </c:otherwise>
+                                </c:choose>
+                            </tr>
+                        </c:forEach>
                         <input name="submit" type="submit" class="e" value="Run Script"/>
 
                     </form>

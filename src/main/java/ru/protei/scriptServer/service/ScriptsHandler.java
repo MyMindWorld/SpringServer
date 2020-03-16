@@ -1,6 +1,7 @@
 package ru.protei.scriptServer.service;
 
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +16,7 @@ import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.utils.Async.AsyncExecutor;
 import ru.protei.scriptServer.utils.Utils;
 
-import java.io.*;
-import java.util.Arrays;
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -88,7 +88,13 @@ public class ScriptsHandler {
 
     @SneakyThrows
     public void runPythonScript(String[] params,String scriptName) {
-        String executable = "python";
+        String executable;
+        if (SystemUtils.IS_OS_LINUX){
+            executable = "python3";
+        }
+        else {
+            executable = "python";
+        }
 //        String[] commandParams = {"import os","print(os.getcwd())","exit()"};
         logger.info(String.valueOf(utils.getScriptsDirectory().isDirectory()));
         AsyncExecutor asyncExecutor = new AsyncExecutor(executable, params, utils.getScriptsDirectory(), false,scriptName);

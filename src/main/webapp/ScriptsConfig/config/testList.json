@@ -23,12 +23,19 @@
         "value 2",
         "value 3",
         "value 4"
-      ],
-      "file_extensions": [
-        "fi_value 1",
-        "fi_value 2",
-        "fi_value 3",
-        "fi_value 4"
+      ]
+    },
+    {
+      "name": "Я ЛИИИИИИИИИИИИИИСТ",
+      "param": "--hella_listasd",
+      "description": "У него есть текст в подсказке",
+      "type": "multiselect",
+      "required": true,
+      "values": [
+        "value 1",
+        "value 2",
+        "value 3",
+        "value 4"
       ]
     },
     {

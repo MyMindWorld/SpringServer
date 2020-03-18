@@ -1,14 +1,21 @@
 package ru.protei.scriptServer.controller;
 
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import ru.protei.scriptServer.model.POJO.Message;
+import ru.protei.scriptServer.model.POJO.OutputMessage;
 import ru.protei.scriptServer.model.Script;
 import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.service.LogService;
@@ -17,12 +24,16 @@ import ru.protei.scriptServer.service.UserService;
 import ru.protei.scriptServer.utils.Utils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Map;
 
 @Controller
 public class ScriptsController {
 
-    Logger logger = LoggerFactory.getLogger(AdminPageController.class);
+    Logger logger = LoggerFactory.getLogger(ScriptsController.class);
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
     @Autowired
     UserService userService;
     @Autowired
@@ -34,22 +45,66 @@ public class ScriptsController {
     @Autowired
     LogService logService;
 
-    @RequestMapping(value = "/scripts/run_script", method = RequestMethod.GET)
-    public String runScript(@RequestParam String[] commandParams, Script scriptObject, HttpServletRequest req) {
+    @SneakyThrows
+    @RequestMapping(value = "/scripts/run_script", method = RequestMethod.POST)
+    @ResponseBody
+    public void runScript(@RequestParam Map<String,String> allRequestParams, String name, HttpServletRequest req) {
+        Script scriptObject = scriptRepository.findByNameEquals(name);
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Script script = scriptRepository.findByNameEquals(scriptObject.getName());
-        logger.info("Raw params : " + Arrays.toString(commandParams));
-        String[] resultRunString = utils.createParamsString(script,commandParams);
-        if (!Arrays.toString(principal.getAuthorities().toArray()).contains(script.getName())) {
-            logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "RUNNING SCRIPT WITHOUT ROLE! '" + script.getName() + "'", Arrays.toString(commandParams));
-            return "ErrorCodes/403";
+        Message message = new Message();
+        for (String value: allRequestParams.keySet()
+             ) {logger.info(value + " : " + allRequestParams.get(value));
+
         }
-        logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "Run script '" + script.getName() + "'", Arrays.toString(resultRunString));
-        logger.info("Received params : " + Arrays.toString(commandParams));
+        if (allRequestParams.size() == 0){
+            Thread.sleep(1000L);
+            message.setFrom("SCRIPT");
+            message.setText("Parameters could not be empty! Or should they...");
+            sendToSock(message);
+        }
 
-        scriptsHandler.runPythonScript(resultRunString, script.getScript_path());
+        message.setFrom("SCRIPT");
+        message.setText("Started!");
+        sendToSock(message);
+        logger.info("I WAS CALLED!!!!");
 
 
-        return "redirect:" + req.getHeader("Referer");
+//        logger.info("Raw params : " + Arrays.toString(commandParams));
+//        String[] resultRunString = utils.createParamsString(script, commandParams);
+//        if (!Arrays.toString(principal.getAuthorities().toArray()).contains(script.getName())) {
+//            logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "RUNNING SCRIPT WITHOUT ROLE! '" + script.getName() + "'", Arrays.toString(commandParams));
+//            return "ErrorCodes/403";
+//        }
+//        logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "Run script '" + script.getName() + "'", Arrays.toString(resultRunString));
+//        logger.info("Received params : " + Arrays.toString(commandParams));
+//
+//        scriptsHandler.runPythonScript(resultRunString, script.getScript_path());
+
+
+
+
+//        return "redirect:" + req.getHeader("Referer");
+    }
+
+    public void sendToSock(Message message) {
+        logger.info("SENDING MESSAGE" + message.getText());
+        this.simpMessagingTemplate.convertAndSend("/topic/messages/", message);
+    }
+
+    public void sendToSock(String message) {
+        Message messageObj = new Message();
+        messageObj.setFrom("SCRIPT");
+        messageObj.setText(message);
+        logger.info("SENDING MESSAGE" + message);
+        this.simpMessagingTemplate.convertAndSend("/topic/messages/", messageObj);
+    }
+
+    @MessageMapping("/chat")
+    @SendTo("/topic/messages/")
+    public OutputMessage sendReceivedMessageToWS(Message message) {
+        logger.info("SENDING MESSAGE" + message.getText());
+        String time = new SimpleDateFormat("HH:mm").format(new Date());
+        return new OutputMessage(message.getFrom(), message.getText(), time);
     }
 }

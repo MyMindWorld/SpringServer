@@ -34,6 +34,8 @@ public class ScriptsHandler {
     LogService logService;
     @Autowired
     Utils utils;
+    @Autowired
+    AsyncExecutor asyncExecutor;
 
 
     @SneakyThrows
@@ -97,9 +99,9 @@ public class ScriptsHandler {
         }
 //        String[] commandParams = {"import os","print(os.getcwd())","exit()"};
         logger.info(String.valueOf(utils.getScriptsDirectory().isDirectory()));
-        AsyncExecutor asyncExecutor = new AsyncExecutor(executable, params, utils.getScriptsDirectory(), false,scriptName);
+//        AsyncExecutor asyncExecutor = new AsyncExecutor(executable, params, utils.getScriptsDirectory(), false,scriptName);
         logger.info("x" + "/x\tsecs in main thread \t\t status:" + asyncExecutor.runstate + " of async thread that monitors the process");
-        asyncExecutor.start();//start() invokes the run() method as a detached thread
+        asyncExecutor.run(executable, params, utils.getScriptsDirectory(), false,scriptName);//start() invokes the run() method as a detached thread
 //        Thread.sleep(1000);
 //        asyncExecutor.terminate();
 //        for(int i=0;i<10;i++) {
@@ -108,7 +110,7 @@ public class ScriptsHandler {
 //            logger.info(i+"/10\tsecs in main thread \t\t status:"+asyncExecutor.runstate+" of async thread that monitors the process");
 //        }
 //
-        asyncExecutor.join(); // main thread has nothing to do anymore, wait till other thread that monitor other process finishes as well
+//        asyncExecutor.join(); // main thread has nothing to do anymore, wait till other thread that monitor other process finishes as well
         logger.info("Exit code : " + asyncExecutor.processExitcode);
 //        System.exit(0);
         logger.info("Done.");

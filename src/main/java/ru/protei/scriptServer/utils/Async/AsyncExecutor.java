@@ -2,13 +2,20 @@ package ru.protei.scriptServer.utils.Async;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import ru.protei.scriptServer.controller.ScriptsController;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class AsyncExecutor extends Thread {
+@Service
+public class AsyncExecutor {
     Logger logger = LoggerFactory.getLogger(AsyncExecutor.class);
+
+    @Autowired
+    ScriptsController scriptsController;
 
 
     private String executable;
@@ -21,15 +28,6 @@ public class AsyncExecutor extends Thread {
     public int processExitcode = -1;
     private boolean passCommandsAsLinesToShellExecutableAfterStartup = false;
 
-    public AsyncExecutor(String executable, String[] commandParams, File directory,String scriptName) {
-        this.executable = executable;
-        this.commandParams = commandParams;
-        this.runstate = Runstate.CREATED;
-        this.directory = directory;
-        this.passCommandsAsLinesToShellExecutableAfterStartup = false;
-        this.scriptName = scriptName;
-    }
-
     /**
      * if you want to run a single-process with arguments use <b>false</b> example executable="java" commandParams={"-jar","myjarfile.jar","arg0","arg1"}
      * <p>
@@ -39,17 +37,8 @@ public class AsyncExecutor extends Thread {
      * @param commandParams
      * @param passCommandsAsLinesToShellExecutableAfterStartup
      */
-    public AsyncExecutor(String executable, String[] commandParams, File directory, boolean passCommandsAsLinesToShellExecutableAfterStartup,String scriptName) {
-        this.executable = executable;
-        this.commandParams = commandParams;
-        this.runstate = Runstate.CREATED;
-        this.directory = directory;
-        this.passCommandsAsLinesToShellExecutableAfterStartup = passCommandsAsLinesToShellExecutableAfterStartup;
-        this.scriptName = scriptName;
-    }
 
-    @Override
-    public void run() {
+    public void run(String executable, String[] commandParams, File directory, boolean passCommandsAsLinesToShellExecutableAfterStartup, String scriptName) {
         this.runstate = Runstate.RUNNING;
         // 1 start the process
         Process p = null;
@@ -65,18 +54,19 @@ public class AsyncExecutor extends Thread {
                 for (int i = 0; i < commandParams.length; i++) {
                     String commandstring = commandParams[i];
                     stdin.println(commandstring);
+                    scriptsController.sendToSock(commandstring);
                 }
                 stdin.close();
             } else {
                 // pass the arguments directly during startup to the process
                 // * example:
                 // * run 'java -jar myexecutable.jar arg0 arg1 ...'
-                String[] args = new String[]{executable,scriptName};
+                String[] args = new String[]{executable, scriptName};
                 String[] execWithArgs = new String[args.length + commandParams.length];
                 System.arraycopy(args, 0, execWithArgs, 0, args.length);
                 System.arraycopy(commandParams, 0, execWithArgs, args.length, commandParams.length);
                 logger.info(Arrays.toString(execWithArgs));
-                p = Runtime.getRuntime().exec(execWithArgs,null,directory);
+                p = Runtime.getRuntime().exec(execWithArgs, null, directory);
             }
             // 2 print the output
             InputStream is = p.getInputStream();
@@ -95,6 +85,7 @@ public class AsyncExecutor extends Thread {
                     if (lineStdout != null) {
 //                        System.out.println(lineStdout);
                         logger.info(lineStdout);
+                        scriptsController.sendToSock(lineStdout);
                         linesSoFarStdout.add(lineStdout);
                     }
                     if (lineStderr != null) {

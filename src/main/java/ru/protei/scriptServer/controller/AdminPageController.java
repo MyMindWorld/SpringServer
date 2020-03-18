@@ -157,7 +157,6 @@ public class AdminPageController {
         }
 
 
-
         return roles(model);
     }
 
@@ -201,7 +200,7 @@ public class AdminPageController {
             userFromRepo.setRoles(roles);
             userRepository.save(userFromRepo);
             model.addAttribute("success", true);
-            model.addAttribute("successMessage", "Updated user '"  + userFromRepo.getUsername() +  "' roles successfully!");
+            model.addAttribute("successMessage", "Updated user '" + userFromRepo.getUsername() + "' roles successfully!");
             return updateUser(model);
         }
 

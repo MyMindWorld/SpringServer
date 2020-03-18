@@ -38,15 +38,104 @@
     <%--            src="https://code.jquery.com/jquery-2.1.3.min.js"--%>
     <%--            integrity="sha256-ivk71nXhz9nsyFDoYoGf2sbjrR9ddh+XDkCcfZxjvcM="--%>
     <%--            crossorigin="anonymous"></script>--%>
+    <script src="<c:url value="/vendor/sockjs/sockjs.js"/>"></script>
+    <script src="<c:url value="/vendor/stomp/stomp.js"/>"></script>
+    <script type="text/javascript">
+        var stompClient = null;
+        var connectionName = "<sec:authentication property='principal.username' />";
+        // var scriptFormData = new FormData();
+        // var test = document.getElementsByName("commandParams")
+        var $form = $("#ScriptForm");
+        var data = getFormData($form);
+
+        function buildPostData(count) {
+            for (let element in count){
+                scriptFormData.append('username', '');
+            }
+
+
+        }
+
+        function setConnected(connected) {
+            document.getElementById('connect').disabled = connected;
+            document.getElementById('disconnect').disabled = !connected;
+            document.getElementById('conversationDiv').style.visibility
+                = connected ? 'visible' : 'hidden';
+            document.getElementById('response').innerHTML = '';
+        }
+
+        function connect() {
+            var socket = new SockJS('/ScriptServer/chat');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+                setConnected(true);
+                console.log('Connected: ' + frame);
+                stompClient.subscribe('/topic/messages/', function (messageOutput) {
+                    showMessageOutput(JSON.parse(messageOutput.body));
+                });
+            });
+        }
+
+        function disconnect() {
+            if (stompClient != null) {
+                stompClient.disconnect();
+            }
+            setConnected(false);
+            console.log("Disconnected");
+        }
+
+        function sendMessage() {
+            var text = document.getElementById('text').value;
+            stompClient.send("/app/chat", {},
+                JSON.stringify({'from': connectionName, 'text': text}));
+        }
+
+        function showMessageOutput(messageOutput) {
+            var response = document.getElementById('response');
+            var p = document.createElement('p');
+            p.style.wordWrap = 'break-word';
+            p.appendChild(document.createTextNode(messageOutput.from + ": "
+                + messageOutput.text + " (" + messageOutput.time + ")"));
+            response.appendChild(p);
+        }
+
+        function getFormData($form){
+            var unindexed_array = $form.serializeArray();
+            var indexed_array = {};
+
+            $.map(unindexed_array, function(n, i){
+                indexed_array[n['name']] = n['value'];
+            });
+
+            return indexed_array;
+        }
+
+        function runScript() {
+            $.ajax({
+                dataType: "json",
+                method: "POST",
+                url: '<c:url value="/scripts/run_script"/>',
+                data: $('#ScriptForm').serializeArray(),
+                // data: data,
+                success: function (data) {
+                    console.log("IM HERE")
+                    console.log(data)
+                },
+                error: function(data){ console.log('my message' + data); }
+
+            });
+
+        }
+    </script>
 </head>
 <body>
 
 <div class='nav'>
     <ul>
         <li>
-            <a class='logo' href='http://andytran.me'>
-                <img src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/169963/logo_(1).svg' width="10" height="10">
-            </a>
+<%--            <a class='logo' href='http://andytran.me'>--%>
+<%--                <img src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/169963/logo_(1).svg' width="10" height="10">--%>
+<%--            </a>--%>
         </li>
         <li>
             <a href='#portfolio'>Profile</a>
@@ -131,7 +220,7 @@
                 <h4>${script.display_name}</h4>
                 <table>
                     <thead>
-                    <form name='f' onsubmit="return validateAddUserForm()" class="form__group field" action=
+                    <form name='f' id="ScriptForm" onsubmit="return validateAddUserForm()" class="form__group field" action=
                         <c:url value='/scripts/run_script'/> method='GET'>
                         <input name="name" id='name' type="hidden" value="${script.name}"/>
 
@@ -139,14 +228,16 @@
                             <tr>
                                 <c:choose>
                                     <c:when test="${parameter.type == 'list'}">
-                                        <select name="commandParams" class="single" name="${parameter.name}[]" style="width: 200px" <c:if test="${parameter.required}">required</c:if>>
+                                        <select name="${parameter.param}" class="single"
+                                                style="width: 200px" <c:if test="${parameter.required}">required</c:if>>
                                             <c:forEach items="${parameter.values}" var="listValue">
                                                 <option value="${listValue}">${listValue}</option>
                                             </c:forEach>
                                         </select>
                                     </c:when>
                                     <c:when test="${parameter.type == 'multiselect'}">
-                                        <select name="commandParams" class="multy" name="${parameter.name}[]" multiple="multiple"
+                                        <select name="${parameter.param}" class="multy"
+                                                multiple="multiple"
                                                 style="width: 200px" <c:if test="${parameter.required}">required</c:if>>
                                             <c:forEach items="${parameter.values}" var="listValue">
                                                 <option value="${listValue}">${listValue}</option>
@@ -155,22 +246,26 @@
                                     </c:when>
                                     <c:when test="${parameter.type == 'text'}">
                                         <input type="text" class="form__field" placeholder="${parameter.name}"
-                                               name="commandParams" id='${parameter.name}' maxlength="${parameter.max}"<c:if test="${parameter.required}">required</c:if>/>
+                                               name="${parameter.param}" id='${parameter.name}' maxlength="${parameter.max}"
+                                               <c:if test="${parameter.required}">required</c:if>/>
                                     </c:when>
                                     <c:when test="${parameter.type == 'hidden'}">
                                         <%--                                        Параметр типа HIDDEN обрабатывается на стороне сервера, либо дефолтное значение, либо результат работы скрипта--%>
                                     </c:when>
                                     <c:when test="${parameter.type == 'boolean'}">
-                                        <input name="commandParams" class="tgl tgl-light" id="${parameter.name}" type="checkbox" <c:if test="${parameter.required}">required</c:if>/>
+                                        <input name="${parameter.param}" class="tgl tgl-light" id="${parameter.name}"
+                                               type="checkbox" <c:if test="${parameter.required}">required</c:if>/>
                                         <label class="tgl-btn" for="${parameter.name}">${parameter.name}</label>
                                     </c:when>
                                     <c:when test="${parameter.type == 'int'}">
-                                        <input name="commandParams" type="number" id="${parameter.name}" name="${parameter.name}"
-                                               min=${parameter.min} max=${parameter.max} <c:if test="${parameter.required}">required</c:if>>
+                                        <input name="${parameter.param}" type="number" id="${parameter.name}"
+                                               min=${parameter.min} max=${parameter.max}
+                                               <c:if test="${parameter.required}">required</c:if>>
                                         <label for="${parameter.name}">${parameter.name}</label>
                                     </c:when>
                                     <c:when test="${parameter.type == 'file_upload'}">
-                                        <input name="commandParams" type="file" name="${parameter.name}" size="50" <c:if test="${parameter.required}">required</c:if>/>
+                                        <input name="${parameter.param}" type="file" size="50"
+                                               <c:if test="${parameter.required}">required</c:if>/>
                                     </c:when>
 
 
@@ -180,11 +275,30 @@
                                 </c:choose>
                             </tr>
                         </c:forEach>
-                        <input name="submit" type="submit" class="e" value="Run Script"/>
+<%--                        <input name="submit" type="submit" class="e" value="Run Script"/>--%>
 
                     </form>
                     </thead>
                 </table>
+
+                <div>
+                    <div>
+<%--                        <input type="text" id="from" placeholder="Choose a nickname"/>--%>
+                    </div>
+                    <br/>
+                    <div>
+                        <button id="connect" class="e" onclick="connect(); runScript();">Run Script</button>
+                        <button id="disconnect" disabled="disabled" onclick="disconnect();">
+                            Disconnect
+                        </button>
+                    </div>
+                    <br/>
+                    <div id="conversationDiv">
+                        <input type="text" id="text" placeholder="Write a message..."/>
+                        <button id="sendMessage" onclick="sendMessage();">Send</button>
+                        <p id="response"></p>
+                    </div>
+                </div>
 
 
             </sec:authorize>

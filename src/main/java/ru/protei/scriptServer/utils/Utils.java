@@ -143,7 +143,7 @@ public class Utils {
         ArrayList<String> resultArray = new ArrayList<String>();
         for (Parameters paramKey : parametersKeys) {
             if (paramKey.constant) {
-//                if (paramKey.values) // продумать как назвать параметр для скритта в конфиге
+//                if (paramKey.values) // продумать как назвать параметр для скрипта в конфиге
                 resultArray.add(paramKey.getParam());
                 resultArray.add(paramKey.getDefaultConstant());
             } else {

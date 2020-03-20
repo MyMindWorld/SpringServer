@@ -1,6 +1,7 @@
 {
   "name": "TestList",
   "display_name": "Тест листаAAAAAA",
+  "group": "List",
   "script_path": "bdupdate.py",
   "description": "Тестим лист",
   "requires_terminal": false,

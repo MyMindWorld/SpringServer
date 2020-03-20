@@ -1,6 +1,7 @@
 {
   "name": "testscriptRun",
   "display_name": "Тест Рана",
+  "group": "List",
   "script_path": "test.py",
   "description": "Тестим лист",
   "requires_terminal": false,

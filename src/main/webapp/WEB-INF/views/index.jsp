@@ -49,7 +49,7 @@
         var data = getFormData($form);
 
         function buildPostData(count) {
-            for (let element in count){
+            for (let element in count) {
                 scriptFormData.append('username', '');
             }
 
@@ -99,11 +99,11 @@
             response.appendChild(p);
         }
 
-        function getFormData($form){
+        function getFormData($form) {
             var unindexed_array = $form.serializeArray();
             var indexed_array = {};
 
-            $.map(unindexed_array, function(n, i){
+            $.map(unindexed_array, function (n, i) {
                 indexed_array[n['name']] = n['value'];
             });
 
@@ -121,7 +121,9 @@
                     console.log("IM HERE")
                     console.log(data)
                 },
-                error: function(data){ console.log('my message' + data); }
+                error: function (data) {
+                    console.log('my message' + data);
+                }
 
             });
 
@@ -133,58 +135,32 @@
 <div class='nav'>
     <ul>
         <li>
-<%--            <a class='logo' href='http://andytran.me'>--%>
-<%--                <img src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/169963/logo_(1).svg' width="10" height="10">--%>
-<%--            </a>--%>
+            <%--                        <a class='logo' href='http://andytran.me'>--%>
+            <%--                            <img src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/169963/logo_(1).svg' width="10" height="10">--%>
+            <%--                        </a>--%>
         </li>
         <li>
             <a href='#portfolio'>Profile</a>
         </li>
-        <li>
-            <a href='#calendar'>
-                112 ES
-                <i class='fa fa-caret-down'></i>
-            </a>
-            <ul class='menu'>
-                <c:forEach items="${list}" var="item">
-                    <sec:authorize access="hasAuthority('${item.name}')">
-                        <li>
-                            <a href='<c:url value="/index/${item.name}"/>'>${item.display_name}</a>
-                        </li>
-                    </sec:authorize>
-                </c:forEach>
-            </ul>
-        <li/>
-        <li>
-            <a href='#calendar'>
-                ВидеоПортал
-                <i class='fa fa-caret-down'></i>
-            </a>
-            <ul class='menu'>
-                <c:forEach items="${list}" var="item">
-                    <sec:authorize access="hasAuthority('${item.name}')">
-                        <li>
-                            <a href='<c:url value="/index/${item.name}"/>'>${item.display_name}</a>
-                        </li>
-                    </sec:authorize>
-                </c:forEach>
-            </ul>
-        <li/>
-        <li>
-            <a href='#calendar'>
-                Ксеон
-                <i class='fa fa-caret-down'></i>
-            </a>
-            <ul class='menu'>
-                <c:forEach items="${list}" var="item">
-                    <sec:authorize access="hasAuthority('${item.name}')">
-                        <li>
-                            <a href='<c:url value="/index/${item.name}"/>'>${item.display_name}</a>
-                        </li>
-                    </sec:authorize>
-                </c:forEach>
-            </ul>
-        <li/>
+        <c:forEach items="${groups}" var="group">
+            <li>
+                <a href='#calendar'>
+                        ${group}
+                    <i class='fa fa-caret-down'></i>
+                </a>
+                <ul class='menu'>
+                    <c:forEach items="${list}" var="item">
+                        <c:if test="${item.group_name == group}">
+                            <sec:authorize access="hasAuthority('${item.name}')">
+                                <li>
+                                    <a href='<c:url value="/index/${item.name}"/>'>${item.display_name}</a>
+                                </li>
+                            </sec:authorize>
+                        </c:if>
+                    </c:forEach>
+                </ul>
+            <li/>
+        </c:forEach>
         <sec:authorize access="hasAuthority('ADMIN_PAGE_USAGE')">
             <li>
                 <a href="<c:url value="/admin"/>" style="color: grey">
@@ -220,8 +196,9 @@
                 <h4>${script.display_name}</h4>
                 <table>
                     <thead>
-                    <form name='f' id="ScriptForm" onsubmit="return validateAddUserForm()" class="form__group field" action=
-                        <c:url value='/scripts/run_script'/> method='GET'>
+                    <form name='f' id="ScriptForm" onsubmit="return validateAddUserForm()" class="form__group field"
+                          action=
+                              <c:url value='/scripts/run_script'/> method='GET'>
                         <input name="name" id='name' type="hidden" value="${script.name}"/>
 
                         <c:forEach items="${parameters}" var="parameter">
@@ -246,7 +223,8 @@
                                     </c:when>
                                     <c:when test="${parameter.type == 'text'}">
                                         <input type="text" class="form__field" placeholder="${parameter.name}"
-                                               name="${parameter.param}" id='${parameter.name}' maxlength="${parameter.max}"
+                                               name="${parameter.param}" id='${parameter.name}'
+                                               maxlength="${parameter.max}"
                                                <c:if test="${parameter.required}">required</c:if>/>
                                     </c:when>
                                     <c:when test="${parameter.type == 'hidden'}">
@@ -275,7 +253,7 @@
                                 </c:choose>
                             </tr>
                         </c:forEach>
-<%--                        <input name="submit" type="submit" class="e" value="Run Script"/>--%>
+                            <%--                        <input name="submit" type="submit" class="e" value="Run Script"/>--%>
 
                     </form>
                     </thead>
@@ -283,7 +261,7 @@
 
                 <div>
                     <div>
-<%--                        <input type="text" id="from" placeholder="Choose a nickname"/>--%>
+                            <%--                        <input type="text" id="from" placeholder="Choose a nickname"/>--%>
                     </div>
                     <br/>
                     <div>

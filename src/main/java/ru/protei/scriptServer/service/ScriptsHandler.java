@@ -60,6 +60,7 @@ public class ScriptsHandler {
 
                 JsonScript jsonScript = utils.parseJsonToObject(config.getInputStream());
                 script.setName(jsonScript.name);
+                script.setGroup_name(jsonScript.group);
                 script.setDisplay_name(jsonScript.display_name);
                 script.setScript_path(jsonScript.script_path);
                 script.setParametersJson(jsonScript.paramsToJsonString());

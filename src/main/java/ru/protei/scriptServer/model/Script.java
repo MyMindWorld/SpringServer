@@ -14,13 +14,11 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class Script {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.AUTO)
-//    private Long id;
     @NotBlank
     @Id
-    //@Column(nullable = false, unique = true) // ????
     private String name;
+    @Column(columnDefinition = "LONGTEXT")
+    private String group_name;
     @NotBlank
     private String display_name;
     @NotBlank

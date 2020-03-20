@@ -15,6 +15,8 @@ import ru.protei.scriptServer.repository.UserRepository;
 import ru.protei.scriptServer.utils.Utils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static ru.protei.scriptServer.utils.Utils.getUsername;
@@ -44,8 +46,15 @@ public class MainPageController {
     public ModelAndView showMenu() {
         ModelAndView modelAndView = new ModelAndView("index");
         List<Script> scriptList = scriptRepository.findAll();
+        List<String> groupsList = new ArrayList<>();
+        for (Script script : scriptList) { // todo Sort?
+            if (!groupsList.contains(script.getGroup_name())) {
+                groupsList.add(script.getGroup_name());
+            }
+        }
 
         modelAndView.addObject("list", scriptList);
+        modelAndView.addObject("groups", groupsList);
 
         return modelAndView;
     }

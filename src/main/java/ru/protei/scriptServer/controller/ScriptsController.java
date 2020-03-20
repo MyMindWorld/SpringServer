@@ -25,6 +25,7 @@ import ru.protei.scriptServer.utils.Utils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 
@@ -48,16 +49,22 @@ public class ScriptsController {
     @SneakyThrows
     @RequestMapping(value = "/scripts/run_script", method = RequestMethod.POST)
     @ResponseBody
-    public void runScript(@RequestParam Map<String,String> allRequestParams, String name, HttpServletRequest req) {
+    public void runScript(@RequestParam Map<String, String> allRequestParams, String name, HttpServletRequest req) {
         Script scriptObject = scriptRepository.findByNameEquals(name);
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Script script = scriptRepository.findByNameEquals(scriptObject.getName());
         Message message = new Message();
-        for (String value: allRequestParams.keySet()
-             ) {logger.info(value + " : " + allRequestParams.get(value));
+        if (!Arrays.toString(principal.getAuthorities().toArray()).contains(script.getName())) { // legshooting
+            logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "RUNNING SCRIPT WITHOUT ROLE! '" + script.getName() + "'", String.valueOf(allRequestParams));
+            // todo 403 page
+            return;
+        }
+        for (String value : allRequestParams.keySet()
+        ) {
+            logger.info(value + " : " + allRequestParams.get(value));
 
         }
-        if (allRequestParams.size() == 0){
+        if (allRequestParams.size() == 0) {
             Thread.sleep(1000L);
             message.setFrom("SCRIPT");
             message.setText("Parameters could not be empty! Or should they...");
@@ -72,16 +79,11 @@ public class ScriptsController {
 
 //        logger.info("Raw params : " + Arrays.toString(commandParams));
 //        String[] resultRunString = utils.createParamsString(script, commandParams);
-//        if (!Arrays.toString(principal.getAuthorities().toArray()).contains(script.getName())) {
-//            logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "RUNNING SCRIPT WITHOUT ROLE! '" + script.getName() + "'", Arrays.toString(commandParams));
-//            return "ErrorCodes/403";
-//        }
+
 //        logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "Run script '" + script.getName() + "'", Arrays.toString(resultRunString));
 //        logger.info("Received params : " + Arrays.toString(commandParams));
 //
 //        scriptsHandler.runPythonScript(resultRunString, script.getScript_path());
-
-
 
 
 //        return "redirect:" + req.getHeader("Referer");

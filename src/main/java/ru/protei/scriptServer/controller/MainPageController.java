@@ -3,6 +3,8 @@ package ru.protei.scriptServer.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,17 +40,21 @@ public class MainPageController {
     }
 
     @RequestMapping("/")
-    public ModelAndView redirectToIndex() {
-        return showMenu();
+    public ModelAndView redirectToIndex(HttpServletRequest req) {
+        return showMenu(req);
     }
 
     @RequestMapping("/index")
-    public ModelAndView showMenu() {
+    public ModelAndView showMenu(HttpServletRequest req) {
+        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         ModelAndView modelAndView = new ModelAndView("index");
+        String allowedScripts = Arrays.toString(principal.getAuthorities().toArray()); // legshooting
         List<Script> scriptList = scriptRepository.findAll();
         List<String> groupsList = new ArrayList<>();
+
         for (Script script : scriptList) { // todo Sort?
-            if (!groupsList.contains(script.getGroup_name())) {
+            if ((!groupsList.contains(script.getGroup_name())) & allowedScripts.contains(script.getName())) {
+
                 groupsList.add(script.getGroup_name());
             }
         }
@@ -68,7 +74,7 @@ public class MainPageController {
         }
         logger.warn("User '" + getUsername() + "' requested script '" + scriptName + "', and displayName : " + script.getDisplay_name());
         Parameters[] parameters = utils.stringToListOfParams(script.getParametersJson());
-        ModelAndView modelAndView = showMenu();
+        ModelAndView modelAndView = showMenu(request);
 
 
         return modelAndView.addObject("script", script).addObject("parameters", parameters);

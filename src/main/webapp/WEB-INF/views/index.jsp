@@ -140,11 +140,11 @@
             <%--                        </a>--%>
         </li>
         <li>
-            <a href='#portfolio'>Profile</a>
+            <a href="<c:url value="/admin"/>">Profile</a>
         </li>
         <c:forEach items="${groups}" var="group">
             <li>
-                <a href='#calendar'>
+                <a name="menuItem">
                         ${group}
                     <i class='fa fa-caret-down'></i>
                 </a>
@@ -307,10 +307,24 @@
         console.log("Done2")
 
     }
+    function removeEmptyMenuEntries(){
+        console.log("START")
+        let menuItems = document.getElementsByName("menuItem");
+        console.log("Len - " ,menuItems.length)
+        for (let i = 0; i < menuItems.length; i++) {
+
+            console.log(i)
+            console.log(menuItems.item(i)
+                .
+                .toString())
+        }
+
+    }
 
     $(document).ready(function () {
         $('.multy').select2();
         $('.single').select2();
+        removeEmptyMenuEntries()
     });
 </script>
 

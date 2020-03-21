@@ -28,16 +28,9 @@
     <link rel="stylesheet" type="text/css" href="<c:url value="/css/main.css"/>">
     <link rel="stylesheet" type="text/css" href="<c:url value="/css/Newindex.css"/>">
     <!--===============================================================================================-->
-    <%--    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>--%>
-    <%--        <script type="text/javascript" src="<c:url value="/vendor/jquery/jquery-2.1.3.min.js"/>"/>--%>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet"/>
-    <%--    TODO MOVE THEM TO LOCAL INSTALL??--%>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
-    <%--    <script--%>
-    <%--            src="https://code.jquery.com/jquery-2.1.3.min.js"--%>
-    <%--            integrity="sha256-ivk71nXhz9nsyFDoYoGf2sbjrR9ddh+XDkCcfZxjvcM="--%>
-    <%--            crossorigin="anonymous"></script>--%>
+    <script src="<c:url value="/vendor/jquery/jquery-2.1.3.min.js"/>"></script>
+    <script src="<c:url value="/vendor/select2/select2.min.js"/>"></script>
+    <link rel="stylesheet" type="text/css" href="<c:url value="/vendor/select2/select2.min.css"/>"></link>
     <script src="<c:url value="/vendor/sockjs/sockjs.js"/>"></script>
     <script src="<c:url value="/vendor/stomp/stomp.js"/>"></script>
     <script type="text/javascript">
@@ -304,27 +297,11 @@
     function SetMenuVisible() {
         let e = document.getElementById("sidebar");
         e.style.display = 'none'
-        console.log("Done2")
-
-    }
-    function removeEmptyMenuEntries(){
-        console.log("START")
-        let menuItems = document.getElementsByName("menuItem");
-        console.log("Len - " ,menuItems.length)
-        for (let i = 0; i < menuItems.length; i++) {
-
-            console.log(i)
-            console.log(menuItems.item(i)
-                .
-                .toString())
-        }
-
     }
 
     $(document).ready(function () {
         $('.multy').select2();
         $('.single').select2();
-        removeEmptyMenuEntries()
     });
 </script>
 

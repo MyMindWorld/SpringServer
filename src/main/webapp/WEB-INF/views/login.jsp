@@ -3,7 +3,6 @@
 <html lang="en">
 <head>
     <title>Script Server Login</title>
-    <jsp:include page="init.jsp"/>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">

@@ -1,6 +1,6 @@
 {
   "name": "TestList",
-  "display_name": "Тест листаAAAAAA",
+  "display_name": "Тест листов",
   "group": "List",
   "script_path": "bdupdate.py",
   "description": "Тестим лист",
@@ -14,7 +14,7 @@
       "required": false
     },
     {
-      "name": "Я ЛИИИИИИИИИИИИИИСТ",
+      "name": "Обычный лист",
       "param": "--hella_list",
       "description": "У него есть текст в подсказке",
       "type": "list",
@@ -27,7 +27,7 @@
       ]
     },
     {
-      "name": "Я ЛИИИИИИИИИИИИИИСТ",
+      "name": "Мультиселект",
       "param": "--hella_listasd",
       "description": "У него есть текст в подсказке",
       "type": "multiselect",

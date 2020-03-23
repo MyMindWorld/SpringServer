@@ -50,6 +50,9 @@ public class ScriptsController {
     @RequestMapping(value = "/scripts/run_script", method = RequestMethod.POST)
     @ResponseBody
     public void runScript(@RequestParam Map<String, String> allRequestParams, String name, HttpServletRequest req) {
+        // todo return value to list on load or dynamicly? Doing this on server might me easier, but select2
+        //  supoprts ajax https://select2.org/data-sources/ajax
+
         Script scriptObject = scriptRepository.findByNameEquals(name);
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Script script = scriptRepository.findByNameEquals(scriptObject.getName());
@@ -74,7 +77,6 @@ public class ScriptsController {
         message.setFrom("SCRIPT");
         message.setText("Started!");
         sendToSock(message);
-        logger.info("I WAS CALLED!!!!");
 
 
 //        logger.info("Raw params : " + Arrays.toString(commandParams));
@@ -90,7 +92,7 @@ public class ScriptsController {
     }
 
     public void sendToSock(Message message) {
-        logger.info("SENDING MESSAGE" + message.getText());
+        logger.info("SENDING MESSAGE " + message.getText());
         this.simpMessagingTemplate.convertAndSend("/topic/messages/", message);
     }
 
@@ -98,14 +100,14 @@ public class ScriptsController {
         Message messageObj = new Message();
         messageObj.setFrom("SCRIPT");
         messageObj.setText(message);
-        logger.info("SENDING MESSAGE" + message);
+        logger.info("SENDING MESSAGE " + message);
         this.simpMessagingTemplate.convertAndSend("/topic/messages/", messageObj);
     }
 
     @MessageMapping("/chat")
     @SendTo("/topic/messages/")
     public OutputMessage sendReceivedMessageToWS(Message message) {
-        logger.info("SENDING MESSAGE" + message.getText());
+        logger.info("SENDING MESSAGE " + message.getText());
         String time = new SimpleDateFormat("HH:mm").format(new Date());
         return new OutputMessage(message.getFrom(), message.getText(), time);
     }

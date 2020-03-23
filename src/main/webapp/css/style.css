@@ -81,6 +81,10 @@ color: #ff3300;
   color: #1E6AE1;
   /* Цвет текста */
 }
+.e:disabled {
+  background: #dddddd;
+  color: #f7fcf9;
+}
 
 .d:hover {
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
@@ -236,7 +240,7 @@ color: #ff3300;
   position: relative;
   padding: 15px 0 0;
   margin-top: 10px;
-  width: 100%;
+  width: 200px;
 }
 
 .form__field {
@@ -255,7 +259,7 @@ color: #ff3300;
   color: transparent;
 }
 .form__field:placeholder-shown ~ .form__label {
-  font-size: 1.3rem;
+  font-size: 1rem;
   cursor: text;
   top: 20px;
 }
@@ -375,8 +379,8 @@ ul.checkbox li.focus  {
   overflow: auto; /* Enable scroll if needed */
   background-color: rgb(0, 0, 0); /* Fallback color */
   background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
-  overflow-x: hidden;
-  overflow-x: auto;
+  /*overflow-x: hidden;*/
+  /*overflow-x: auto;*/
 }
 
 /* Modal Content */

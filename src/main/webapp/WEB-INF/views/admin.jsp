@@ -4,7 +4,6 @@
     <title>Admin</title>
     <%@taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
     <meta <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>>
-    <jsp:include page="init.jsp"/>
     <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
     <style>
         <%@include file="/css/style.css" %>

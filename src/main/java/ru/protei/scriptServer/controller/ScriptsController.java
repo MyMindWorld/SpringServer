@@ -79,20 +79,19 @@ public class ScriptsController {
         sendToSock(message);
 
 
-//        logger.info("Raw params : " + Arrays.toString(commandParams));
-//        String[] resultRunString = utils.createParamsString(script, commandParams);
+        String[] resultRunString = utils.createParamsString(script, allRequestParams);
 
-//        logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "Run script '" + script.getName() + "'", Arrays.toString(resultRunString));
-//        logger.info("Received params : " + Arrays.toString(commandParams));
+        logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "Run script '" + script.getName() + "'", Arrays.toString(resultRunString));
+        logger.info("Created string : " + Arrays.toString(resultRunString));
 //
-//        scriptsHandler.runPythonScript(resultRunString, script.getScript_path());
-
+        scriptsHandler.runPythonScript(resultRunString, script.getScript_path());
 
 //        return "redirect:" + req.getHeader("Referer");
     }
 
     public void sendToSock(Message message) {
-        logger.info("SENDING MESSAGE " + message.getText());
+        logger.info("SENDING MESSAGE sendToSock OBJ " + message.getText());
+        message.setTime(new SimpleDateFormat("HH:mm").format(new Date()));
         this.simpMessagingTemplate.convertAndSend("/topic/messages/", message);
     }
 
@@ -100,14 +99,15 @@ public class ScriptsController {
         Message messageObj = new Message();
         messageObj.setFrom("SCRIPT");
         messageObj.setText(message);
-        logger.info("SENDING MESSAGE " + message);
+        messageObj.setTime(new SimpleDateFormat("HH:mm").format(new Date()));
+        logger.info("SENDING MESSAGE sendToSock STRING " + message);
         this.simpMessagingTemplate.convertAndSend("/topic/messages/", messageObj);
     }
 
     @MessageMapping("/chat")
     @SendTo("/topic/messages/")
     public OutputMessage sendReceivedMessageToWS(Message message) {
-        logger.info("SENDING MESSAGE " + message.getText());
+        logger.info("SENDING MESSAGE sendReceivedMessageToWS  " + message.getText());
         String time = new SimpleDateFormat("HH:mm").format(new Date());
         return new OutputMessage(message.getFrom(), message.getText(), time);
     }

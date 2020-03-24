@@ -68,12 +68,14 @@ public class AsyncExecutor {
                 logger.info(Arrays.toString(execWithArgs));
                 p = Runtime.getRuntime().exec(execWithArgs, null, directory);
             }
+            logger.info("READING START");
             // 2 print the output
             InputStream is = p.getInputStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
             InputStream eis = p.getErrorStream();
             BufferedReader ebr = new BufferedReader(new InputStreamReader(eis));
+
 
             String lineStdout = null;
             String lineStderr = null;
@@ -88,9 +90,13 @@ public class AsyncExecutor {
                         scriptsController.sendToSock(lineStdout);
                         linesSoFarStdout.add(lineStdout);
                     }
+                    else {
+                        logger.info("NOTHING");
+                    }
                     if (lineStderr != null) {
 //                        System.out.println(lineStderr);
                         logger.error(lineStderr);
+                        scriptsController.sendToSock(lineStderr);
                         linesSoFarStderr.add(lineStderr);
                     }
                 }

@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Map;
 
 import static org.passay.DictionaryRule.ERROR_CODE;
 
@@ -135,30 +136,34 @@ public class Utils {
         return password;
     }
 
-    public String[] createParamsString(Script script, String[] params) {
+    public String[] createParamsString(Script script, Map<String, String> params) {
+        params.remove("name"); // Аргумент в котором передается от клиента название скрипта
         // todo refactor to array mb?
+        // todo нужна ли здесь валидация
         Parameters[] parametersKeys = stringToListOfParams(script.getParametersJson());
-        int mapped = 0;
-        int length = 0;
         ArrayList<String> resultArray = new ArrayList<String>();
-        for (Parameters paramKey : parametersKeys) {
+        for (Parameters paramKey : parametersKeys) { // сбор констант
             if (paramKey.constant) {
 //                if (paramKey.values) // продумать как назвать параметр для скрипта в конфиге
+                if (params.get(paramKey) == null){
+                    continue;
+                }
                 resultArray.add(paramKey.getParam());
                 resultArray.add(paramKey.getDefaultConstant());
-            } else {
-                resultArray.add(paramKey.getParam());
-                resultArray.add(params[mapped]);
-                mapped++;
             }
-            length = length + 2;
         }
-//        paramsString.delete(paramsString.length() - 2, paramsString.length()); // НаQa?
-        String[] resultString = new String[length];
+        for (String paramKey : params.keySet()) { // сбор констант
+            if (params.get(paramKey) == null){
+                continue;
+            }
+            resultArray.add(paramKey);
+            resultArray.add(params.get(paramKey));
+        }
+
+        String[] resultString = new String[resultArray.size()];
         for (int i = 0; i < resultArray.size(); i++) {
             resultString[i] = resultArray.get(i);
         }
-//        return paramsString.toString();
         return resultString;
     }
 

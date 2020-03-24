@@ -2,7 +2,7 @@
   "name": "0 ParameterTest",
   "display_name": "Тест Параметров",
   "group": "Misc",
-  "script_path": "parameterized.sh",
+  "script_path": "test.py",
   "working_directory": "./samples",
   "description": "This script does nothing except accepting a lot of parameters and printing them",
   "allowed_users": [

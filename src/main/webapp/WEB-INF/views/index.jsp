@@ -125,6 +125,21 @@
             });
             return false;
         }
+        const out = document.getElementById("output")
+        let c = 0
+
+        setInterval(function() {
+            // allow 1px inaccuracy by adding 1
+            const isScrolledToBottom = out.scrollHeight - out.clientHeight <= out.scrollTop + 1
+            // scroll to bottom if isScrolledToBottom is true
+            if (isScrolledToBottom) {
+                out.scrollTop = out.scrollHeight - out.clientHeight
+            }
+        }, 500)
+
+        function format () {
+            return Array.prototype.slice.call(arguments).join(' ')
+        }
     </script>
 </head>
 <body>
@@ -262,17 +277,12 @@
 
         </form>
         <button id="runScriptButton" class="e"
-                onclick="connect(); runScript();"
+                onclick="connect();"
         >Run Script
         </button>
         <button id="disconnect" class="e" disabled="disabled" onclick="disconnect();">
             Disconnect
         </button>
-        <div id="conversationDiv">
-            <input type="text" id="text" placeholder="Write a message..."/>
-            <button id="sendMessage" onclick="sendMessage();">Send</button>
-            <p id="response"></p>
-        </div>
     </sec:authorize>
 </div>
 <script>
@@ -282,19 +292,34 @@
         return false;
     });
 </script>
-    <%--                   Показывается только если НЕТ необходимой роли --%>
+    <%--Показывается только если НЕТ необходимой роли --%>
 <sec:authorize access="!hasAuthority('${script.name}')">
-    <div class="script-content">
+    <div class="blank_message">
         У вас отсутсвуют права на выполнение запрошенного скрипта.
         <br>
         Обратитесь к руководителю вашей группы.
     </div>
 </sec:authorize>
+    <%--Показывается только если выбран скрипт и есть роль --%>
+<sec:authorize access="hasAuthority('${script.name}')">
+    <div class="script-content" id="output">
+        <p id="response"></p>
+        <div id="conversationDiv">
+            <input type="text" id="text" placeholder="Write a message..."/>
+            <button id="sendMessage" onclick="sendMessage();">Send</button>
+        </div>
+    </div>
+</sec:authorize>
 
 </c:when>
 <c:otherwise> <%-- Если не выбран, дефолтная страница --%>
-    <div class="script-content">
+    <div class="blank_message">
         <img src="<c:url value="/images/cutLogo.png"/>" alt="script server logo">
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
         Доступ к необходимым скриптам можно запросить у руководителя вашей группы<br>
         (Cake is a lie!)
     </div>

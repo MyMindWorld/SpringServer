@@ -209,13 +209,46 @@ body {
     /*left: 20px;*/
     /*right: 20px;*/
     /*top: 20px;*/
-    /*width: 400px;*/
+    width: 75%;
+    overflow-x: hidden;
+    overflow-x: auto;
+    height:80%;
     /*height: 160px;*/
     padding: 10px 20px;
     background: #e9e9e9;
     position: fixed;
     top: 70px;
+    margin-left: 350px;
+    /*transform: translate(-50%, -50%);*/
+
+}
+.script-content p{
+    width: 80%;
+    color: rgb(14, 11, 11);
+    font-family: Monospace;
+    margin: 10px 0px 0px 10px;
+    text-align: left;
+}
+
+.blank_message {
+    padding: 10px 20px;
+    background: #e9e9e9;
+    position: fixed;
+    top: 70px;
+    margin:auto;
     width: 100%;
     /*transform: translate(-50%, -50%);*/
 
+}
+.blank_message img{
+    position: relative;
+    top: 70px;
+    padding: 5px; /* Поля вокруг текста */
+    margin: 10px 10px 20px 5px; /* Значения отступов */
+}
+.blank_message p{
+    color: rgb(255, 255, 255);
+    font-family: Monospace;
+    margin: 10px 0px 0px 10px;
+    text-align: center;
 }

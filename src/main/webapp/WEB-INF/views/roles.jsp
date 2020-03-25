@@ -103,7 +103,8 @@
                                 var="role_privelege">${role_privelege.id},</c:forEach>]);">Update
                 role
             </button>
-            <button id="deleteUser" class="e" onclick="openModalDelete('${role.id}','${role.name}');">Delete role</button>
+            <button id="deleteUser" class="e" onclick="openModalDelete('${role.id}','${role.name}');">Delete role
+            </button>
         </td>
         </c:forEach>
 </table>
@@ -130,31 +131,34 @@
         <p style="font-size:235%;text-align:center;" id="ModalWindowRoleName">Updating HERE SHOULD BE USERNAME roles</p>
         <button id="selectAllModalButton" class="e" onclick="selectAllCheckBoxesModal('privilegesUpdate');"> Select All
         </button>
-        <button id="deSelectAllModalButton" class="e" onclick="deSelectAllCheckBoxesModal('privilegesUpdate');"> DeSelect All
+        <button id="deSelectAllModalButton" class="e" onclick="deSelectAllCheckBoxesModal('privilegesUpdate');">
+            DeSelect All
         </button>
         <form name='f' action=
         <c:url value='/admin/update_role'/> method='POST' onsubmit="return validateAddRoleForm('privilegesUpdate')">
 
             <input name="name" id='roleName' type="hidden" value=""/>
             <div class="form__group field">
-                <input type="input" class="form__field" placeholder="Name" name="nameNew" id='roleNameNew' maxlength="20"
+                <input type="input" class="form__field" placeholder="Name" name="nameNew" id='roleNameNew'
+                       maxlength="20"
                        pattern="^[a-zA-Z0-9_-]{3,20}$" title="ONLY 3-20 characters, underscore or dash"/>
                 <label for="roleNameNew" class="form__label">New Role Name</label>
             </div>
-            <input name="submit" type="submit" class="e" value="Update Role"/>
+
 
             <fieldset class="group">
                 <legend>Select Privileges</legend>
                 <ul class="checkbox">
                     <c:forEach items="${privileges}" var="privilege">
                         <li>
-                            <input type="checkbox" name="privilegesUpdate" id="${privilege.id}" value="${privilege.id}"/>
+                            <input type="checkbox" name="privilegesUpdate" id="${privilege.id}"
+                                   value="${privilege.id}"/>
                             <label for="${privilege.id}"><c:out value="${privilege.name}"/></label>
                         </li>
                     </c:forEach>
                 </ul>
             </fieldset>
-
+            <input name="submit" type="submit" class="e" value="Update Role"/>
 
 
         </form>
@@ -218,16 +222,14 @@
     <!-- Modal content -->
     <div class="modal-content" style="height: auto">
         <span class="close">&times;</span>
-        <p style="font-size:235%;text-align:center;"id="DeleteModalWindowRole">'ERROR!'</p>
+        <p style="font-size:235%;text-align:center;" id="DeleteModalWindowRole">'ERROR!'</p>
         <form name='f' class="form__group field" action=
         <c:url value='/admin/delete_role'/> method='POST'>
 
             <input name="name" id='roleDeleteName' type="hidden" value=""/>
             <input name="id" id='roleIdDelete' type="hidden" value=""/>
 
-            <input name="submit"style="align-self: center" type="submit" class="e" value="Delete Role"/>
-
-
+            <input name="submit" style="align-self: center" type="submit" class="e" value="Delete Role"/>
 
 
         </form>
@@ -238,7 +240,7 @@
     // Get the modal
     const modalDelete = document.getElementById("deleteUserModal");
 
-    function openModalDelete (id,roleName){
+    function openModalDelete(id, roleName) {
         modalDelete.style.display = "block";
         document.getElementById('DeleteModalWindowRole').innerHTML = "Are you sure want to delete role <b>" + roleName.toString() + "</b> ?";
         document.getElementById('roleDeleteName').value = roleName;
@@ -247,12 +249,12 @@
         const span = document.getElementsByClassName("close")[1];
 
         // When the user clicks on <span> (x), close the modal
-        span.onclick = function() {
+        span.onclick = function () {
             modalDelete.style.display = "none";
         }
 
         // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             if (event.target == modalDelete) {
                 modalDelete.style.display = "none";
             }

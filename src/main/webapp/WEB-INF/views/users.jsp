@@ -140,7 +140,7 @@
         <c:url value='/admin/update_user'/> method='POST' onsubmit="return validateAddUserForm('roleVarUpdate')">
 
             <input name="username" id='username' type="hidden" value=""/>
-            <input name="submit" type="submit" class="e" value="Update Roles"/>
+
 
             <fieldset class="group">
                 <legend>Select Roles</legend>
@@ -152,6 +152,7 @@
 
                 </ul>
             </fieldset>
+            <input name="submit" type="submit" class="e" value="Update Roles"/>
 
 
 

@@ -138,6 +138,12 @@ public class RolesController {
 
 
         if (roleFromRepo != null) {
+            if (roleFromRepo.is_protected()) {
+                logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Attempt of deleting protected role ", "Role name : '" + role.getName() + "', Privileges : " + role.getPrivileges());
+                model.addAttribute("error", true);
+                model.addAttribute("errorMessage", "Deleting protected roles is forbidden!");
+                return roles(model);
+            }
             logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Delete role", roleFromRepo.toString());
             if (roleFromRepo.getUsers().size() != 0) {
                 roleService.deleteRoleFromUsers(roleFromRepo);
@@ -147,8 +153,8 @@ public class RolesController {
             model.addAttribute("successMessage", "Deleted role '" + roleFromRepo.getName() + "' successfully!");
         } else {
             model.addAttribute("error", true);
-            model.addAttribute("errorMessage", "User with username '" + roleFromRepo.getName() + "' not found!!! Please contact admin");
-            logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Role Delete", roleFromRepo.getName(), "USER NOT FOUND!");
+            model.addAttribute("errorMessage", "Role with name with username '" + roleFromRepo.getName() + "' not found!!! Please contact admin");
+            logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Role Delete", roleFromRepo.getName(), "ROLE NOT FOUND!");
 
         }
         return roles(model);

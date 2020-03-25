@@ -14,9 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+import ru.protei.scriptServer.model.LogEntity;
 import ru.protei.scriptServer.model.POJO.Message;
 import ru.protei.scriptServer.model.POJO.OutputMessage;
+import ru.protei.scriptServer.model.Role;
 import ru.protei.scriptServer.model.Script;
+import ru.protei.scriptServer.model.User;
 import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.service.LogService;
 import ru.protei.scriptServer.service.ScriptsHandler;
@@ -27,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -45,6 +50,16 @@ public class ScriptsController {
     ScriptsHandler scriptsHandler;
     @Autowired
     LogService logService;
+
+    @RequestMapping("/admin/scripts")
+    public ModelAndView scriptsPage() {
+        ModelAndView modelAndView = new ModelAndView("scripts");
+        List<Script> scriptList = scriptRepository.findAll();
+
+        modelAndView.addObject("scriptsList", scriptList);
+
+        return modelAndView;
+    }
 
     @SneakyThrows
     @RequestMapping(value = "/scripts/run_script", method = RequestMethod.POST)

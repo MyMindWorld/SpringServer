@@ -17,6 +17,7 @@ public class Role {
     private Long id;
     @NotBlank
     private String name;
+    private boolean is_protected;
     @ManyToMany(mappedBy = "roles")
     private Collection<User> users;
 

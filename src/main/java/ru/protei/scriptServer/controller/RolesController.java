@@ -98,14 +98,14 @@ public class RolesController {
         List<Privilege> privileges = privilegeRepository.findAllById(iterable);
         boolean isRoleNameUpdated = newRoleName != roleName & !newRoleName.isEmpty();
 
-        logger.info("Received update role request from : '" + getUsername() + "' adding " + roleName);
+        logger.info("Received update role request from : '" + getUsername() + "' updating role '" + roleName + "'");
         logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Role update", "Role name : '" + roleName + "', new privileges : " + privileges);
 
-        Role sameRole = roleService.findRoleByPrivileges(privileges);
-        if (sameRole != null & !isRoleNameUpdated) {
-            logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Attempt of creating already existing role ", "Role name : '" + roleName + "', Privileges : " + privileges);
+        Role roleFromRepo = roleRepository.findByNameEquals(roleName);
+        if (roleFromRepo.is_protected()) {
+            logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Attempt of updating protected role ", "Role name : '" + roleName + "', Privileges : " + privileges);
             model.addAttribute("error", true);
-            model.addAttribute("errorMessage", "Role with this privileges already exists, it's called '" + sameRole.getName() + "' Try using it for your purposes.");
+            model.addAttribute("errorMessage", "Updating protected roles is forbidden!");
         } else {
             Role updatedRole;
             if (isRoleNameUpdated) {

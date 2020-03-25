@@ -59,9 +59,13 @@ public class ScriptsHandler {
             try {
 
                 JsonScript jsonScript = utils.parseJsonToObject(config.getInputStream());
+                // todo if parsing straight to db really hard?
                 script.setName(jsonScript.name);
                 script.setGroup_name(jsonScript.group);
                 script.setDisplay_name(jsonScript.display_name);
+                script.setVenv(jsonScript.venv);
+                script.setPython_version(jsonScript.python_version);
+                script.setRequirements(jsonScript.requirements);
                 script.setScript_path(jsonScript.script_path);
                 script.setParametersJson(jsonScript.paramsToJsonString());
             } catch (IOException e) {
@@ -78,11 +82,11 @@ public class ScriptsHandler {
         }
 
 
-        List<Privilege> allPrivilege = privilegeService.returnAllPrivileges();
+        List<Privilege> allPrivileges = privilegeService.returnAllPrivileges();
 
-        Role role_all = roleService.createRoleIfNotFound("ROLE_ALL_SCRIPTS", allPrivilege);
+        Role role_all = roleService.createRoleIfNotFound("ROLE_ALL_SCRIPTS", allPrivileges,true);
         if (role_all == null)
-            roleService.updateRole("ROLE_ALL_SCRIPTS", allPrivilege);
+            roleService.updateRole("ROLE_ALL_SCRIPTS", allPrivileges,true);
 
         logger.warn(scriptRepository.findAll().toString());
 

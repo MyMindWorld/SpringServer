@@ -21,7 +21,7 @@ public class RoleService {
 
 
     @Autowired
-    public RoleRepository roleRepository;
+    private RoleRepository roleRepository;
 
 
     @Transactional
@@ -38,6 +38,21 @@ public class RoleService {
             return role;
         }
         return null;
+    }
+
+    @Transactional
+    public Role createRoleIfNotFound(
+            String name, List<Privilege> privileges, boolean is_protected) {
+        Role role = roleRepository.findByNameEquals(name);
+        if (role == null) {
+            role = new Role(name);
+            role.setPrivileges(privileges);
+            role.set_protected(is_protected);
+            roleRepository.save(role);
+            logger.info("New role '" + name + "' created");
+            return role;
+        }
+        return role;
     }
 
     @Transactional
@@ -72,9 +87,21 @@ public class RoleService {
     }
 
     @Transactional
+    public Role updateRole(
+            String name, List<Privilege> privileges, boolean is_protected) {
+        Role role = roleRepository.findByNameEquals(name);
+        role.setPrivileges(privileges);
+        role.setName(name);
+        role.set_protected(is_protected);
+        roleRepository.save(role);
+        logger.info("Role '" + name + "' updated");
+        return role;
+    }
+
+    @Transactional
     public void deleteRoleFromUsers(Role role) {
         Collection<User> usersWithRole = role.getUsers();
-        for (User userWithRole : usersWithRole ) {
+        for (User userWithRole : usersWithRole) {
             Collection<Role> userRoles = userWithRole.getRoles();
             userRoles.remove(role);
         }

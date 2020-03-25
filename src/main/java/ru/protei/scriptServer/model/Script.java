@@ -22,6 +22,10 @@ public class Script {
     @NotBlank
     private String display_name;
     @NotBlank
+    private String python_version;
+    private String venv;
+    private String requirements;
+    @NotBlank
     private String script_path;
     @NotBlank
     @Column(columnDefinition = "LONGTEXT")

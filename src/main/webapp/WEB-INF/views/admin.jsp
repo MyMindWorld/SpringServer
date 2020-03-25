@@ -16,7 +16,7 @@
     <a href="<c:url value="/index"/>" class="e"><i class="far fa-arrow-alt-circle-left"></i> Home </a>
 </div>
 <sec:authorize access="hasAuthority('SCRIPTS_UPDATE')">
-    <a href="<c:url value="/admin/update_scripts"/>" class="e">Update Scripts</a>
+    <a href="<c:url value="/admin/scripts"/>" class="e">Scripts</a>
 </sec:authorize>
 <sec:authorize access="hasAuthority('ROLES_SETTING')">
     <a href="<c:url value="/admin/roles"/>" class="e">Roles</a>

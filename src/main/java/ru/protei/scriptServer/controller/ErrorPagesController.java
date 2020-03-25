@@ -17,6 +17,7 @@ public class ErrorPagesController {
     public String Forbidden() {
         return "ErrorCodes/403";
     }
+
     @RequestMapping("/ErrorCodes/500")
     @ExceptionHandler
     public String InternalServerError() {

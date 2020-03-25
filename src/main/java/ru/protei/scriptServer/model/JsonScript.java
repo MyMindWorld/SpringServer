@@ -15,6 +15,9 @@ public class JsonScript {
     public String name; // unique
     public String group;
     public String display_name;
+    public String venv;
+    public String requirements;
+    public String python_version;
     public String script_path;
     public String description;
     // add display name

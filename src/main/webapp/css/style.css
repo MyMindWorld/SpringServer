@@ -325,16 +325,18 @@ color: #ff3300;
 }
 
 fieldset.group  {
+  margin: 0;
   padding: 0;
-  margin: 0 0 1.25em;
+  margin-bottom: 1.25em;
   padding: .125em;
+  display: inline-block;
 }
 
 fieldset.group legend {
   margin: 0;
   padding: 0;
   font-weight: bold;
-  /*margin-left: 20px;*/
+  margin-left: 20px;
   font-size: 100%;
   color: black;
 }
@@ -358,7 +360,7 @@ ul.checkbox li {
 }
 
 ul.checkbox li label {
-  margin-left: ;
+  margin-left: auto;
 }
 ul.checkbox li:hover,
 ul.checkbox li.focus  {

@@ -19,9 +19,8 @@
     <a href="<c:url value="/admin/update_scripts"/>" class="e">Update Scripts</a>
 </sec:authorize>
 <sec:authorize access="hasAuthority('ROLES_SETTING')">
-    <a href="<c:url value="/admin/create_role"/>" class="e">Create Role</a>
-    <a href="<c:url value="/admin/create_user"/>" class="e">Create User</a>
-    <a href="<c:url value="/admin/update_user"/>" class="e">Update User Role</a>
+    <a href="<c:url value="/admin/roles"/>" class="e">Roles</a>
+    <a href="<c:url value="/admin/users"/>" class="e">Users</a>
 </sec:authorize>
 
 
@@ -143,9 +142,9 @@
 
     document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
         const table = th.closest('table');
-        Array.from(table.querySelectorAll('tr:nth-child(n+2)'))
+        Array.from(table.querySelectorAll('tbody tr'))
             .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
-            .forEach(tr => table.appendChild(tr));
+            .forEach(tr => table.querySelector("tbody").appendChild(tr));
     })));
     console.log("Sort Enable Done!");
 

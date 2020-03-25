@@ -6,11 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.protei.scriptServer.model.Privilege;
 import ru.protei.scriptServer.model.Role;
+import ru.protei.scriptServer.model.User;
 import ru.protei.scriptServer.repository.PrivilegeRepository;
 import ru.protei.scriptServer.repository.RoleRepository;
 import ru.protei.scriptServer.repository.UserRepository;
 
 import javax.transaction.Transactional;
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -51,6 +53,31 @@ public class RoleService {
         roleRepository.save(role);
         logger.info("Role '" + name + "' updated");
         return role;
+    }
+
+    @Transactional
+    public Role updateRole(
+            String name, String newName, List<Privilege> privileges) {
+
+        Role role = roleRepository.findByNameEquals(name);
+        if (role == null) {
+            logger.warn("Role '" + name + "' not found!");
+            return null;
+        }
+        role.setPrivileges(privileges);
+        role.setName(newName);
+        roleRepository.save(role);
+        logger.info("Role '" + name + "' updated, new name : " + newName);
+        return role;
+    }
+
+    @Transactional
+    public void deleteRoleFromUsers(Role role) {
+        Collection<User> usersWithRole = role.getUsers();
+        for (User userWithRole : usersWithRole ) {
+            Collection<Role> userRoles = userWithRole.getRoles();
+            userRoles.remove(role);
+        }
     }
 
     @Transactional

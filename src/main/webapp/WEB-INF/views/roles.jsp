@@ -29,7 +29,7 @@
 <c:url value='/admin/create_role'/> method='POST' onsubmit="return validateAddRoleForm('privileges')">
     <div class="form__group field">
         <input type="input" class="form__field" placeholder="Name" name="name" id='name' required maxlength="20"
-               pattern="^[a-zA-Z0-9_-]{3,20}$" title="ONLY 3-20 characters, underscore or dash"/>
+               pattern="^[a-zA-Z0-9_-]{3,20}$" title="ONLY 3-20 Latin characters, underscore or dash"/>
         <label for="name" class="form__label">Role Name</label>
     </div>
     <br/><br/>
@@ -141,7 +141,7 @@
             <div class="form__group field">
                 <input type="input" class="form__field" placeholder="Name" name="nameNew" id='roleNameNew'
                        maxlength="20"
-                       pattern="^[a-zA-Z0-9_-]{3,20}$" title="ONLY 3-20 characters, underscore or dash"/>
+                       pattern="^[a-zA-Z0-9_-]{3,20}$" title="ONLY 3-20 Latin characters, underscore or dash"/>
                 <label for="roleNameNew" class="form__label">New Role Name</label>
             </div>
 

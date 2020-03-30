@@ -70,6 +70,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/admin/roles").hasAuthority("ROLES_SETTING")
                 .antMatchers("/admin/users").hasAuthority("ROLES_SETTING")
                 .antMatchers("/admin/update_user").hasAuthority("ROLES_SETTING")
+                .antMatchers("/admin/server_control").hasAuthority("SERVER_CONTROL")
                 .antMatchers("/api/**").permitAll()
                 .antMatchers("/css/**").permitAll()
                 .antMatchers("/fonts/**").permitAll()

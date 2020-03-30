@@ -66,7 +66,6 @@ public class AdminPageController {
     }
 
 
-
     @RequestMapping(value = "/admin/update_scripts", method = RequestMethod.GET)
     public String updateScripts(HttpServletRequest request) {
         scriptsHandler.updateScriptsInDb();
@@ -75,8 +74,12 @@ public class AdminPageController {
         return "redirect:/admin";
     }
 
+    @RequestMapping("/admin/server_control")
+    public ModelAndView serverControlPage() {
+        ModelAndView modelAndView = new ModelAndView("ServerControlPage");
 
-
+        return modelAndView;
+    }
 
 
 }

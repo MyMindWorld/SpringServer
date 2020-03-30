@@ -33,11 +33,15 @@
 </div>
 
 <sec:authorize access="hasAuthority('SCRIPTS_UPDATE')">
-    <a href="<c:url value="/admin/update_scripts"/>" class="e">Update Scripts</a>
+    <a href="<c:url value="/admin/update_scripts"/>" class="e" style="width:120px;">Update Scripts</a>
+    <a href="<c:url value="/admin/update_scripts"/>" class="e" style="width:200px">Update Scripts & clear venv</a>
+    <a href="<c:url value="/admin/update_scripts"/>" class="e" style="width:200px">Update Scripts from GitLab</a>
+    <br>
+    <br>
 </sec:authorize>
 
 
-<div class="search-box">
+<div class="search-box" style="margin-top: unset">
     <input
             id="SearchInput"
             type="text"
@@ -87,28 +91,24 @@
             <c:out value="${script.requirements}"/>
         </td>
         <td>
-            <button id="deleteUser" class="e" onclick="">Update script</button>
+            <button id="updateScript" class="e" onclick="openModalUpdate('${script.name}','${script.display_name}');">Update config</button>
         </td>
         </c:forEach>
 </table>
 
 
-<div id="deleteUserModal" class="modal">
+<div id="updateScriptModal" class="modal">
 
     <!-- Modal content -->
     <div class="modal-content" style="height: auto">
-        <span class="close">&times;</span>
-        <p style="font-size:235%;text-align:center;"id="DeleteModalWindowUsername">'Are you sure want to delete user "' + username + '" ?'</p>
+        <span class="close">X</span>
+        <p style="font-size:235%;text-align:center;" id="modalText">'IF YOU SEE THIS,ITS A BUG!</p>
         <form name='f' class="form__group field" action=
         <c:url value='/admin/delete_user'/> method='POST'>
 
-            <input name="username" id='usernameDelete' type="hidden" value=""/>
-            <input name="id" id='userIdDelete' type="hidden" value=""/>
+            <input name="username" id="scriptToUpdate" type="hidden" value=""/>
 
-            <input name="submit"style="align-self: center" type="submit" class="e" value="Delete user"/>
-
-
-
+            <input name="submit" type="submit" class="e" value="Update script config and clear venv"/>
 
         </form>
     </div>
@@ -141,79 +141,27 @@
     }
 </script>
 <script type="text/javascript">
-
-    function validateAddUserForm(checkBoxType) {
-        let roleCheckboxes = document.getElementsByName(checkBoxType);
-        for (const roleCheckbox of roleCheckboxes) {
-            if (roleCheckbox.checked == true){
-                return true
-            }
-        }
-        alert("Please choose roles!");
-        return false
-
-
-    }
-
-</script>
-<script type="text/javascript">
     // Get the modal
-    const modal = document.getElementById("updateUserModal");
+    const modalUpdate = document.getElementById("updateScriptModal");
 
-    // Get the <span> element that closes the modal
-    const span = document.getElementsByClassName("close")[0];
-
-
-    function openModal (id,roles,username){
-        modal.style.display = "block";
-        console.log(id)
-        console.log(roles)
-        let roleCheckboxes = document.getElementsByName("roleVarUpdate");
-        for (const roleCheckbox of roleCheckboxes) {
-            roleCheckbox.checked = false;
+    function openModalUpdate(script_name, script_display_name) {
+        modalUpdate.style.display = "block";
+        if (script_name != null){
+            document.getElementById('modalText').innerHTML = "Are you sure want to update Script <b>" + script_display_name.toString() + "</b> ?";
         }
-        for (const role of roles) {
-            document.getElementById(role).checked = true;
-        }
-        document.getElementById('ModalWindowUsername').innerHTML = "Updating <b>" + username.toString() + "</b> roles";
-        document.getElementById('username').value = username;
+        document.getElementById('scriptToUpdate').value = script_display_name;
+
+        const span = document.getElementsByClassName("close")[0];
 
         // When the user clicks on <span> (x), close the modal
-        span.onclick = function() {
-            modal.style.display = "none";
+        span.onclick = function () {
+            modalUpdate.style.display = "none";
         }
 
         // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-        }
-    }
-
-
-</script>
-<script type="text/javascript">
-    // Get the modal
-    const modalDelete = document.getElementById("deleteUserModal");
-
-    function openModalDelete (id,username){
-        modalDelete.style.display = "block";
-        document.getElementById('DeleteModalWindowUsername').innerHTML = "Are you sure want to delete user <b>" + username.toString() + "</b> ?";
-        document.getElementById('usernameDelete').value = username;
-        document.getElementById('userIdDelete').value = id;
-
-        const span = document.getElementsByClassName("close")[1];
-
-        // When the user clicks on <span> (x), close the modal
-        span.onclick = function() {
-            modalDelete.style.display = "none";
-        }
-
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function(event) {
-            if (event.target == modalDelete) {
-                modalDelete.style.display = "none";
+        window.onclick = function (event) {
+            if (event.target == modalUpdate) {
+                modalUpdate.style.display = "none";
             }
         }
 

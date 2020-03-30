@@ -22,6 +22,10 @@
     <a href="<c:url value="/admin/roles"/>" class="e">Roles</a>
     <a href="<c:url value="/admin/users"/>" class="e">Users</a>
 </sec:authorize>
+<sec:authorize access="hasAuthority('SERVER_CONTROL')">
+    <a href="<c:url value="/admin/server_control"/>" class="e">Server Control</a>
+</sec:authorize>
+
 
 
 <div class="search-box">

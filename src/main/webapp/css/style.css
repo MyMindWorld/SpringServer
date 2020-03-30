@@ -56,7 +56,8 @@ color: #ff3300;
   /* Цвет текста */
 }
 .e {
-  background-color: #1ECBE1;
+  transition: .3s ease;
+  background-color: #0070b4;
   /* Цвет фона кнопки */
   border: 1px solid #f7fcf9;
   /* Рамка */
@@ -109,7 +110,7 @@ color: #ff3300;
 
 }
 .content-table thead tr {
-  background-color: #56c9c1;
+  background-color: #0AC2A5;
   color: #ffffff;
   text-align: left;
   font-weight: bold;

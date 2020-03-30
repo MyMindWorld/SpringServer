@@ -60,9 +60,11 @@ public class TestLoginDataLoader {
                 = privilegeService.createPrivilegeIfNotFound("SCRIPTS_UPDATE");
         Privilege rolesAdmin
                 = privilegeService.createPrivilegeIfNotFound("ROLES_SETTING");
+        Privilege serverControl
+                = privilegeService.createPrivilegeIfNotFound("SERVER_CONTROL");
 
         List<Privilege> adminPrivileges = Arrays.asList(
-                scripts_view, admin_page_usage,scriptsUpdate,rolesAdmin);
+                scripts_view, admin_page_usage,scriptsUpdate,rolesAdmin,serverControl);
         Role adminRole = roleService.createRoleIfNotFound("ROLE_ADMIN", adminPrivileges,true);
         Role userRole = roleService.createRoleIfNotFound("ROLE_USER", Arrays.asList(scripts_view),true);
         Role roleAll = roleRepository.findByNameEquals("ROLE_ALL_SCRIPTS");

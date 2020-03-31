@@ -5,10 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import ru.protei.scriptServer.model.LogEntity;
 import ru.protei.scriptServer.model.Role;
@@ -22,7 +20,6 @@ import ru.protei.scriptServer.utils.Utils;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-import static ru.protei.scriptServer.utils.Utils.getUsername;
 
 @Controller
 public class AdminPageController {
@@ -71,7 +68,7 @@ public class AdminPageController {
         scriptsHandler.updateScriptsInDb();
         logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "SCRIPTS UPDATE", "");
 
-        return "redirect:/admin";
+        return "redirect:/admin/scripts";
     }
 
     @RequestMapping("/admin/server_control")

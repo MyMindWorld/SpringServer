@@ -4,7 +4,7 @@
   "group": "List",
   "python_version": "5.8",
   "venv": "misc",
-  "requirements": "TestRequirements",
+  "requirements": "testReq.txt",
   "script_path": "bdupdate.py",
   "description": "Тестим лист",
   "requires_terminal": false,

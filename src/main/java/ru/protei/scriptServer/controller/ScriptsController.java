@@ -15,16 +15,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
-import ru.protei.scriptServer.model.LogEntity;
+import ru.protei.scriptServer.model.*;
 import ru.protei.scriptServer.model.POJO.Message;
 import ru.protei.scriptServer.model.POJO.OutputMessage;
-import ru.protei.scriptServer.model.Role;
-import ru.protei.scriptServer.model.Script;
-import ru.protei.scriptServer.model.User;
 import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.service.LogService;
 import ru.protei.scriptServer.service.ScriptsHandler;
 import ru.protei.scriptServer.service.UserService;
+import ru.protei.scriptServer.utils.SystemIntegration.VenvManager;
 import ru.protei.scriptServer.utils.Utils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -50,6 +48,8 @@ public class ScriptsController {
     ScriptsHandler scriptsHandler;
     @Autowired
     LogService logService;
+    @Autowired
+    VenvManager venvManager;
 
     @RequestMapping("/admin/scripts")
     public ModelAndView scriptsPage() {
@@ -83,10 +83,19 @@ public class ScriptsController {
 
         }
         if (allRequestParams.size() == 0) {
-            Thread.sleep(1000L);
             message.setFrom("SCRIPT");
             message.setText("Parameters could not be empty! Or should they...");
             sendToSock(message);
+        }
+        if (script.getVenv() == null) {
+            message.setFrom("SCRIPT");
+            message.setText("Using default venv. It's HIGHLY recommended not doing this. Please, specify unique venv name and requirements file");
+            sendToSock(message);
+            if (script.getRequirements()!= null){
+                Venv defaultVenv = venvManager.createIfNotExists("default",script.getRequirements());
+                venvManager.installPackagesInVenv(defaultVenv,script.getRequirements());
+                // нужно на случай если венв уже существовал, докидываем зависимостей.
+            }
         }
 
         message.setFrom("SCRIPT");
@@ -99,7 +108,7 @@ public class ScriptsController {
         logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "Run script '" + script.getName() + "'", Arrays.toString(resultRunString));
         logger.info("Created string : " + Arrays.toString(resultRunString));
 //
-        scriptsHandler.runPythonScript(resultRunString, script.getScript_path());
+        scriptsHandler.runPythonScript(resultRunString, script);
 
 //        return "redirect:" + req.getHeader("Referer");
     }

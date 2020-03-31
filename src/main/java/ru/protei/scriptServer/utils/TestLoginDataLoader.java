@@ -10,11 +10,13 @@ import org.springframework.stereotype.Component;
 import ru.protei.scriptServer.model.Privilege;
 import ru.protei.scriptServer.model.Role;
 import ru.protei.scriptServer.model.User;
+import ru.protei.scriptServer.model.Venv;
 import ru.protei.scriptServer.repository.RoleRepository;
 import ru.protei.scriptServer.service.LogService;
 import ru.protei.scriptServer.service.PrivilegeService;
 import ru.protei.scriptServer.service.RoleService;
 import ru.protei.scriptServer.service.UserService;
+import ru.protei.scriptServer.utils.SystemIntegration.VenvManager;
 
 import javax.transaction.Transactional;
 import java.util.Arrays;
@@ -64,9 +66,9 @@ public class TestLoginDataLoader {
                 = privilegeService.createPrivilegeIfNotFound("SERVER_CONTROL");
 
         List<Privilege> adminPrivileges = Arrays.asList(
-                scripts_view, admin_page_usage,scriptsUpdate,rolesAdmin,serverControl);
-        Role adminRole = roleService.createRoleIfNotFound("ROLE_ADMIN", adminPrivileges,true);
-        Role userRole = roleService.createRoleIfNotFound("ROLE_USER", Arrays.asList(scripts_view),true);
+                scripts_view, admin_page_usage, scriptsUpdate, rolesAdmin, serverControl);
+        Role adminRole = roleService.createRoleIfNotFound("ROLE_ADMIN", adminPrivileges, true);
+        Role userRole = roleService.createRoleIfNotFound("ROLE_USER", Arrays.asList(scripts_view), true);
         Role roleAll = roleRepository.findByNameEquals("ROLE_ALL_SCRIPTS");
 
         User admin = new User();
@@ -74,7 +76,7 @@ public class TestLoginDataLoader {
         admin.setLdapName("admin_admin");
         admin.setPassword(passwordEncoder.encode("admin"));
         admin.setEmail("admin@admin.com");
-        admin.setRoles(Arrays.asList(adminRole, userRole,roleAll));
+        admin.setRoles(Arrays.asList(adminRole, userRole, roleAll));
         admin.setEnabled(true);
 
         User user = new User();

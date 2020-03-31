@@ -13,7 +13,8 @@ import ru.protei.scriptServer.model.Privilege;
 import ru.protei.scriptServer.model.Role;
 import ru.protei.scriptServer.model.Script;
 import ru.protei.scriptServer.repository.ScriptRepository;
-import ru.protei.scriptServer.utils.Async.AsyncExecutor;
+import ru.protei.scriptServer.utils.SystemIntegration.PythonScriptsRunner;
+import ru.protei.scriptServer.utils.SystemIntegration.VenvManager;
 import ru.protei.scriptServer.utils.Utils;
 
 import java.io.IOException;
@@ -35,7 +36,9 @@ public class ScriptsHandler {
     @Autowired
     Utils utils;
     @Autowired
-    AsyncExecutor asyncExecutor;
+    PythonScriptsRunner pythonScriptsRunner;
+    @Autowired
+    VenvManager venvManager;
 
 
     @SneakyThrows
@@ -84,9 +87,9 @@ public class ScriptsHandler {
 
         List<Privilege> allPrivileges = privilegeService.returnAllPrivileges();
 
-        Role role_all = roleService.createRoleIfNotFound("ROLE_ALL_SCRIPTS", allPrivileges,true);
+        Role role_all = roleService.createRoleIfNotFound("ROLE_ALL_SCRIPTS", allPrivileges, true);
         if (role_all == null)
-            roleService.updateRole("ROLE_ALL_SCRIPTS", allPrivileges,true);
+            roleService.updateRole("ROLE_ALL_SCRIPTS", allPrivileges, true);
 
         logger.warn(scriptRepository.findAll().toString());
 
@@ -94,32 +97,11 @@ public class ScriptsHandler {
     }
 
     @SneakyThrows
-    public void runPythonScript(String[] params,String scriptName) {
-        String executable;
-        if (SystemUtils.IS_OS_LINUX){
-            executable = "python3";
-        }
-        else {
-            executable = "python";
-        }
-//        String[] commandParams = {"import os","print(os.getcwd())","exit()"};
-        logger.info(String.valueOf(utils.getScriptsDirectory().isDirectory()));
-//        AsyncExecutor asyncExecutor = new AsyncExecutor(executable, params, utils.getScriptsDirectory(), false,scriptName);
-        logger.info("x" + "/x\tsecs in main thread \t\t status:" + asyncExecutor.runstate + " of async thread that monitors the process");
-        asyncExecutor.run(executable, params, utils.getScriptsDirectory(), false,scriptName);//start() invokes the run() method as a detached thread
-//        Thread.sleep(1000);
-//        asyncExecutor.terminate();
-//        for(int i=0;i<10;i++) {
-//            // you can do whatever here and the other process is still running and printing its output inside detached thread
-//            Thread.sleep(10);
-//            logger.info(i+"/10\tsecs in main thread \t\t status:"+asyncExecutor.runstate+" of async thread that monitors the process");
-//        }
-//
-//        asyncExecutor.join(); // main thread has nothing to do anymore, wait till other thread that monitor other process finishes as well
-        logger.info("Exit code : " + asyncExecutor.processExitcode);
-//        System.exit(0);
-        logger.info("Done.");
+    public void runPythonScript(String[] params, Script script) {
+        venvManager.createIfNotExists(script.getVenv(), script.getRequirements());
 
+        pythonScriptsRunner.run(params, utils.getScriptsDirectory(), false, script.getScript_path(), script.getVenv());
+        logger.info("Exit code : " + pythonScriptsRunner.processExitcode);
     }
 
 

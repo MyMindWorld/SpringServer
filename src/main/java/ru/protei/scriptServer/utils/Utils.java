@@ -3,6 +3,7 @@ package ru.protei.scriptServer.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.apache.commons.lang3.SystemUtils;
 import org.passay.CharacterData;
 import org.passay.CharacterRule;
 import org.passay.EnglishCharacterData;
@@ -41,14 +42,59 @@ public class Utils {
     private String configPath;
     @Value("${scriptsPath:/scripts}")
     private String scriptsPath;
+    @Value("${venvPath:/venvDir}")
+    private String venvPath;
+    @Value("${requirementsPath:/requirements}")
+    private String requirementsPath;
     @Autowired
     private ResourceLoader resourceLoader;
+    String webappFolder = "/src/main/webapp";  // todo Handle webaps folder
 
     public File getScriptsDirectory() {
-        String webappFolder = "/src/main/webapp";  // todo Handle webaps folder
-        logger.info(System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + scriptsPath);
         return new File(System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + scriptsPath + "/");
     }
+
+    public File getVenvDirectory() {
+        return new File(System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + venvPath + "/");
+    }
+
+    public File getRequirementsDirectory() {
+        return new File(System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + requirementsPath + "/");
+    }
+
+    public String getPythonExecutable() {
+        if (SystemUtils.IS_OS_LINUX) {
+            return "python3";
+        } else {
+            return "python";
+        }
+    }
+
+    public File getVenvActivationPath(String venvName) {
+        if (SystemUtils.IS_OS_LINUX) {
+            return new File(getVenvDirectory().toString() + "/" + venvName + "/bin/");
+        } else {
+            return new File(getVenvDirectory().toString() + "\\" + venvName + "\\Scripts\\");
+        }
+    }
+
+    public String[] getArgsForRequirementsInstall(File requirementsFile) {
+        if (SystemUtils.IS_OS_LINUX) {
+            return new String[]{"./activate.bat", "&&", "pip", "install", "-r", requirementsFile.getAbsolutePath()};
+        } else {
+            return new String[]{"cmd", "/c", "activate.bat", "&&", "pip", "install", "-r", requirementsFile.getAbsolutePath()};
+        }
+    }
+
+    public String[] getArgsForRunningScriptInVenv(String venvName, String scriptPath) {
+        if (SystemUtils.IS_OS_LINUX) {
+            return new String[]{"./" + System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + venvPath + "/" + venvName + "/Scripts/python ",scriptPath};
+        } else {
+            return new String[]{System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + venvPath + "/" + venvName + "/Scripts/python.exe ", scriptPath};
+        }
+
+    }
+
 
     public Parameters[] stringToListOfParams(String source) {
         ObjectMapper mapper = new ObjectMapper();
@@ -145,7 +191,7 @@ public class Utils {
         for (Parameters paramKey : parametersKeys) { // сбор констант
             if (paramKey.constant) {
 //                if (paramKey.values) // продумать как назвать параметр для скрипта в конфиге
-                if (params.get(paramKey) == null){
+                if (params.get(paramKey) == null) {
                     continue;
                 }
                 resultArray.add(paramKey.getParam());
@@ -153,7 +199,7 @@ public class Utils {
             }
         }
         for (String paramKey : params.keySet()) { // сбор констант
-            if (params.get(paramKey) == null){
+            if (params.get(paramKey) == null) {
                 continue;
             }
             resultArray.add(paramKey);

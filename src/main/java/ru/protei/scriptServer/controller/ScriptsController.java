@@ -135,9 +135,9 @@ public class ScriptsController {
             message.setText("Using default venv. It's HIGHLY recommended not doing this. Please, specify unique venv name and requirements file");
             sendToSock(message);
             if (script.getRequirements()!= null){
-                Venv defaultVenv = venvManager.createIfNotExists("default",script.getRequirements());
-                venvManager.installPackagesInVenv(defaultVenv,script.getRequirements());
-                // нужно на случай если венв уже существовал, докидываем зависимостей.
+                message.setFrom("SCRIPT");
+                message.setText("Adding requirements to default venv is forbidden! Please use custom venv for this case!");
+                sendToSock(message);
             }
         }
 

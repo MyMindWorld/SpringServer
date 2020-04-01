@@ -24,7 +24,6 @@ public class VenvManager {
     Utils utils;
     @Autowired
     VenvRepository venvRepository;
-    private String defaultVenvName = "DefaultVenv";
 
     @SneakyThrows
     public Venv createDefaultVenv() {
@@ -44,7 +43,7 @@ public class VenvManager {
                 logger.error(e.getMessage());
             }
         }
-        Venv createdVenv = createIfNotExists(defaultVenvName, defaultRequirements.getName());
+        Venv createdVenv = createIfNotExists(utils.defaultVenvName, defaultRequirements.getName());
         if (defaultRequirements!=null){
             installPackagesInVenv(createdVenv, defaultRequirements.getName());
         }

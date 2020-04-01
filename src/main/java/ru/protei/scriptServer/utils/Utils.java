@@ -49,6 +49,8 @@ public class Utils {
     private String requirementsPath;
     @Value("${defaultVenvRequirementsFileName:defaultVenvRequirements.txt}")
     private String defaultVenvRequirementsFileName;
+    @Value("${defaultVenvName:defaultVenv}")
+    public String defaultVenvName;
     @Autowired
     private ResourceLoader resourceLoader;
     String webappFolder = "/src/main/webapp";  // todo Handle webaps folder

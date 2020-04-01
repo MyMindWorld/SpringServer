@@ -147,7 +147,11 @@ public class ScriptsHandler {
 
     @SneakyThrows
     public void runPythonScript(String[] params, Script script) {
-        venvManager.createIfNotExists(script.getVenv(), script.getRequirements());
+        if (script.getVenv() == null) {
+            script.setVenv(utils.defaultVenvName);
+        } else {
+            venvManager.createIfNotExists(script.getVenv(), script.getRequirements());
+        }
 
         pythonScriptsRunner.run(params, utils.getScriptsDirectory(), false, script.getScript_path(), script.getVenv());
         logger.info("Exit code : " + pythonScriptsRunner.processExitcode);

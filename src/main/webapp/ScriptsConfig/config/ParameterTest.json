@@ -4,8 +4,6 @@
   "group": "Misc",
   "script_path": "test.py",
   "python_version": "3.5",
-  "venv": "misc",
-  "requirements": "",
   "working_directory": "./samples",
   "description": "This script does nothing except accepting a lot of parameters and printing them",
   "allowed_users": [

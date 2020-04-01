@@ -35,12 +35,14 @@ public class LogService {
         logEntity.setAction(strings[2]);
         logEntity.setParams(strings[3]);
         logEntity.setDate(date);
-        try {
-
+        if (strings.length>4){
             logEntity.setErrorLog(strings[4]);
-        } catch (IndexOutOfBoundsException ignored) {
+            logger.error("Logging ERROR action '" + logEntity.toString() + '"');
         }
-        logger.info("Logging action '" + logEntity.toString() + '"');
+        else {
+            logger.info("Logging action '" + logEntity.toString() + '"');
+        }
+
 
         logRepository.save(logEntity);
     }

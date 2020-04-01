@@ -34,8 +34,8 @@
 
 <sec:authorize access="hasAuthority('SCRIPTS_UPDATE')">
     <a href="<c:url value="/admin/update_scripts"/>" class="e" style="width:120px;">Update Scripts</a>
-    <a href="<c:url value="/admin/update_scripts"/>" class="e" style="width:200px">Update Scripts & clear venv</a>
-    <a href="<c:url value="/admin/update_scripts"/>" class="e" style="width:200px">Update Scripts from GitLab</a>
+    <a href="<c:url value="/admin/update_scripts_and_drop_venv"/>" class="e" style="width:200px">Update Scripts & clear venv</a>
+    <a href="<c:url value="/admin/update_scripts_from_gitlab"/>" class="e" style="width:200px">Update Scripts from GitLab</a>
     <br>
     <br>
 </sec:authorize>
@@ -104,9 +104,9 @@
         <span class="close">X</span>
         <p style="font-size:235%;text-align:center;" id="modalText">'IF YOU SEE THIS,ITS A BUG!</p>
         <form name='f' class="form__group field" action=
-        <c:url value='/admin/delete_user'/> method='POST'>
+        <c:url value='/admin/update_script'/> method='POST'>
 
-            <input name="username" id="scriptToUpdate" type="hidden" value=""/>
+            <input name="name" id="scriptToUpdate" type="hidden" value=""/>
 
             <input name="submit" type="submit" class="e" value="Update script config and clear venv"/>
 
@@ -149,7 +149,7 @@
         if (script_name != null){
             document.getElementById('modalText').innerHTML = "Are you sure want to update Script <b>" + script_display_name.toString() + "</b> ?";
         }
-        document.getElementById('scriptToUpdate').value = script_display_name;
+        document.getElementById('scriptToUpdate').value = script_name;
 
         const span = document.getElementsByClassName("close")[0];
 

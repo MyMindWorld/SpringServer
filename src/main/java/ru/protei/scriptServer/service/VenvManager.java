@@ -1,10 +1,13 @@
-package ru.protei.scriptServer.utils.SystemIntegration;
+package ru.protei.scriptServer.service;
 
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
+import ru.protei.scriptServer.model.JsonScript;
 import ru.protei.scriptServer.model.Venv;
 import ru.protei.scriptServer.repository.VenvRepository;
 import ru.protei.scriptServer.utils.Utils;
@@ -66,7 +69,12 @@ public class VenvManager {
         }
         logger.info("Finished venv '" + name + "' creation");
         venvRepository.save(venv);
-        installPackagesInVenv(venv, requirementsFileName);
+        if (!requirementsFileName.isEmpty()) {
+            installPackagesInVenv(venv, requirementsFileName);
+        } else {
+            logger.info("Venv doesn't require packages. Skipping");
+        }
+
         return venv;
     }
 
@@ -76,6 +84,10 @@ public class VenvManager {
 
         File requirementsFile = new File(utils.getRequirementsDirectory() + "/" + requirementsFileName);
         List<String> installedPackages = FileUtils.readLines(requirementsFile, "utf-8");
+
+//        TODO pip install -r requirements.txt --proxy=<ПРОТЕЙ_АНДРЕЙ> если тачка будет изолирована
+//        https://wiki.protei.ru/doku.php?id=protei:qa:python:pypi&s[]=pip
+//        https://wiki.protei.ru/doku.php?id=protei:qa:python:virtualenv&s[]=pip
 
         Process venvCreatingProc = Runtime.getRuntime().exec(utils.getArgsForRequirementsInstall(requirementsFile), null, utils.getVenvActivationPath(venv.getName()));
         InputStream is = venvCreatingProc.getInputStream();
@@ -102,18 +114,31 @@ public class VenvManager {
     @SneakyThrows
     public void deleteVenv(String venvName) {
         File dir = new File(utils.getVenvDirectory().toString() + "\\" + venvName);
-        if (!dir.canWrite()) {
-            logger.error("Directory with venv is not writable! Change permissions");
-            return;
-        }
         if (!dir.isDirectory() || !dir.exists()) {
             logger.error("'Directory' with venv :'" + venvName + "' is not a directory or doesn't exists!");
             return;
         }
+        if (!dir.canWrite()) {
+            logger.error("Directory with venv is not writable! Change permissions");
+            return;
+        }
         logger.info("Started venv '" + venvName + "' deleting");
         FileUtils.deleteDirectory(dir);
-        venvRepository.delete(venvRepository.findByNameEquals(venvName));
+        Venv venvFromRepository = venvRepository.findByNameEquals(venvName);
+        if (venvFromRepository != null){
+            venvRepository.delete(venvFromRepository);
+        }
         logger.info("Finished venv '" + venvName + "' deleting");
+    }
+
+    @SneakyThrows
+    public void deleteAllVenvs() {
+        File[] allVenvs = utils.getVenvs();
+        for (File venv : allVenvs) {
+            String venvName = venv.getName();
+            logger.warn(venvName + " directory found");
+            deleteVenv(venvName);
+        }
     }
 
     @SneakyThrows

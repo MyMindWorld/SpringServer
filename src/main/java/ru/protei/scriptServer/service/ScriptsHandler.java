@@ -1,7 +1,6 @@
 package ru.protei.scriptServer.service;
 
 import lombok.SneakyThrows;
-import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import ru.protei.scriptServer.model.Role;
 import ru.protei.scriptServer.model.Script;
 import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.utils.SystemIntegration.PythonScriptsRunner;
-import ru.protei.scriptServer.utils.SystemIntegration.VenvManager;
 import ru.protei.scriptServer.utils.Utils;
 
 import java.io.IOException;
@@ -42,7 +40,7 @@ public class ScriptsHandler {
 
 
     @SneakyThrows
-    public void updateScriptsInDb() {
+    public void updateAllScriptsConfigs() {
         logger.info("Database cleanup started!");
 
         if (scriptRepository.findAll().size() > 0) {
@@ -83,17 +81,68 @@ public class ScriptsHandler {
 
 
         }
+        updateRoleAllScripts();
+    }
+
+    @SneakyThrows
+    public Script updateSpecifiedScriptConfig(Script script) {
+        logger.info("Database cleanup started!");
+        scriptRepository.delete(script);
+
+        Resource[] configs = utils.getConfigs();
+        if (configs == null) {
+            logger.warn("Scripts folder is empty!");
+            return null;
+        }
+        for (Resource config : configs) {
+            try {
+
+                JsonScript jsonScript = utils.parseJsonToObject(config.getInputStream());
+                if (!(jsonScript.name.equals(script.getName()))) {
+                    logger.info(jsonScript.name + " !+ " + script.getName());
+                    continue;
+                }
+                script.setGroup_name(jsonScript.group);
+                script.setDisplay_name(jsonScript.display_name);
+                script.setVenv(jsonScript.venv);
+                script.setPython_version(jsonScript.python_version);
+                script.setRequirements(jsonScript.requirements);
+                script.setScript_path(jsonScript.script_path);
+                script.setParametersJson(jsonScript.paramsToJsonString());
+            } catch (IOException e) {
+                logger.error("Mapping json to object failed!", e);
+            }
+            scriptRepository.save(script);
+        }
+        if (scriptRepository.findByNameEquals(script.getName()) != null) {
+            logger.info("Script with name '" + script.getName() + "' successfully updated");
+            return script;
+        } else {
+            logger.error("Script config was not found during update!");
+            return null;
+        }
+    }
 
 
+    public Script updateSpecifiedScriptConfigAndDropVenv(Script script) {
+        venvManager.deleteVenv(script.getVenv());
+        return updateSpecifiedScriptConfig(script);
+    }
+
+    public Script updateSpecifiedScriptConfigAndRecreateVenv(Script script) {
+        venvManager.deleteVenv(script.getVenv());
+        Script updatedScript = updateSpecifiedScriptConfig(script);
+        venvManager.createVenv(script.getVenv(), script.getRequirements());
+        return updatedScript;
+    }
+
+
+    public void updateRoleAllScripts() {
         List<Privilege> allPrivileges = privilegeService.returnAllPrivileges();
 
         Role role_all = roleService.createRoleIfNotFound("ROLE_ALL_SCRIPTS", allPrivileges, true);
         if (role_all == null)
             roleService.updateRole("ROLE_ALL_SCRIPTS", allPrivileges, true);
-
-        logger.warn(scriptRepository.findAll().toString());
-
-
     }
 
     @SneakyThrows

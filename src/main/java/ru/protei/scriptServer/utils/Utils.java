@@ -88,7 +88,7 @@ public class Utils {
 
     public String[] getArgsForRunningScriptInVenv(String venvName, String scriptPath) {
         if (SystemUtils.IS_OS_LINUX) {
-            return new String[]{"./" + System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + venvPath + "/" + venvName + "/Scripts/python ",scriptPath};
+            return new String[]{"./" + System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + venvPath + "/" + venvName + "/Scripts/python ", scriptPath};
         } else {
             return new String[]{System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + venvPath + "/" + venvName + "/Scripts/python.exe ", scriptPath};
         }
@@ -117,7 +117,6 @@ public class Utils {
     }
 
     public Resource[] getConfigs() {
-        final Path rootPath = Paths.get(scriptServerResourcesPath);
         try {
             Resource[] resources = ResourcePatternUtils.getResourcePatternResolver(resourceLoader).getResources(scriptServerResourcesPath + configPath + "/*.json");
             logger.info("Found : '" + resources.length + "' json configs");
@@ -127,6 +126,19 @@ public class Utils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public File[] getVenvs() {
+        String venvDir = new String();
+        if (SystemUtils.IS_OS_LINUX) {
+            venvDir = "./" + System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + venvPath + "/";
+        } else {
+            venvDir = System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + venvPath + "\\";
+        }
+        logger.info("Looking for venvs in '" + venvDir + "'");
+        File[] directories = new File(venvDir).listFiles(File::isDirectory);
+        logger.info("Found : '" + directories.length + "' venv's");
+        return directories;
     }
 
     public static String getUsername() {

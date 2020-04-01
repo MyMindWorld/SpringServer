@@ -23,7 +23,7 @@ public class OnEventsAction {
     @EventListener(ApplicationStartedEvent.class)
     public void afterStartup() {
         logger.info("AfterStartup invocation started!");
-        scriptsHandler.updateScriptsInDb();
+        scriptsHandler.updateAllScriptsConfigs();
         testLoginDataLoader.fillTestData();
     }
 }

@@ -22,7 +22,7 @@ import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.service.LogService;
 import ru.protei.scriptServer.service.ScriptsHandler;
 import ru.protei.scriptServer.service.UserService;
-import ru.protei.scriptServer.utils.SystemIntegration.VenvManager;
+import ru.protei.scriptServer.service.VenvManager;
 import ru.protei.scriptServer.utils.Utils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -60,6 +60,49 @@ public class ScriptsController {
 
         return modelAndView;
     }
+
+    @RequestMapping(value = "/admin/update_scripts", method = RequestMethod.GET)
+    public String updateScripts(HttpServletRequest request) {
+        scriptsHandler.updateAllScriptsConfigs();
+        logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Scripts update", "");
+
+        return "redirect:/admin/scripts";
+    }
+
+    @RequestMapping(value = "/admin/update_scripts_and_drop_venv", method = RequestMethod.GET)
+    public String updateScriptsAndDropVenv(HttpServletRequest request) {
+        logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "All Venv deleting", "");
+        venvManager.deleteAllVenvs();
+        logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "SCRIPTS UPDATE", "");
+        scriptsHandler.updateAllScriptsConfigs();
+        return "redirect:/admin/scripts";
+    }
+
+    @RequestMapping(value = "/admin/update_scripts_from_gitlab", method = RequestMethod.GET)
+    public String updateScriptsFromGitlab(HttpServletRequest request) {
+        scriptsHandler.updateAllScriptsConfigs();
+        logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Scripts update from gitlab", "");
+        logger.info("Scripts update from gitlab will be available later!");
+
+        return "redirect:/admin/scripts";
+    }
+
+    @RequestMapping(value = "/admin/update_script", method = RequestMethod.POST)
+    public String updateSpecifiedScriptConfig(HttpServletRequest request,Script scriptToUpdate) {
+        Script scriptFromDB = scriptRepository.findByNameEquals(scriptToUpdate.getName());
+        if (scriptFromDB != null){
+            scriptsHandler.updateSpecifiedScriptConfigAndDropVenv(scriptFromDB);
+            logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Script '" + scriptFromDB.getName() + "' update", "");
+        }
+        else {
+            logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Script '" + scriptFromDB.getName() + "' update", "","SCRIPT NOT FOUND IN DB!");
+            logger.error("Script not found!");
+        }
+
+        return "redirect:/admin/scripts";
+    }
+
+
 
     @SneakyThrows
     @RequestMapping(value = "/scripts/run_script", method = RequestMethod.POST)

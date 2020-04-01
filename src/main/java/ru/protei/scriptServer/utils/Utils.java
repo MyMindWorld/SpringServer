@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternUtils;
@@ -46,6 +47,8 @@ public class Utils {
     private String venvPath;
     @Value("${requirementsPath:/requirements}")
     private String requirementsPath;
+    @Value("${defaultVenvRequirementsFileName:defaultVenvRequirements.txt}")
+    private String defaultVenvRequirementsFileName;
     @Autowired
     private ResourceLoader resourceLoader;
     String webappFolder = "/src/main/webapp";  // todo Handle webaps folder
@@ -139,6 +142,19 @@ public class Utils {
         File[] directories = new File(venvDir).listFiles(File::isDirectory);
         logger.info("Found : '" + directories.length + "' venv's");
         return directories;
+    }
+
+    public File getDefaultVenvRequirements() {
+        File defaultRequirements;
+
+        try {
+            defaultRequirements = new ClassPathResource(defaultVenvRequirementsFileName).getFile();
+            logger.info("Found default requirements in : '" + defaultRequirements.getPath() + "'");
+            return defaultRequirements;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static String getUsername() {

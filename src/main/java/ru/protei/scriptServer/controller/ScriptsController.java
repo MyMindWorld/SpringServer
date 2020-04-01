@@ -73,8 +73,10 @@ public class ScriptsController {
     public String updateScriptsAndDropVenv(HttpServletRequest request) {
         logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "All Venv deleting", "");
         venvManager.deleteAllVenvs();
-        logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "SCRIPTS UPDATE", "");
+        logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Scripts update", "");
         scriptsHandler.updateAllScriptsConfigs();
+        logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Creating default venv", "");
+        venvManager.createDefaultVenv();
         return "redirect:/admin/scripts";
     }
 

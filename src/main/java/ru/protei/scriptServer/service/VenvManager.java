@@ -14,6 +14,7 @@ import ru.protei.scriptServer.utils.Utils;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,6 +24,32 @@ public class VenvManager {
     Utils utils;
     @Autowired
     VenvRepository venvRepository;
+    private String defaultVenvName = "DefaultVenv";
+
+    @SneakyThrows
+    public Venv createDefaultVenv() {
+        File defaultRequirements = utils.getDefaultVenvRequirements();
+
+        if (defaultRequirements == null) {
+            logger.info("Default requirements not found.");
+        } else {
+            logger.info("Default requirements found.");
+            File destination = new File(utils.getRequirementsDirectory().toString() + "\\");
+            logger.info("Copying to '" + destination + "'");
+            try {
+                FileUtils.deleteQuietly(new File(utils.getRequirementsDirectory().toString() + "\\" + defaultRequirements));
+                FileUtils.copyFileToDirectory(defaultRequirements, destination);
+                logger.info("Copying was successful.");
+            } catch (IOException e) {
+                logger.error(e.getMessage());
+            }
+        }
+        Venv createdVenv = createIfNotExists(defaultVenvName, defaultRequirements.getName());
+        if (defaultRequirements!=null){
+            installPackagesInVenv(createdVenv, defaultRequirements.getName());
+        }
+        return createdVenv;
+    }
 
     @SneakyThrows
     public Venv createIfNotExists(String name, String requirementsFileName) {
@@ -81,9 +108,16 @@ public class VenvManager {
     @SneakyThrows
     public Venv installPackagesInVenv(Venv venv, String requirementsFileName) {
         logger.info("Started venv '" + venv.getName() + "' packages from '" + requirementsFileName + "' install");
-
-        File requirementsFile = new File(utils.getRequirementsDirectory() + "/" + requirementsFileName);
-        List<String> installedPackages = FileUtils.readLines(requirementsFile, "utf-8");
+        File requirementsFile;
+        List<String> installedPackages = new ArrayList<>();
+        try {
+            requirementsFile = new File(utils.getRequirementsDirectory() + "/" + requirementsFileName);
+            FileUtils.readLines(requirementsFile, "utf-8");
+        }
+        catch (FileNotFoundException e){
+            logger.error("Requirements '" + requirementsFileName + "' not found");
+            return null;
+        }
 
 //        TODO pip install -r requirements.txt --proxy=<ПРОТЕЙ_АНДРЕЙ> если тачка будет изолирована
 //        https://wiki.protei.ru/doku.php?id=protei:qa:python:pypi&s[]=pip
@@ -125,7 +159,7 @@ public class VenvManager {
         logger.info("Started venv '" + venvName + "' deleting");
         FileUtils.deleteDirectory(dir);
         Venv venvFromRepository = venvRepository.findByNameEquals(venvName);
-        if (venvFromRepository != null){
+        if (venvFromRepository != null) {
             venvRepository.delete(venvFromRepository);
         }
         logger.info("Finished venv '" + venvName + "' deleting");
@@ -136,9 +170,9 @@ public class VenvManager {
         File[] allVenvs = utils.getVenvs();
         for (File venv : allVenvs) {
             String venvName = venv.getName();
-            logger.warn(venvName + " directory found");
             deleteVenv(venvName);
         }
+
     }
 
     @SneakyThrows

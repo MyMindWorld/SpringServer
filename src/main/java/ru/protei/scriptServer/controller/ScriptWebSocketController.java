@@ -27,9 +27,6 @@ public class ScriptWebSocketController {
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private SimpMessageSendingOperations messagingTemplate;
 
     private Gson gson = new Gson();
 

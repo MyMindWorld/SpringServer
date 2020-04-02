@@ -66,6 +66,12 @@
                 stompClient.subscribe('/topic/messages/', function (messageOutput) {
                     showMessageOutput(JSON.parse(messageOutput.body));
                 });
+                stompClient.subscribe('/user/' + connectionName + '/errors', function (messageOutput) {
+                    showMessageOutput(JSON.parse(messageOutput.body));
+                });
+                stompClient.subscribe('/user/' + connectionName + '/reply', function (messageOutput) {
+                    showMessageOutput(JSON.parse(messageOutput.body));
+                });
             });
             setTimeout(() => {
                 runScript();
@@ -83,7 +89,7 @@
 
         function sendMessage() {
             const text = document.getElementById('text').value;
-            stompClient.send("/app/chat", {},
+            stompClient.send("/scriptsWS/chat", {},
                 JSON.stringify({'from': connectionName, 'text': text}));
         }
 

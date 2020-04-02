@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.protei.scriptServer.controller.ScriptWebSocketController;
 import ru.protei.scriptServer.controller.ScriptsController;
 import ru.protei.scriptServer.utils.Utils;
 
@@ -18,7 +19,7 @@ public class PythonScriptsRunner {
     Utils utils;
 
     @Autowired
-    ScriptsController scriptsController;
+    ScriptWebSocketController scriptWebSocketController;
 
     public ArrayList<String> linesSoFarStdout = new ArrayList<>();
     public ArrayList<String> linesSoFarStderr = new ArrayList<>();
@@ -26,7 +27,7 @@ public class PythonScriptsRunner {
     public int processExitcode = -1;
 
 
-    public void run(String[] commandParams, File directory, boolean passCommandsAsLinesToShellExecutableAfterStartup, String scriptName,String venvName) {
+    public void run(String[] commandParams, File directory, boolean passCommandsAsLinesToShellExecutableAfterStartup, String scriptName,String venvName,String username) {
         this.runstate = Runstate.RUNNING;
         // 1 start the process
         Process p = null;
@@ -42,7 +43,7 @@ public class PythonScriptsRunner {
                 for (int i = 0; i < commandParams.length; i++) {
                     String commandstring = commandParams[i];
                     stdin.println(commandstring);
-                    scriptsController.sendToSock(commandstring);
+                    scriptWebSocketController.sendToSock(username,commandstring);
                 }
                 stdin.close();
             } else {
@@ -75,7 +76,7 @@ public class PythonScriptsRunner {
                     if (lineStdout != null) {
 //                        System.out.println(lineStdout);
                         logger.info(lineStdout);
-                        scriptsController.sendToSock(lineStdout);
+                        scriptWebSocketController.sendToSock(username,lineStdout);
                         linesSoFarStdout.add(lineStdout);
                     }
                     else {
@@ -84,7 +85,7 @@ public class PythonScriptsRunner {
                     if (lineStderr != null) {
 //                        System.out.println(lineStderr);
                         logger.error(lineStderr);
-                        scriptsController.sendToSock(lineStderr);
+                        scriptWebSocketController.sendToSock(username,lineStderr);
                         linesSoFarStderr.add(lineStderr);
                     }
                 }

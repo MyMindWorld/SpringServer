@@ -37,8 +37,6 @@ public class ScriptsController {
 
     Logger logger = LoggerFactory.getLogger(ScriptsController.class);
     @Autowired
-    private SimpMessagingTemplate simpMessagingTemplate;
-    @Autowired
     UserService userService;
     @Autowired
     ScriptRepository scriptRepository;
@@ -50,6 +48,8 @@ public class ScriptsController {
     LogService logService;
     @Autowired
     VenvManager venvManager;
+    @Autowired
+    ScriptWebSocketController scriptWebSocketController;
 
     @RequestMapping("/admin/scripts")
     public ModelAndView scriptsPage() {
@@ -130,22 +130,22 @@ public class ScriptsController {
         if (allRequestParams.size() == 0) {
             message.setFrom("SCRIPT");
             message.setText("Parameters could not be empty! Or should they...");
-            sendToSock(message);
+            scriptWebSocketController.sendToSock(principal.getUsername(),message);
         }
         if (script.getVenv() == null) {
             message.setFrom("SCRIPT");
             message.setText("Using default venv. It's HIGHLY recommended not doing this. Please, specify unique venv name and requirements file");
-            sendToSock(message);
+            scriptWebSocketController.sendToSock(principal.getUsername(),message);
             if (script.getRequirements()!= null){
                 message.setFrom("SCRIPT");
                 message.setText("Adding requirements to default venv is forbidden! Please use custom venv for this case!");
-                sendToSock(message);
+                scriptWebSocketController.sendToSock(principal.getUsername(),message);
             }
         }
 
         message.setFrom("SCRIPT");
         message.setText("Started!");
-        sendToSock(message);
+        scriptWebSocketController.sendToSock(principal.getUsername(),message);
 
 
         String[] resultRunString = utils.createParamsString(script, allRequestParams);
@@ -153,31 +153,10 @@ public class ScriptsController {
         logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "Run script '" + script.getName() + "'", Arrays.toString(resultRunString));
         logger.info("Created string : " + Arrays.toString(resultRunString));
 //
-        scriptsHandler.runPythonScript(resultRunString, script);
+        scriptsHandler.runPythonScript(resultRunString, script,principal.getUsername());
 
 //        return "redirect:" + req.getHeader("Referer");
     }
 
-    public void sendToSock(Message message) {
-        logger.info("SENDING MESSAGE sendToSock OBJ " + message.getText());
-        message.setTime(new SimpleDateFormat("HH:mm").format(new Date()));
-        this.simpMessagingTemplate.convertAndSend("/topic/messages/", message);
-    }
 
-    public void sendToSock(String message) {
-        Message messageObj = new Message();
-        messageObj.setFrom("SCRIPT");
-        messageObj.setText(message);
-        messageObj.setTime(new SimpleDateFormat("HH:mm").format(new Date()));
-        logger.info("SENDING MESSAGE sendToSock STRING " + message);
-        this.simpMessagingTemplate.convertAndSend("/topic/messages/", messageObj);
-    }
-
-    @MessageMapping("/chat")
-    @SendTo("/topic/messages/")
-    public OutputMessage sendReceivedMessageToWS(Message message) {
-        logger.info("SENDING MESSAGE sendReceivedMessageToWS  " + message.getText());
-        String time = new SimpleDateFormat("HH:mm").format(new Date());
-        return new OutputMessage(message.getFrom(), message.getText(), time);
-    }
 }

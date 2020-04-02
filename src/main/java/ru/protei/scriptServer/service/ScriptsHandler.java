@@ -153,7 +153,7 @@ public class ScriptsHandler {
             venvManager.createIfNotExists(script.getVenv(), script.getRequirements());
         }
 
-        pythonScriptsRunner.run(params, utils.getScriptsDirectory(), false, script.getScript_path(), script.getVenv(),username);
+        pythonScriptsRunner.run(params, utils.getScriptsDirectory(), false, script, script.getVenv(),username);
         logger.info("Exit code : " + pythonScriptsRunner.processExitcode);
     }
 

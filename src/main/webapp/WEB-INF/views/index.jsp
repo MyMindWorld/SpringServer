@@ -57,7 +57,7 @@
             document.getElementById('response').innerHTML = '';
         }
 
-        function connect() {
+        function connect(scriptName) {
             const socket = new SockJS('/ScriptServer/chat');
             stompClient = Stomp.over(socket);
             stompClient.connect({}, function (frame) {
@@ -69,7 +69,7 @@
                 stompClient.subscribe('/user/' + connectionName + '/errors', function (messageOutput) {
                     showMessageOutput(JSON.parse(messageOutput.body));
                 });
-                stompClient.subscribe('/user/' + connectionName + '/reply', function (messageOutput) {
+                stompClient.subscribe('/user/' + connectionName + '/reply/' + scriptName, function (messageOutput) {
                     showMessageOutput(JSON.parse(messageOutput.body));
                 });
             });
@@ -283,7 +283,7 @@
 
         </form>
         <button id="runScriptButton" class="e"
-                onclick="connect();"
+                onclick="connect('${script.name}');"
         >Run Script
         </button>
         <button id="disconnect" class="e" disabled="disabled" onclick="disconnect();">

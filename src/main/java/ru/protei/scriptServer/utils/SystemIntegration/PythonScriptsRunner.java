@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.protei.scriptServer.controller.ScriptWebSocketController;
 import ru.protei.scriptServer.controller.ScriptsController;
+import ru.protei.scriptServer.model.Script;
 import ru.protei.scriptServer.utils.Utils;
 
 import java.io.*;
@@ -27,7 +28,7 @@ public class PythonScriptsRunner {
     public int processExitcode = -1;
 
 
-    public void run(String[] commandParams, File directory, boolean passCommandsAsLinesToShellExecutableAfterStartup, String scriptName,String venvName,String username) {
+    public void run(String[] commandParams, File directory, boolean passCommandsAsLinesToShellExecutableAfterStartup, Script script, String venvName, String username) {
         this.runstate = Runstate.RUNNING;
         // 1 start the process
         Process p = null;
@@ -38,19 +39,19 @@ public class PythonScriptsRunner {
                 // * example:
                 // * open 'cmd' (shell)
                 // * write 'echo "hello world"' and press enter
-                p = Runtime.getRuntime().exec(utils.getArgsForRunningScriptInVenv(venvName,scriptName), null, directory);
+                p = Runtime.getRuntime().exec(utils.getArgsForRunningScriptInVenv(venvName,script.getScript_path()), null, directory);
                 PrintWriter stdin = new PrintWriter(p.getOutputStream());
                 for (int i = 0; i < commandParams.length; i++) {
                     String commandstring = commandParams[i];
                     stdin.println(commandstring);
-                    scriptWebSocketController.sendToSock(username,commandstring);
+                    scriptWebSocketController.sendToSock(username,commandstring,script.getName());
                 }
                 stdin.close();
             } else {
                 // pass the arguments directly during startup to the process
                 // * example:
                 // * run 'java -jar myexecutable.jar arg0 arg1 ...'
-                String[] args = utils.getArgsForRunningScriptInVenv(venvName,scriptName);
+                String[] args = utils.getArgsForRunningScriptInVenv(venvName,script.getScript_path());
                 String[] execWithArgs = new String[args.length + commandParams.length];
                 System.arraycopy(args, 0, execWithArgs, 0, args.length);
                 System.arraycopy(commandParams, 0, execWithArgs, args.length, commandParams.length);
@@ -76,7 +77,7 @@ public class PythonScriptsRunner {
                     if (lineStdout != null) {
 //                        System.out.println(lineStdout);
                         logger.info(lineStdout);
-                        scriptWebSocketController.sendToSock(username,lineStdout);
+                        scriptWebSocketController.sendToSock(username,lineStdout,script.getName());
                         linesSoFarStdout.add(lineStdout);
                     }
                     else {
@@ -85,7 +86,7 @@ public class PythonScriptsRunner {
                     if (lineStderr != null) {
 //                        System.out.println(lineStderr);
                         logger.error(lineStderr);
-                        scriptWebSocketController.sendToSock(username,lineStderr);
+                        scriptWebSocketController.sendToSock(username,lineStderr,script.getName());
                         linesSoFarStderr.add(lineStderr);
                     }
                 }

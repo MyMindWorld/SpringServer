@@ -49,19 +49,19 @@ public class ScriptWebSocketController {
         return exception.getMessage();
     }
 
-    public void sendToSock(String username, Message message) {
+    public void sendToSock(String username, Message message,String scriptName) {
         logger.info("SENDING MESSAGE sendToSock OBJ " + message.getText());
         message.setTime(new SimpleDateFormat("HH:mm").format(new Date()));
-        this.simpMessagingTemplate.convertAndSendToUser(username,"/reply", message);
+        this.simpMessagingTemplate.convertAndSendToUser(username,"/reply/" + scriptName, message);
     }
 
-    public void sendToSock(String username, String message) {
+    public void sendToSock(String username, String message,String scriptName) {
         Message messageObj = new Message();
         messageObj.setFrom("SCRIPT");
         messageObj.setText(message);
         messageObj.setTime(new SimpleDateFormat("HH:mm").format(new Date()));
         logger.info("SENDING MESSAGE sendToSock STRING " + message);
-        this.simpMessagingTemplate.convertAndSendToUser(username,"/reply", messageObj);
+        this.simpMessagingTemplate.convertAndSendToUser(username,"/reply/" + scriptName, messageObj);
     }
 
     @MessageMapping("/chat")

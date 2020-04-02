@@ -130,22 +130,22 @@ public class ScriptsController {
         if (allRequestParams.size() == 0) {
             message.setFrom("SCRIPT");
             message.setText("Parameters could not be empty! Or should they...");
-            scriptWebSocketController.sendToSock(principal.getUsername(),message);
+            scriptWebSocketController.sendToSock(principal.getUsername(),message,scriptObject.getName());
         }
         if (script.getVenv() == null) {
             message.setFrom("SCRIPT");
             message.setText("Using default venv. It's HIGHLY recommended not doing this. Please, specify unique venv name and requirements file");
-            scriptWebSocketController.sendToSock(principal.getUsername(),message);
+            scriptWebSocketController.sendToSock(principal.getUsername(),message,scriptObject.getName());
             if (script.getRequirements()!= null){
                 message.setFrom("SCRIPT");
                 message.setText("Adding requirements to default venv is forbidden! Please use custom venv for this case!");
-                scriptWebSocketController.sendToSock(principal.getUsername(),message);
+                scriptWebSocketController.sendToSock(principal.getUsername(),message,scriptObject.getName());
             }
         }
 
         message.setFrom("SCRIPT");
         message.setText("Started!");
-        scriptWebSocketController.sendToSock(principal.getUsername(),message);
+        scriptWebSocketController.sendToSock(principal.getUsername(),message,scriptObject.getName());
 
 
         String[] resultRunString = utils.createParamsString(script, allRequestParams);

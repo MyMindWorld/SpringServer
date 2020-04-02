@@ -8,14 +8,11 @@ import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 import ru.protei.scriptServer.model.POJO.Message;
 import ru.protei.scriptServer.model.POJO.OutputMessage;
-import ru.protei.scriptServer.model.User;
-import ru.protei.scriptServer.repository.UserRepository;
 
 import java.security.Principal;
 import java.text.SimpleDateFormat;

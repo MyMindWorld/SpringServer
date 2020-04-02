@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.protei.scriptServer.controller.ScriptWebSocketController;
-import ru.protei.scriptServer.controller.ScriptsController;
 import ru.protei.scriptServer.model.Script;
 import ru.protei.scriptServer.utils.Utils;
 

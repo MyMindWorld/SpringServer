@@ -1,5 +1,6 @@
 package ru.protei.scriptServer.utils.SystemIntegration;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,24 +39,26 @@ public class PythonScriptsRunner {
                 // * example:
                 // * open 'cmd' (shell)
                 // * write 'echo "hello world"' and press enter
-                p = Runtime.getRuntime().exec(utils.getArgsForRunningScriptInVenv(venvName,script.getScript_path()), null, directory);
+                ProcessBuilder pb = new ProcessBuilder(utils.getArgsForRunningScriptInVenv(venvName, script.getScript_path())).directory(directory);
+                p = pb.start();
                 PrintWriter stdin = new PrintWriter(p.getOutputStream());
                 for (int i = 0; i < commandParams.length; i++) {
                     String commandstring = commandParams[i];
                     stdin.println(commandstring);
-                    scriptWebSocketController.sendToSock(username,commandstring,script.getName());
+                    scriptWebSocketController.sendToSock(username, commandstring, script.getName());
                 }
                 stdin.close();
             } else {
                 // pass the arguments directly during startup to the process
                 // * example:
                 // * run 'java -jar myexecutable.jar arg0 arg1 ...'
-                String[] args = utils.getArgsForRunningScriptInVenv(venvName,script.getScript_path());
+                String[] args = utils.getArgsForRunningScriptInVenv(venvName, script.getScript_path());
                 String[] execWithArgs = new String[args.length + commandParams.length];
                 System.arraycopy(args, 0, execWithArgs, 0, args.length);
                 System.arraycopy(commandParams, 0, execWithArgs, args.length, commandParams.length);
                 logger.info(Arrays.toString(execWithArgs));
-                p = Runtime.getRuntime().exec(execWithArgs, null, directory);
+                ProcessBuilder pb = new ProcessBuilder(execWithArgs).directory(directory);
+                p = pb.start();
             }
             logger.info("READING START");
             // 2 print the output
@@ -69,12 +72,8 @@ public class PythonScriptsRunner {
             String lineStdout = null;
             String lineStderr = null;
             while (p.isAlive()) {
-                Thread.yield(); // *
-                // * free cpu clock for other tasks on your PC! maybe even add thread.sleep(milliseconds) to free some more
-                // * everytime this thread gets cpu clock it will try the following codeblock inside the while and yield afterwards for the next time it gets cpu-time from sheduler
                 while ((lineStdout = br.readLine()) != null || (lineStderr = ebr.readLine()) != null) {
                     if (lineStdout != null) {
-//                        System.out.println(lineStdout);
                         logger.info(lineStdout);
                         scriptWebSocketController.sendToSock(username,lineStdout,script.getName());
                         linesSoFarStdout.add(lineStdout);
@@ -83,7 +82,6 @@ public class PythonScriptsRunner {
                         logger.info("NOTHING");
                     }
                     if (lineStderr != null) {
-//                        System.out.println(lineStderr);
                         logger.error(lineStderr);
                         scriptWebSocketController.sendToSock(username,lineStderr,script.getName());
                         linesSoFarStderr.add(lineStderr);
@@ -93,13 +91,11 @@ public class PythonScriptsRunner {
             // 3 when process ends
             this.processExitcode = p.exitValue();
         } catch (Exception e) {
-//            System.err.println("Something went wrong!");
             logger.error("Something went wrong!");
             e.printStackTrace();
         }
         if (processExitcode != 0) {
-//            System.err.println("The other process stopped with unexpected existcode: " + processExitcode);
-            logger.error("The other process stopped with unexpected existcode: " + processExitcode);
+            logger.error("The other process stopped with unexpected exitcode: " + processExitcode);
         }
         this.runstate = Runstate.STOPPED;
     }

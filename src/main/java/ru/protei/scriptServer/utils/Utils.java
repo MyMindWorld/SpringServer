@@ -93,9 +93,9 @@ public class Utils {
 
     public String[] getArgsForRunningScriptInVenv(String venvName, String scriptPath) {
         if (SystemUtils.IS_OS_LINUX) {
-            return new String[]{"./" + System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + venvPath + "/" + venvName + "/Scripts/python ", scriptPath};
+            return new String[]{"./" + System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + venvPath + "/" + venvName + "/Scripts/python ", "-u", scriptPath};
         } else {
-            return new String[]{System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + venvPath + "/" + venvName + "/Scripts/python.exe ", scriptPath};
+            return new String[]{System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + venvPath + "/" + venvName + "/Scripts/python.exe ", "-u", scriptPath};
         }
 
     }

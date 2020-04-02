@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import ru.protei.scriptServer.controller.ScriptWebSocketController;
 import ru.protei.scriptServer.model.JsonScript;
 import ru.protei.scriptServer.model.Privilege;
 import ru.protei.scriptServer.model.Role;
@@ -37,6 +38,8 @@ public class ScriptsHandler {
     PythonScriptsRunner pythonScriptsRunner;
     @Autowired
     VenvManager venvManager;
+    @Autowired
+    ScriptWebSocketController scriptWebSocketController;
 
 
     @SneakyThrows
@@ -146,14 +149,16 @@ public class ScriptsHandler {
     }
 
     @SneakyThrows
-    public void runPythonScript(String[] params, Script script,String username) {
+    public void runPythonScript(String[] params, Script script, String username) {
         if (script.getVenv() == null) {
             script.setVenv(utils.defaultVenvName);
         } else {
+            scriptWebSocketController.sendToSock(username, "Creating venv...", script.getName());
             venvManager.createIfNotExists(script.getVenv(), script.getRequirements());
+            scriptWebSocketController.sendToSock(username, "Venv creation complete!", script.getName());
         }
-
-        pythonScriptsRunner.run(params, utils.getScriptsDirectory(), false, script, script.getVenv(),username);
+        scriptWebSocketController.sendToSock(username, "Starting script '" + script.getDisplay_name() + "'", script.getName());
+        pythonScriptsRunner.run(params, utils.getScriptsDirectory(), false, script, script.getVenv(), username);
         logger.info("Exit code : " + pythonScriptsRunner.processExitcode);
     }
 

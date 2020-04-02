@@ -143,11 +143,6 @@ public class ScriptsController {
             }
         }
 
-        message.setFrom("SCRIPT");
-        message.setText("Started!");
-        scriptWebSocketController.sendToSock(principal.getUsername(),message,scriptObject.getName());
-
-
         String[] resultRunString = utils.createParamsString(script, allRequestParams);
 
         logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "Run script '" + script.getName() + "'", Arrays.toString(resultRunString));

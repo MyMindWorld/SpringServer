@@ -3,6 +3,7 @@ package ru.protei.scriptServer.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.gson.Gson;
 import org.apache.commons.lang3.SystemUtils;
 import org.passay.CharacterData;
 import org.passay.CharacterRule;
@@ -20,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import ru.protei.scriptServer.model.JsonScript;
+import ru.protei.scriptServer.model.POJO.ResultToSelect;
 import ru.protei.scriptServer.model.Parameters;
 import ru.protei.scriptServer.model.Script;
 
@@ -115,6 +117,26 @@ public class Utils {
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.readValue(source, JsonScript.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public String createResultsSelect2Json(ArrayList<String> scriptResults) {
+
+        ResultToSelect resultObject = new ResultToSelect();
+        ResultToSelect.Items[] itemsResult = new ResultToSelect.Items[scriptResults.size()];
+        for (String result:scriptResults) {
+            int resultIndex = scriptResults.indexOf(result);
+            ResultToSelect.Items itemResult = new ResultToSelect.Items(result,resultIndex);
+            itemsResult[resultIndex] = itemResult;
+        }
+        resultObject.setItems(itemsResult);
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.writeValueAsString(resultObject);
         } catch (IOException e) {
             e.printStackTrace();
         }

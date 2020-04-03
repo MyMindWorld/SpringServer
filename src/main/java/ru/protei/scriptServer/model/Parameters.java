@@ -10,6 +10,7 @@ import lombok.Data;
 public class Parameters {
     public String name;
     public String param;
+    public String script;
     public boolean no_value;
     public String description;
     public boolean required;

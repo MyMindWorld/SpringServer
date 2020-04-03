@@ -4,33 +4,23 @@ import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import ru.protei.scriptServer.model.*;
 import ru.protei.scriptServer.model.POJO.Message;
-import ru.protei.scriptServer.model.POJO.OutputMessage;
 import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.service.LogService;
 import ru.protei.scriptServer.service.ScriptsHandler;
 import ru.protei.scriptServer.service.UserService;
 import ru.protei.scriptServer.service.VenvManager;
+import ru.protei.scriptServer.utils.SystemIntegration.DynamicParamsScriptsRunner;
 import ru.protei.scriptServer.utils.Utils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 public class ScriptsController {
@@ -50,6 +40,8 @@ public class ScriptsController {
     VenvManager venvManager;
     @Autowired
     ScriptWebSocketController scriptWebSocketController;
+    @Autowired
+    DynamicParamsScriptsRunner dynamicParamsScriptsRunner;
 
     @RequestMapping("/admin/scripts")
     public ModelAndView scriptsPage() {
@@ -90,14 +82,13 @@ public class ScriptsController {
     }
 
     @RequestMapping(value = "/admin/update_script", method = RequestMethod.POST)
-    public String updateSpecifiedScriptConfig(HttpServletRequest request,Script scriptToUpdate) {
+    public String updateSpecifiedScriptConfig(HttpServletRequest request, Script scriptToUpdate) {
         Script scriptFromDB = scriptRepository.findByNameEquals(scriptToUpdate.getName());
-        if (scriptFromDB != null){
+        if (scriptFromDB != null) {
             scriptsHandler.updateSpecifiedScriptConfigAndDropVenv(scriptFromDB);
             logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Script '" + scriptFromDB.getName() + "' update", "");
-        }
-        else {
-            logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Script '" + scriptFromDB.getName() + "' update", "","SCRIPT NOT FOUND IN DB!");
+        } else {
+            logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Script '" + scriptToUpdate.getName() + "' update", "", "SCRIPT NOT FOUND IN DB!");
             logger.error("Script not found!");
         }
 
@@ -105,17 +96,12 @@ public class ScriptsController {
     }
 
 
-
     @SneakyThrows
     @RequestMapping(value = "/scripts/run_script", method = RequestMethod.POST)
     @ResponseBody
-    public void runScript(@RequestParam Map<String, String> allRequestParams, String name, HttpServletRequest req) {
-        // todo return value to list on load or dynamicly? Doing this on server might me easier, but select2
-        //  supoprts ajax https://select2.org/data-sources/ajax
-
-        Script scriptObject = scriptRepository.findByNameEquals(name);
+    public void runScript(@RequestParam Map<String, String> allRequestParams, String scriptName, HttpServletRequest req) {
+        Script script = scriptRepository.findByNameEquals(scriptName);
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Script script = scriptRepository.findByNameEquals(scriptObject.getName());
         Message message = new Message();
         if (!Arrays.toString(principal.getAuthorities().toArray()).contains(script.getName())) { // legshooting
             logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "RUNNING SCRIPT WITHOUT ROLE! '" + script.getName() + "'", String.valueOf(allRequestParams));
@@ -130,16 +116,16 @@ public class ScriptsController {
         if (allRequestParams.size() == 0) {
             message.setFrom("SCRIPT");
             message.setText("Parameters could not be empty! Or should they...");
-            scriptWebSocketController.sendToSock(principal.getUsername(),message,scriptObject.getName());
+            scriptWebSocketController.sendToSock(principal.getUsername(), message, script.getName());
         }
         if (script.getVenv() == null) {
             message.setFrom("SCRIPT");
             message.setText("Using default venv. It's HIGHLY recommended not doing this. Please, specify unique venv name and requirements file");
-            scriptWebSocketController.sendToSock(principal.getUsername(),message,scriptObject.getName());
-            if (script.getRequirements()!= null){
+            scriptWebSocketController.sendToSock(principal.getUsername(), message, script.getName());
+            if (script.getRequirements() != null) {
                 message.setFrom("SCRIPT");
                 message.setText("Adding requirements to default venv is forbidden! Please use custom venv for this case!");
-                scriptWebSocketController.sendToSock(principal.getUsername(),message,scriptObject.getName());
+                scriptWebSocketController.sendToSock(principal.getUsername(), message, script.getName());
             }
         }
 
@@ -148,10 +134,9 @@ public class ScriptsController {
         logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "Run script '" + script.getName() + "'", Arrays.toString(resultRunString));
         logger.info("Created string : " + Arrays.toString(resultRunString));
 //
-        scriptsHandler.runPythonScript(resultRunString, script,principal.getUsername());
+        scriptsHandler.runPythonScript(resultRunString, script, principal.getUsername());
 
 //        return "redirect:" + req.getHeader("Referer");
     }
-
 
 }

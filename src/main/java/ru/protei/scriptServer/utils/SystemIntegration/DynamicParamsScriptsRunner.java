@@ -41,7 +41,6 @@ public class DynamicParamsScriptsRunner {
             ProcessBuilder pb = new ProcessBuilder(args).directory(directory);
             p = pb.start();
 
-            logger.info("READING START");
             // 2 print the output
             InputStream is = p.getInputStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -55,7 +54,6 @@ public class DynamicParamsScriptsRunner {
             while (p.isAlive()) {
                 while ((lineStdout = br.readLine()) != null || (lineStderr = ebr.readLine()) != null) {
                     if (lineStdout != null & !lineStdout.isEmpty()) {
-                        logger.info(lineStdout);
                         linesSoFarStdout.add(lineStdout);
                     }
                     if (lineStderr != null & !lineStdout.isEmpty()) {

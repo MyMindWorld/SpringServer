@@ -101,6 +101,10 @@ public class ScriptsController {
     @ResponseBody
     public void runScript(@RequestParam Map<String, String> allRequestParams, String scriptName, HttpServletRequest req) {
         Script script = scriptRepository.findByNameEquals(scriptName);
+        if (script == null) {
+            logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "Running unknown script! '" + scriptName + "'", String.valueOf(allRequestParams));
+            return;
+        }
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Message message = new Message();
         if (!Arrays.toString(principal.getAuthorities().toArray()).contains(script.getName())) { // legshooting

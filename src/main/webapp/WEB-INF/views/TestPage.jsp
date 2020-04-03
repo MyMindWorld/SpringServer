@@ -87,6 +87,7 @@
         $(".js-example-data-ajax").select2({
             placeholder: "PLACEHOLDER",
             minimumInputLength: 0,
+            delay:100,
             allowClear: true,
             ajax: {
                 url: "http://127.0.0.1:8080/ScriptServer/scripts/run_script_select",

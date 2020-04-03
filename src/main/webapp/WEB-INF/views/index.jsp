@@ -131,10 +131,11 @@
             });
             return false;
         }
+
         const out = document.getElementById("output")
         let c = 0
 
-        setInterval(function() {
+        setInterval(function () {
             // allow 1px inaccuracy by adding 1
             const isScrolledToBottom = out.scrollHeight - out.clientHeight <= out.scrollTop + 1
             // scroll to bottom if isScrolledToBottom is true
@@ -143,7 +144,7 @@
             }
         }, 500)
 
-        function format () {
+        function format() {
             return Array.prototype.slice.call(arguments).join(' ')
         }
     </script>
@@ -212,11 +213,11 @@
     <sec:authorize access="hasAuthority('${script.name}')">
         <h4>${script.display_name}</h4>
         <form name='f' id="ScriptForm" onsubmit="return connect();">
-            <input name="name" id='name' type="hidden" value="${script.name}"/>
+            <input name="scriptName" id='name' type="hidden" value="${script.name}"/>
 
             <c:forEach items="${parameters}" var="parameter">
                 <c:choose>
-                    <c:when test="${parameter.type == 'list'}">
+                    <c:when test="${parameter.type == 'list' and parameter.script == null}">
                         <label class="col-sm-2 control-label" for="${parameter.param}">
                             <c:out value="${parameter.name}"></c:out>
 
@@ -229,7 +230,53 @@
                             </select>
                         </label>
                     </c:when>
-                    <c:when test="${parameter.type == 'multiselect'}">
+                    <c:when test="${parameter.type == 'list' and parameter.script != null}">
+                        <label class="col-sm-2 control-label" for="${parameter.param}">
+                            <c:out value="${parameter.name}"></c:out>
+
+                            <select id="${parameter.param}" name="${parameter.param}" class="${parameter.param}"
+                                    style="width: 200px; padding-left: 50px;"
+                                    <c:if test="${parameter.required}">required</c:if>>
+                                <c:forEach items="${parameter.values}" var="listValue">
+                                    <option value="${listValue}">${listValue}</option>
+                                </c:forEach>
+                            </select>
+                        </label>
+                        <script>
+                            $(document).ready(function () {
+                                $(".${parameter.param}").select2({
+                                    placeholder: "${parameter.name}",
+                                    minimumInputLength: 0,
+                                    delay: 100,
+                                    allowClear: true,
+                                    ajax: {
+                                        url: '<c:url value="/scripts/run_script_select"/>',
+                                        dataType: "json",
+                                        type: "GET",
+                                        data: function (params) {
+                                            return {
+                                                scriptName: '${script.name}',
+                                                paramName: '${parameter.name}'
+                                            };
+
+                                        },
+                                        processResults: function (data) {
+                                            console.log(data)
+                                            return {
+                                                results: $.map(data.items, function (item) {
+                                                    return {
+                                                        text: item.result,
+                                                        id: item.id
+                                                    }
+                                                })
+                                            };
+                                        }
+                                    }
+                                });
+                            });
+                        </script>
+                    </c:when>
+                    <c:when test="${parameter.type == 'multiselect' and parameter.script == null}">
                         <label for="${parameter.description}">
                             <c:out value="${parameter.name}"></c:out>
                             <select name="${parameter.param}" class="multy form__field"
@@ -241,6 +288,52 @@
                                 </c:forEach>
                             </select>
                         </label>
+                    </c:when>
+                    <c:when test="${parameter.type == 'multiselect' and parameter.script != null}">
+                        <label for="${parameter.description}">
+                            <c:out value="${parameter.name}"></c:out>
+                            <select name="${parameter.param}" class="${parameter.param} form__field"
+                                    multiple="multiple"
+                                    style="width: 200px;"
+                                    <c:if test="${parameter.required}">required</c:if>>
+                                <c:forEach items="${parameter.values}" var="listValue">
+                                    <option value="${listValue}">${listValue}</option>
+                                </c:forEach>
+                            </select>
+                        </label>
+                        <script>
+                            $(document).ready(function () {
+                                $(".${parameter.param}").select2({
+                                    placeholder: "${parameter.name}",
+                                    minimumInputLength: 0,
+                                    delay: 100,
+                                    allowClear: true,
+                                    ajax: {
+                                        url: '<c:url value="/scripts/run_script_select"/>',
+                                        //todo filter results
+                                        dataType: "json",
+                                        type: "GET",
+                                        data: function (params) {
+                                            return {
+                                                scriptName: '${script.name}',
+                                                paramName: '${parameter.name}'
+                                            };
+                                        },
+                                        processResults: function (data) {
+                                            console.log(data)
+                                            return {
+                                                results: $.map(data.items, function (item) {
+                                                    return {
+                                                        text: item.result,
+                                                        id: item.id
+                                                    }
+                                                })
+                                            };
+                                        }
+                                    }
+                                });
+                            });
+                        </script>
                     </c:when>
                     <c:when test="${parameter.type == 'text'}">
                         <div class="form__group field">

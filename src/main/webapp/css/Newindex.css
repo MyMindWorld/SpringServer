@@ -195,6 +195,7 @@ body {
     width: 300px; /* Ширина колонки */
     padding: 5px; /* Поля вокруг текста */
     margin: 10px 10px 20px 5px; /* Значения отступов */
+    float:left;
 
 
 }
@@ -202,7 +203,9 @@ body {
 .script-params input,label,select,ul,button {
     margin: 10px; /* Отступы вокруг элемента */
     padding: 10px; /* Поля вокруг текста */
+    float:left;
 }
+.field {clear:both; text-align:left;}
 
 /*}*/
 .script-content {

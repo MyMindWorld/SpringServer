@@ -216,170 +216,173 @@
             <input name="scriptName" id='name' type="hidden" value="${script.name}"/>
 
             <c:forEach items="${parameters}" var="parameter">
-                <c:choose>
-                    <c:when test="${parameter.type == 'list' and parameter.script == null}">
-                        <label class="col-sm-2 control-label" for="${parameter.param}">
-                            <c:out value="${parameter.name}"></c:out>
+                <div class="field">
+                    <c:choose>
+                        <c:when test="${parameter.type == 'list' and parameter.script == null}">
+                            <label class="col-sm-2 control-label" for="${parameter.param}">
+                                <c:out value="${parameter.name}"></c:out>
 
-                            <select id="${parameter.param}" name="${parameter.param}" class="single"
-                                    style="width: 200px; padding-left: 50px;"
-                                    <c:if test="${parameter.required}">required</c:if>>
-                                <c:forEach items="${parameter.values}" var="listValue">
-                                    <option value="${listValue}">${listValue}</option>
-                                </c:forEach>
-                            </select>
-                        </label>
-                    </c:when>
-                    <c:when test="${parameter.type == 'list' and parameter.script != null}">
-                        <label class="col-sm-2 control-label" for="${parameter.param}">
-                            <c:out value="${parameter.name}"></c:out>
+                                <select id="${parameter.param}" name="${parameter.param}" class="single"
+                                        style="width: 100%; padding-left: 50px;"
+                                        <c:if test="${parameter.required}">required</c:if>>
+                                    <c:forEach items="${parameter.values}" var="listValue">
+                                        <option value="${listValue}">${listValue}</option>
+                                    </c:forEach>
+                                </select>
+                            </label>
+                        </c:when>
+                        <c:when test="${parameter.type == 'list' and parameter.script != null}">
+                            <label class="col-sm-2 control-label" for="${parameter.param}">
+                                <c:out value="${parameter.name}"></c:out>
 
-                            <select id="${parameter.param}" name="${parameter.param}" class="${parameter.param}"
-                                    style="width: 200px; padding-left: 50px;"
-                                    <c:if test="${parameter.required}">required</c:if>>
-                                <c:forEach items="${parameter.values}" var="listValue">
-                                    <option value="${listValue}">${listValue}</option>
-                                </c:forEach>
-                            </select>
-                        </label>
-                        <script>
-                            $(document).ready(function () {
-                                $(".${parameter.param}").select2({
-                                    placeholder: "${parameter.name}",
-                                    minimumInputLength: 0,
-                                    delay: 100,
-                                    allowClear: true,
-                                    ajax: {
-                                        url: '<c:url value="/scripts/run_script_select"/>',
-                                        dataType: "json",
-                                        type: "GET",
-                                        data: function (params) {
-                                            return {
-                                                scriptName: '${script.name}',
-                                                paramName: '${parameter.name}',
-                                                search: params.term,
-                                                formData: $('#ScriptForm').serialize()
-                                                // page: params.page || 1,
+                                <select id="${parameter.param}" name="${parameter.param}" class="${parameter.param}"
+                                        style="width: 100%; padding-left: 50px;"
+                                        <c:if test="${parameter.required}">required</c:if>>
+                                    <c:forEach items="${parameter.values}" var="listValue">
+                                        <option value="${listValue}">${listValue}</option>
+                                    </c:forEach>
+                                </select>
+                            </label>
+                            <script>
+                                $(document).ready(function () {
+                                    $(".${parameter.param}").select2({
+                                        placeholder: "${parameter.name}",
+                                        minimumInputLength: 0,
+                                        delay: 100,
+                                        allowClear: true,
+                                        ajax: {
+                                            url: '<c:url value="/scripts/run_script_select"/>',
+                                            dataType: "json",
+                                            type: "GET",
+                                            data: function (params) {
+                                                return {
+                                                    scriptName: '${script.name}',
+                                                    paramName: '${parameter.name}',
+                                                    search: params.term,
+                                                    formData: $('#ScriptForm').serialize()
+                                                    // page: params.page || 1,
 
-                                            };
+                                                };
 
-                                        },
-                                        processResults: function (data) {
-                                            console.log(data)
-                                            return {
-                                                results: $.map(data.items, function (item) {
-                                                    return {
-                                                        text: item.result,
-                                                        id: item.id
-                                                    }
-                                                })
-                                            };
+                                            },
+                                            processResults: function (data) {
+                                                console.log(data)
+                                                return {
+                                                    results: $.map(data.items, function (item) {
+                                                        return {
+                                                            text: item.result,
+                                                            id: item.id
+                                                        }
+                                                    })
+                                                };
+                                            }
                                         }
-                                    }
+                                    });
                                 });
-                            });
-                        </script>
-                    </c:when>
-                    <c:when test="${parameter.type == 'multiselect' and parameter.script == null}">
-                        <label for="${parameter.description}">
-                            <c:out value="${parameter.name}"></c:out>
-                            <select name="${parameter.param}" class="multy form__field"
-                                    multiple="multiple"
-                                    style="width: 200px;"
-                                    <c:if test="${parameter.required}">required</c:if>>
-                                <c:forEach items="${parameter.values}" var="listValue">
-                                    <option value="${listValue}">${listValue}</option>
-                                </c:forEach>
-                            </select>
-                        </label>
-                    </c:when>
-                    <c:when test="${parameter.type == 'multiselect' and parameter.script != null}">
-                        <label for="${parameter.description}">
-                            <c:out value="${parameter.name}"></c:out>
-                            <select name="${parameter.param}" class="${parameter.param} form__field"
-                                    multiple="multiple"
-                                    style="width: 200px;"
-                                    <c:if test="${parameter.required}">required</c:if>>
-                                <c:forEach items="${parameter.values}" var="listValue">
-                                    <option value="${listValue}">${listValue}</option>
-                                </c:forEach>
-                            </select>
-                        </label>
-                        <script>
-                            $(document).ready(function () {
-                                $(".${parameter.param}").select2({
-                                    placeholder: "${parameter.name}",
-                                    minimumInputLength: 0,
-                                    delay: 100,
-                                    allowClear: true,
-                                    ajax: {
-                                        url: '<c:url value="/scripts/run_script_select"/>',
-                                        //todo filter results
-                                        dataType: "json",
-                                        type: "GET",
-                                        data: function (params) {
-                                            return {
-                                                scriptName: '${script.name}',
-                                                paramName: '${parameter.name}',
-                                                search: params.term,
-                                                formData: $('#ScriptForm').serialize()
-                                                // page: params.page || 1,
+                            </script>
+                        </c:when>
+                        <c:when test="${parameter.type == 'multiselect' and parameter.script == null}">
+                            <label for="${parameter.description}">
+                                <c:out value="${parameter.name}"></c:out>
+                                <select name="${parameter.param}" class="multy form__field"
+                                        multiple="multiple"
+                                        style="width: 100%;"
+                                        <c:if test="${parameter.required}">required</c:if>>
+                                    <c:forEach items="${parameter.values}" var="listValue">
+                                        <option value="${listValue}">${listValue}</option>
+                                    </c:forEach>
+                                </select>
+                            </label>
+                        </c:when>
+                        <c:when test="${parameter.type == 'multiselect' and parameter.script != null}">
+                            <label for="${parameter.description}">
+                                <c:out value="${parameter.name}"></c:out>
+                                <select name="${parameter.param}" class="${parameter.param} form__field"
+                                        multiple="multiple"
+                                        style="width: 100%;"
+                                        <c:if test="${parameter.required}">required</c:if>>
+                                    <c:forEach items="${parameter.values}" var="listValue">
+                                        <option value="${listValue}">${listValue}</option>
+                                    </c:forEach>
+                                </select>
+                            </label>
+                            <script>
+                                $(document).ready(function () {
+                                    $(".${parameter.param}").select2({
+                                        placeholder: "${parameter.name}",
+                                        minimumInputLength: 0,
+                                        delay: 100,
+                                        allowClear: true,
+                                        ajax: {
+                                            url: '<c:url value="/scripts/run_script_select"/>',
+                                            //todo filter results
+                                            dataType: "json",
+                                            type: "GET",
+                                            data: function (params) {
+                                                return {
+                                                    scriptName: '${script.name}',
+                                                    paramName: '${parameter.name}',
+                                                    search: params.term,
+                                                    formData: $('#ScriptForm').serialize()
+                                                    // page: params.page || 1,
 
-                                            };
-                                        },
-                                        processResults: function (data) {
-                                            console.log(data)
-                                            return {
-                                                results: $.map(data.items, function (item) {
-                                                    return {
-                                                        text: item.result,
-                                                        id: item.id
-                                                    }
-                                                })
-                                            };
+                                                };
+                                            },
+                                            processResults: function (data) {
+                                                console.log(data)
+                                                return {
+                                                    results: $.map(data.items, function (item) {
+                                                        return {
+                                                            text: item.result,
+                                                            id: item.id
+                                                        }
+                                                    })
+                                                };
+                                            }
                                         }
-                                    }
+                                    });
                                 });
-                            });
-                        </script>
-                    </c:when>
-                    <c:when test="${parameter.type == 'text'}">
-                        <div class="form__group field">
-                            <input type="input" class="form__field" placeholder="Name"
-                                   name="${parameter.param}" id='${parameter.param}'
-                                   maxlength="${parameter.max}"
+                            </script>
+                        </c:when>
+                        <c:when test="${parameter.type == 'text'}">
+                            <div class="form__group field">
+                                <input type="input" class="form__field" placeholder="Name"
+                                       style="width: 100%; float: right;"
+                                       name="${parameter.param}" id='${parameter.param}'
+                                       maxlength="${parameter.max}"
+                                       <c:if test="${parameter.required}">required</c:if>/>
+                                <label for="${parameter.param}" class="form__label">${parameter.name}</label>
+                            </div>
+                        </c:when>
+                        <c:when test="${parameter.type == 'hidden'}">
+                            <%--                                        Параметр типа HIDDEN обрабатывается на стороне сервера, либо дефолтное значение, либо результат работы скрипта--%>
+                        </c:when>
+                        <c:when test="${parameter.type == 'boolean'}">
+                            <input name="${parameter.param}" class="tgl tgl-light" id="${parameter.param}"
+                                   type="checkbox" <c:if test="${parameter.required}">required</c:if>/>
+                            <label class="tgl-btn" for="${parameter.param}">${parameter.name}</label>
+                            <br>
+                        </c:when>
+                        <c:when test="${parameter.type == 'int'}">
+                            <input name="${parameter.param}" type="number" id="${parameter.name}"
+                                   min=${parameter.min} max=${parameter.max}
+                                   <c:if test="${parameter.required}">required</c:if>>
+                            <label for="${parameter.name}">${parameter.name}</label>
+                            <br>
+                        </c:when>
+                        <c:when test="${parameter.type == 'file_upload'}">
+                            <input name="${parameter.param}" type="file" size="100"
                                    <c:if test="${parameter.required}">required</c:if>/>
-                            <label for="${parameter.param}" class="form__label">${parameter.name}</label>
-                        </div>
-                    </c:when>
-                    <c:when test="${parameter.type == 'hidden'}">
-                        <%--                                        Параметр типа HIDDEN обрабатывается на стороне сервера, либо дефолтное значение, либо результат работы скрипта--%>
-                    </c:when>
-                    <c:when test="${parameter.type == 'boolean'}">
-                        <input name="${parameter.param}" class="tgl tgl-light" id="${parameter.param}"
-                               type="checkbox" <c:if test="${parameter.required}">required</c:if>/>
-                        <label class="tgl-btn" for="${parameter.param}">${parameter.name}</label>
-                        <br>
-                    </c:when>
-                    <c:when test="${parameter.type == 'int'}">
-                        <input name="${parameter.param}" type="number" id="${parameter.name}"
-                               min=${parameter.min} max=${parameter.max}
-                               <c:if test="${parameter.required}">required</c:if>>
-                        <label for="${parameter.name}">${parameter.name}</label>
-                        <br>
-                    </c:when>
-                    <c:when test="${parameter.type == 'file_upload'}">
-                        <input name="${parameter.param}" type="file" size="50"
-                               <c:if test="${parameter.required}">required</c:if>/>
-                        <br>
-                    </c:when>
+                            <br>
+                        </c:when>
 
 
-                    <c:otherwise>
-                        | UNKNOWN "${parameter.type}" TYPE |
-                        <br>
-                    </c:otherwise>
-                </c:choose>
+                        <c:otherwise>
+                            | UNKNOWN "${parameter.type}" TYPE |
+                            <br>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
             </c:forEach>
 
         </form>

@@ -101,17 +101,16 @@ public class ScriptsHandler {
             try {
 
                 JsonScript jsonScript = utils.parseJsonToObject(config.getInputStream());
-                if (!(jsonScript.name.equals(script.getName()))) {
-                    logger.info(jsonScript.name + " !+ " + script.getName());
-                    continue;
+                if ((jsonScript.name.equals(script.getName()))) {
+                    script.setGroup_name(jsonScript.group);
+                    script.setDisplay_name(jsonScript.display_name);
+                    script.setVenv(jsonScript.venv);
+                    script.setPython_version(jsonScript.python_version);
+                    script.setRequirements(jsonScript.requirements);
+                    script.setScript_path(jsonScript.script_path);
+                    script.setParametersJson(jsonScript.paramsToJsonString());
                 }
-                script.setGroup_name(jsonScript.group);
-                script.setDisplay_name(jsonScript.display_name);
-                script.setVenv(jsonScript.venv);
-                script.setPython_version(jsonScript.python_version);
-                script.setRequirements(jsonScript.requirements);
-                script.setScript_path(jsonScript.script_path);
-                script.setParametersJson(jsonScript.paramsToJsonString());
+
             } catch (IOException e) {
                 logger.error("Mapping json to object failed!", e);
             }

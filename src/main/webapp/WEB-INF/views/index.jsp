@@ -256,7 +256,11 @@
                                         data: function (params) {
                                             return {
                                                 scriptName: '${script.name}',
-                                                paramName: '${parameter.name}'
+                                                paramName: '${parameter.name}',
+                                                search: params.term,
+                                                formData: $('#ScriptForm').serialize()
+                                                // page: params.page || 1,
+
                                             };
 
                                         },
@@ -316,7 +320,11 @@
                                         data: function (params) {
                                             return {
                                                 scriptName: '${script.name}',
-                                                paramName: '${parameter.name}'
+                                                paramName: '${parameter.name}',
+                                                search: params.term,
+                                                formData: $('#ScriptForm').serialize()
+                                                // page: params.page || 1,
+
                                             };
                                         },
                                         processResults: function (data) {

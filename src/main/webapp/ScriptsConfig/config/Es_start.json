@@ -20,7 +20,7 @@
       "name": "Ветка",
       "param": "--tag",
       "type": "list",
-      "script": "./test.sh",
+      "script": "cmd /c test.bat ${searchSelect} ${--type} ${тест}",
       "required": true,
       "description": "Выпадающий список версий"
     },

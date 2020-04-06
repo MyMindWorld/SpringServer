@@ -22,6 +22,9 @@ import ru.protei.scriptServer.utils.Utils;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 
 @RestController
 public class ScriptsRestController {
@@ -45,10 +48,19 @@ public class ScriptsRestController {
 
     @SneakyThrows
     @RequestMapping(value = "/scripts/run_script_select", method = RequestMethod.GET)
-    public String runScriptForSelect(String scriptName, String paramName, HttpServletRequest req) {
+    public String runScriptForSelect(String scriptName, String paramName,String search,String formData, HttpServletRequest req) {
         // todo return value to list on load or dynamicly? Doing this on server might me easier, but select2
         //  supoprts ajax https://select2.org/data-sources/ajax
+        logger.info("scriptName '" + scriptName + "'");
+        logger.info("paramName '" + paramName + "'");
+        logger.info("search '" + search + "'");
+        logger.info("formData '" + formData + "'");
+        Map<String, List<String>> formQuery = utils.splitQuery(formData);
+        for (String value : formQuery.keySet()
+        ) {
+            logger.info(value + " : " + formQuery.get(value));
 
+        }
         Script script = scriptRepository.findByNameEquals(scriptName);
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!Arrays.toString(principal.getAuthorities().toArray()).contains(script.getName())) { // legshooting
@@ -59,7 +71,7 @@ public class ScriptsRestController {
         Parameters[] paramsList = utils.stringToListOfParams(script.getParametersJson());
         for (Parameters param : paramsList) {
             if (param.name.equals(paramName)) {
-                ArrayList<String> scriptResult = dynamicParamsScriptsRunner.run(param.getScript(), utils.getScriptsDirectory());
+                ArrayList<String> scriptResult = dynamicParamsScriptsRunner.run(utils.buildSelectQueryRun(param.getScript(),search,formQuery), utils.getScriptsDirectory());
                 return utils.createResultsSelect2Json(scriptResult);
             }
         }

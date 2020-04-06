@@ -3,6 +3,7 @@ package ru.protei.scriptServer.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.SystemUtils;
 import org.passay.CharacterData;
 import org.passay.CharacterRule;
@@ -27,8 +28,10 @@ import ru.protei.scriptServer.model.Script;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Map;
+import java.net.URLDecoder;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.passay.DictionaryRule.ERROR_CODE;
 
@@ -82,7 +85,7 @@ public class Utils {
         }
     }
 
-    public String[] getArgsForRequirementsInstall(File requirementsFile,String venvName) {
+    public String[] getArgsForRequirementsInstall(File requirementsFile, String venvName) {
         if (SystemUtils.IS_OS_LINUX) {
             return new String[]{System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + venvPath + "/" + venvName + "/bin/python3", "-m", "pip", "install", "-r", requirementsFile.getAbsolutePath()};
         } else {
@@ -97,6 +100,54 @@ public class Utils {
             return new String[]{System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + venvPath + "/" + venvName + "/Scripts/python.exe ", "-u", scriptPath};
         }
 
+    }
+
+    @SneakyThrows
+    public Map<String, List<String>> splitQuery(String params) {
+        final Map<String, List<String>> query_pairs = new LinkedHashMap<String, List<String>>();
+        final String[] pairs = params.split("&");
+        for (String pair : pairs) {
+            final int idx = pair.indexOf("=");
+            final String key = idx > 0 ? URLDecoder.decode(pair.substring(0, idx), "UTF-8") : pair;
+            if (!query_pairs.containsKey(key)) {
+                query_pairs.put(key, new LinkedList<String>());
+            }
+            final String value = idx > 0 && pair.length() > idx + 1 ? URLDecoder.decode(pair.substring(idx + 1), "UTF-8") : null;
+            query_pairs.get(key).add(value);
+        }
+        return query_pairs;
+    }
+
+    @SneakyThrows
+    public String buildSelectQueryRun(String scriptQuery, String searchQuery, Map<String, List<String>> formData) {
+        if (searchQuery == null) {
+            searchQuery = "";
+        }
+        String resultRunString = scriptQuery;
+        Pattern pattern = Pattern.compile("[${]+[-A-Za-zА-Яа-я0-9]+[}]");
+        Matcher matcher = pattern.matcher(scriptQuery);
+        while (matcher.find()) {
+            if (matcher.group().equals("${searchSelect}")) {
+                resultRunString = resultRunString.replace("${searchSelect}", searchQuery);
+            }
+            String possibleParam = matcher.group().replace("${", "").replace("}", "");
+            if (formData.keySet().contains(possibleParam)) {
+                List<String> paramValuesList = formData.get(possibleParam);
+                String paramValue = "";
+                if (paramValuesList.size() == 1) {
+                    paramValue = paramValuesList.get(0);
+                } else {
+                    paramValue = paramValuesList.toString();
+                }
+                if (paramValue == null) {
+                    paramValue = "";
+                }
+                resultRunString = resultRunString.replace(matcher.group(), paramValue);
+
+
+            }
+        }
+        return resultRunString;
     }
 
 
@@ -124,9 +175,9 @@ public class Utils {
 
         ResultToSelect resultObject = new ResultToSelect();
         ResultToSelect.Items[] itemsResult = new ResultToSelect.Items[scriptResults.size()];
-        for (String result:scriptResults) {
+        for (String result : scriptResults) {
             int resultIndex = scriptResults.indexOf(result);
-            ResultToSelect.Items itemResult = new ResultToSelect.Items(result,resultIndex);
+            ResultToSelect.Items itemResult = new ResultToSelect.Items(result, resultIndex);
             itemsResult[resultIndex] = itemResult;
         }
         resultObject.setItems(itemsResult);

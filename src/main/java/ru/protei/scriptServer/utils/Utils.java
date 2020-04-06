@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.passay.CharacterData;
 import org.passay.CharacterRule;
@@ -128,7 +129,7 @@ public class Utils {
         Matcher matcher = pattern.matcher(scriptQuery);
         while (matcher.find()) {
             if (matcher.group().equals("${searchSelect}")) {
-                resultRunString = resultRunString.replace("${searchSelect}", searchQuery);
+                resultRunString = resultRunString.replace("${searchSelect}", "--searchSelect " + searchQuery);
             }
             String possibleParam = matcher.group().replace("${", "").replace("}", "");
             if (formData.keySet().contains(possibleParam)) {
@@ -142,9 +143,7 @@ public class Utils {
                 if (paramValue == null) {
                     paramValue = "";
                 }
-                resultRunString = resultRunString.replace(matcher.group(), paramValue);
-
-
+                resultRunString = resultRunString.replace(matcher.group(), possibleParam + " " + paramValue);
             }
         }
         return resultRunString;
@@ -283,7 +282,7 @@ public class Utils {
     }
 
     public String[] createParamsString(Script script, Map<String, String> params) {
-        params.remove("name"); // Аргумент в котором передается от клиента название скрипта
+        params.remove("scriptName"); // Аргумент в котором передается от клиента название скрипта
         // todo refactor to array mb?
         // todo нужна ли здесь валидация
         Parameters[] parametersKeys = stringToListOfParams(script.getParametersJson());
@@ -299,13 +298,24 @@ public class Utils {
             }
         }
         for (String paramKey : params.keySet()) { // сбор констант
-            if (params.get(paramKey) == null) {
+            String paramValue = params.get(paramKey);
+            if (paramValue == null) {
                 continue;
             }
-            resultArray.add(paramKey);
-            resultArray.add(params.get(paramKey));
+            else {
+                resultArray.add(paramKey);
+                resultArray.add(paramValue);
+            }
+//                resultArray.add(paramValue.get(0));
+//            if (paramValue.size()==1){
+//                resultArray.add(paramKey);
+//                resultArray.add(paramValue.get(0));
+//            }
+//            else {
+//                resultArray.add(paramKey);
+//                resultArray.add(StringUtils.join(paramValue, " "));
+//            }
         }
-
         String[] resultString = new String[resultArray.size()];
         for (int i = 0; i < resultArray.size(); i++) {
             resultString[i] = resultArray.get(i);

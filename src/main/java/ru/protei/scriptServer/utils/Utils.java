@@ -3,7 +3,6 @@ package ru.protei.scriptServer.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.gson.Gson;
 import org.apache.commons.lang3.SystemUtils;
 import org.passay.CharacterData;
 import org.passay.CharacterRule;
@@ -28,8 +27,6 @@ import ru.protei.scriptServer.model.Script;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -79,15 +76,15 @@ public class Utils {
 
     public File getVenvActivationPath(String venvName) {
         if (SystemUtils.IS_OS_LINUX) {
-            return new File(getVenvDirectory().toString() + "/" + venvName + "/bin/");
+            return new File(getVenvDirectory().toString());
         } else {
             return new File(getVenvDirectory().toString() + "\\" + venvName + "\\Scripts\\");
         }
     }
 
-    public String[] getArgsForRequirementsInstall(File requirementsFile) {
+    public String[] getArgsForRequirementsInstall(File requirementsFile,String venvName) {
         if (SystemUtils.IS_OS_LINUX) {
-            return new String[]{"./activate.bat", "&&", "pip", "install", "-r", requirementsFile.getAbsolutePath()};
+            return new String[]{System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + venvPath + "/" + venvName + "/bin/python3", "-m", "pip", "install", "-r", requirementsFile.getAbsolutePath()};
         } else {
             return new String[]{"cmd", "/c", "activate.bat", "&&", "pip", "install", "-r", requirementsFile.getAbsolutePath()};
         }
@@ -95,7 +92,7 @@ public class Utils {
 
     public String[] getArgsForRunningScriptInVenv(String venvName, String scriptPath) {
         if (SystemUtils.IS_OS_LINUX) {
-            return new String[]{"./" + System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + venvPath + "/" + venvName + "/Scripts/python ", "-u", scriptPath};
+            return new String[]{System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + venvPath + "/" + venvName + "/bin/python3", "-u", scriptPath};
         } else {
             return new String[]{System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + venvPath + "/" + venvName + "/Scripts/python.exe ", "-u", scriptPath};
         }

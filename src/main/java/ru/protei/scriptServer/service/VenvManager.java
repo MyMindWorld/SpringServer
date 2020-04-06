@@ -1,17 +1,14 @@
 package ru.protei.scriptServer.service;
 
 import lombok.SneakyThrows;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
-import ru.protei.scriptServer.model.JsonScript;
 import ru.protei.scriptServer.model.Venv;
 import ru.protei.scriptServer.repository.VenvRepository;
 import ru.protei.scriptServer.utils.Utils;
-import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -33,10 +30,10 @@ public class VenvManager {
             logger.info("Default requirements not found.");
         } else {
             logger.info("Default requirements found.");
-            File destination = new File(utils.getRequirementsDirectory().toString() + "\\");
+            File destination = new File(utils.getRequirementsDirectory().toString() + "/");
             logger.info("Copying to '" + destination + "'");
             try {
-                FileUtils.deleteQuietly(new File(utils.getRequirementsDirectory().toString() + "\\" + defaultRequirements));
+                FileUtils.deleteQuietly(new File(utils.getRequirementsDirectory().toString() + "/" + defaultRequirements));
                 FileUtils.copyFileToDirectory(defaultRequirements, destination);
                 logger.info("Copying was successful.");
             } catch (IOException e) {
@@ -122,7 +119,7 @@ public class VenvManager {
 //        https://wiki.protei.ru/doku.php?id=protei:qa:python:pypi&s[]=pip
 //        https://wiki.protei.ru/doku.php?id=protei:qa:python:virtualenv&s[]=pip
 
-        Process venvCreatingProc = Runtime.getRuntime().exec(utils.getArgsForRequirementsInstall(requirementsFile), null, utils.getVenvActivationPath(venv.getName()));
+        Process venvCreatingProc = Runtime.getRuntime().exec(utils.getArgsForRequirementsInstall(requirementsFile,venv.getName()), null, utils.getVenvActivationPath(venv.getName()));
         InputStream is = venvCreatingProc.getInputStream();
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
         InputStream eis = venvCreatingProc.getErrorStream();
@@ -146,7 +143,7 @@ public class VenvManager {
 
     @SneakyThrows
     public void deleteVenv(String venvName) {
-        File dir = new File(utils.getVenvDirectory().toString() + "\\" + venvName);
+        File dir = new File(utils.getVenvDirectory().toString() + "/" + venvName);
         if (!dir.isDirectory() || !dir.exists()) {
             logger.error("'Directory' with venv :'" + venvName + "' is not a directory or doesn't exists!");
             return;

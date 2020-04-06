@@ -222,7 +222,8 @@
                             <label class="col-sm-2 control-label" for="${parameter.param}">
                                 <c:out value="${parameter.name}"></c:out>
 
-                                <select id="${parameter.param}" name="${parameter.param}" class="single"
+                                <select id="${parameter.param}" name="${parameter.param}"
+                                        class="single ${parameter.param}"
                                         style="width: 100%; padding-left: 50px;"
                                         <c:if test="${parameter.required}">required</c:if>>
                                     <c:forEach items="${parameter.values}" var="listValue">
@@ -230,6 +231,13 @@
                                     </c:forEach>
                                 </select>
                             </label>
+                            <script>
+                                $(document).ready(function () {
+                                    $(".${parameter.param}").select2({
+                                        placeholder: "${parameter.name}"
+                                    });
+                                });
+                            </script>
                         </c:when>
                         <c:when test="${parameter.type == 'list' and parameter.script != null}">
                             <label class="col-sm-2 control-label" for="${parameter.param}">
@@ -284,7 +292,7 @@
                         <c:when test="${parameter.type == 'multiselect' and parameter.script == null}">
                             <label for="${parameter.description}">
                                 <c:out value="${parameter.name}"></c:out>
-                                <select name="${parameter.param}" class="multy form__field"
+                                <select name="${parameter.param}" class="multy form__field ${parameter.param}"
                                         multiple="multiple"
                                         style="width: 100%;"
                                         <c:if test="${parameter.required}">required</c:if>>
@@ -293,6 +301,13 @@
                                     </c:forEach>
                                 </select>
                             </label>
+                            <script>
+                                $(document).ready(function () {
+                                    $(".${parameter.param}").select2({
+                                        placeholder: "${parameter.name}"
+                                    });
+                                });
+                            </script>
                         </c:when>
                         <c:when test="${parameter.type == 'multiselect' and parameter.script != null}">
                             <label for="${parameter.description}">
@@ -345,7 +360,7 @@
                             </script>
                         </c:when>
                         <c:when test="${parameter.type == 'text'}">
-                            <div class="form__group field">
+                            <div class="form__group field" style="width: 100%">
                                 <input type="input" class="form__field" placeholder="Name"
                                        style="width: 100%; float: right;"
                                        name="${parameter.param}" id='${parameter.param}'
@@ -383,6 +398,7 @@
                         </c:otherwise>
                     </c:choose>
                 </div>
+                <br>
             </c:forEach>
 
         </form>
@@ -435,16 +451,5 @@
     </div>
 </c:otherwise>
 </c:choose>
-
-
-<script type="text/javascript">
-
-    $(document).ready(function () {
-        $('.multy').select2();
-        $('.single').select2();
-    });
-</script>
-
-
 </body>
 </html>

@@ -72,7 +72,7 @@ public class ScriptsRestController {
         for (Parameters param : paramsList) {
             if (param.name.equals(paramName)) {
                 ArrayList<String> scriptResult = dynamicParamsScriptsRunner.run(utils.buildSelectQueryRun(param.getScript(),search,formQuery), utils.getScriptsDirectory());
-                return utils.createResultsSelect2Json(scriptResult);
+                return utils.createResultsSelect2Json(scriptResult,param);
             }
         }
         logger.info("Returning nothing");

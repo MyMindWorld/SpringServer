@@ -170,14 +170,21 @@ public class Utils {
         return null;
     }
 
-    public String createResultsSelect2Json(ArrayList<String> scriptResults) {
+    public String createResultsSelect2Json(ArrayList<String> scriptResults,Parameters param) {
 
         ResultToSelect resultObject = new ResultToSelect();
-        ResultToSelect.Items[] itemsResult = new ResultToSelect.Items[scriptResults.size()];
+        int resultIndex = 0;
+                ResultToSelect.Items[] itemsResult = new ResultToSelect.Items[scriptResults.size() + param.values.length];
         for (String result : scriptResults) {
-            int resultIndex = scriptResults.indexOf(result);
-            ResultToSelect.Items itemResult = new ResultToSelect.Items(result, resultIndex);
+            resultIndex = scriptResults.indexOf(result);
+            ResultToSelect.Items itemResult = new ResultToSelect.Items(result, result);
             itemsResult[resultIndex] = itemResult;
+        }
+        int defaultParamIndex = resultIndex;
+        for (String defaultParam : param.values) {
+            defaultParamIndex++;
+            ResultToSelect.Items itemResult = new ResultToSelect.Items(defaultParam, defaultParam);
+            itemsResult[defaultParamIndex] = itemResult;
         }
         resultObject.setItems(itemsResult);
 

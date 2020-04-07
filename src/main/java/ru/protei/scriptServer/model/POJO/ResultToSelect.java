@@ -12,9 +12,9 @@ public class ResultToSelect {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Items {
-        private String result;
+        private String resultText;
 
-        private int id;
+        private String resultValue;
 
     }
 }

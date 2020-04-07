@@ -246,13 +246,11 @@
                                 <select id="${parameter.param}" name="${parameter.param}" class="${parameter.param}"
                                         style="width: 100%; padding-left: 50px;"
                                         <c:if test="${parameter.required}">required</c:if>>
-                                    <c:forEach items="${parameter.values}" var="listValue">
-                                        <option value="${listValue}">${listValue}</option>
-                                    </c:forEach>
                                 </select>
                             </label>
                             <script>
                                 $(document).ready(function () {
+                                    var select = $('.${parameter.param}');
                                     $(".${parameter.param}").select2({
                                         placeholder: "${parameter.name}",
                                         minimumInputLength: 0,
@@ -278,8 +276,8 @@
                                                 return {
                                                     results: $.map(data.items, function (item) {
                                                         return {
-                                                            text: item.result,
-                                                            id: item.id
+                                                            text: item.resultValue,
+                                                            id: item.resultText
                                                         }
                                                     })
                                                 };
@@ -316,9 +314,6 @@
                                         multiple="multiple"
                                         style="width: 100%;"
                                         <c:if test="${parameter.required}">required</c:if>>
-                                    <c:forEach items="${parameter.values}" var="listValue">
-                                        <option value="${listValue}">${listValue}</option>
-                                    </c:forEach>
                                 </select>
                             </label>
                             <script>
@@ -348,8 +343,8 @@
                                                 return {
                                                     results: $.map(data.items, function (item) {
                                                         return {
-                                                            text: item.result,
-                                                            id: item.id
+                                                            text: item.resultValue,
+                                                            id: item.resultText
                                                         }
                                                     })
                                                 };

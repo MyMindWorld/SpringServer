@@ -156,12 +156,12 @@ public class ScriptsHandler {
             script.setVenv(utils.defaultVenvName);
         }
         if (venvRepository.findByNameEquals(script.getVenv()) == null) {
-            scriptWebSocketController.sendToSock(username, "Creating venv...", script.getName());
+            scriptWebSocketController.sendToSockFromServer(username, "Creating venv...", script.getName());
             venvManager.createIfNotExists(script.getVenv(), script.getRequirements());
-            scriptWebSocketController.sendToSock(username, "Venv creation complete!", script.getName());
+            scriptWebSocketController.sendToSockFromServer(username, "Venv creation complete!", script.getName());
         }
 
-        scriptWebSocketController.sendToSock(username, "Starting script '" + script.getDisplay_name() + "'", script.getName());
+        scriptWebSocketController.sendToSockFromServer(username, "Starting script '" + script.getDisplay_name() + "'", script.getName());
         pythonScriptsRunner.run(params, utils.getScriptsDirectory(), false, script, script.getVenv(), username);
         logger.info("Exit code : " + pythonScriptsRunner.processExitcode);
     }

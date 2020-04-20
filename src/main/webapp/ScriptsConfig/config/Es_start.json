@@ -10,13 +10,6 @@
   "requires_terminal": false,
   "parameters": [
     {
-      "name": "Поиск",
-      "param": "--type",
-      "description": "Принимает значение Release или Custom",
-      "type": "text",
-      "required": false
-    },
-    {
       "name": "Ветка",
       "param": "--tag",
       "type": "list",

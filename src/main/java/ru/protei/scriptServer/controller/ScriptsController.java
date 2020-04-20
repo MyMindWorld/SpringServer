@@ -122,18 +122,12 @@ public class ScriptsController {
 
         }
         if (allRequestParams.size() == 0) {
-            message.setFrom("SCRIPT");
-            message.setText("Parameters could not be empty! Or should they...");
-            scriptWebSocketController.sendToSock(principal.getUsername(), message, script.getName());
+            scriptWebSocketController.sendToSockFromServer(principal.getUsername(), "Parameters could not be empty! Or should they...", script.getName());
         }
         if (script.getVenv() == null) {
-            message.setFrom("SCRIPT");
-            message.setText("Using default venv. It's HIGHLY recommended not doing this. Please, specify unique venv name and requirements file");
-            scriptWebSocketController.sendToSock(principal.getUsername(), message, script.getName());
+            scriptWebSocketController.sendToSockFromServer(principal.getUsername(), "Using default venv. It's HIGHLY recommended not doing this. Please, specify unique venv name and requirements file", script.getName());
             if (script.getRequirements() != null) {
-                message.setFrom("SCRIPT");
-                message.setText("Adding requirements to default venv is forbidden! Please use custom venv for this case!");
-                scriptWebSocketController.sendToSock(principal.getUsername(), message, script.getName());
+                scriptWebSocketController.sendToSockFromServer(principal.getUsername(), "Adding requirements to default venv is forbidden! Please use custom venv for this case!", script.getName());
             }
         }
 

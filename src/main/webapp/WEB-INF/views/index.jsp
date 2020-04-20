@@ -88,18 +88,18 @@
             console.log("Disconnected");
         }
 
-        function sendMessage() {
+        function sendMessage(scriptName) {
             const text = document.getElementById('text').value;
             stompClient.send("/scriptsWS/chat", {},
-                JSON.stringify({'from': connectionName, 'text': text}));
+                JSON.stringify({'username': connectionName, 'text': text,'scriptName':scriptName}));
         }
 
         function showMessageOutput(messageOutput) {
             const response = document.getElementById('response');
             const p = document.createElement('p');
             p.style.wordWrap = 'break-word';
-            p.appendChild(document.createTextNode(messageOutput.from + ": "
-                + messageOutput.text + " (" + messageOutput.time + ")"));
+            p.appendChild(document.createTextNode(
+                messageOutput.username + ": " + messageOutput.text + " (" + messageOutput.time + ")"));
             response.appendChild(p);
         }
 
@@ -430,7 +430,7 @@
         <p id="response"></p>
         <div id="conversationDiv">
             <input type="text" id="text" placeholder="Write a message..."/>
-            <button id="sendMessage" onclick="sendMessage();">Send</button>
+            <button id="sendMessage" onclick="sendMessage('${script.name}');">Send</button>
         </div>
     </div>
 </sec:authorize>

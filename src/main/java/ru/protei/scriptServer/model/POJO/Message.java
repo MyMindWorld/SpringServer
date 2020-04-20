@@ -9,9 +9,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Message {
 
-    private String from;
-    private String to;
+    private String username;
+    private String scriptName;
+    private String addressedTo;
     private String text;
     private String time;
 
+    @Override
+    public String toString() {
+        return "Message{" +
+                "username='" + username + '\'' +
+                ", scriptName='" + scriptName + '\'' +
+                ", text='" + text + '\'' +
+                ", time='" + time + '\'' +
+                '}';
+    }
 }

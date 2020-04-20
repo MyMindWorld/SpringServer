@@ -13,6 +13,7 @@ import ru.protei.scriptServer.model.Privilege;
 import ru.protei.scriptServer.model.Role;
 import ru.protei.scriptServer.model.Script;
 import ru.protei.scriptServer.repository.ScriptRepository;
+import ru.protei.scriptServer.repository.VenvRepository;
 import ru.protei.scriptServer.utils.SystemIntegration.PythonScriptsRunner;
 import ru.protei.scriptServer.utils.Utils;
 
@@ -38,6 +39,8 @@ public class ScriptsHandler {
     PythonScriptsRunner pythonScriptsRunner;
     @Autowired
     VenvManager venvManager;
+    @Autowired
+    VenvRepository venvRepository;
     @Autowired
     ScriptWebSocketController scriptWebSocketController;
 
@@ -151,11 +154,13 @@ public class ScriptsHandler {
     public void runPythonScript(String[] params, Script script, String username) {
         if (script.getVenv() == null) {
             script.setVenv(utils.defaultVenvName);
-        } else {
+        }
+        if (venvRepository.findByNameEquals(script.getVenv()) == null) {
             scriptWebSocketController.sendToSock(username, "Creating venv...", script.getName());
             venvManager.createIfNotExists(script.getVenv(), script.getRequirements());
             scriptWebSocketController.sendToSock(username, "Venv creation complete!", script.getName());
         }
+
         scriptWebSocketController.sendToSock(username, "Starting script '" + script.getDisplay_name() + "'", script.getName());
         pythonScriptsRunner.run(params, utils.getScriptsDirectory(), false, script, script.getVenv(), username);
         logger.info("Exit code : " + pythonScriptsRunner.processExitcode);

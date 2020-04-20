@@ -49,8 +49,9 @@ public class ScriptsRestController {
     @SneakyThrows
     @RequestMapping(value = "/scripts/run_script_select", method = RequestMethod.GET)
     public String runScriptForSelect(String scriptName, String paramName,String search,String formData, HttpServletRequest req) {
-        // todo return value to list on load or dynamicly? Doing this on server might me easier, but select2
-        //  supoprts ajax https://select2.org/data-sources/ajax
+        if(search == null){
+            search = "";
+        }
         logger.info("scriptName '" + scriptName + "'");
         logger.info("paramName '" + paramName + "'");
         logger.info("search '" + search + "'");
@@ -72,7 +73,7 @@ public class ScriptsRestController {
         for (Parameters param : paramsList) {
             if (param.name.equals(paramName)) {
                 ArrayList<String> scriptResult = dynamicParamsScriptsRunner.run(utils.buildSelectQueryRun(param.getScript(),search,formQuery), utils.getScriptsDirectory());
-                return utils.createResultsSelect2Json(scriptResult,param);
+                return utils.createResultsSelect2Json(scriptResult,param,search);
             }
         }
         logger.info("Returning nothing");

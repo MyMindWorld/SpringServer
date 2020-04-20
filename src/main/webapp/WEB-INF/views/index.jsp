@@ -27,6 +27,7 @@
     <%--    <link rel="stylesheet" type="text/css" href="<c:url value="/css/main.css"/>">--%>
     <link rel="stylesheet" type="text/css" href="<c:url value="/css/Newindex.css"/>">
     <link rel="stylesheet" type="text/css" href="<c:url value="/css/style.css"/>">
+    <link rel="stylesheet" type="text/css" href="<c:url value="/css/ToggleButtons.css"/>">
     <!--===============================================================================================-->
     <script src="<c:url value="/vendor/jquery/jquery-2.1.3.min.js"/>"></script>
     <script src="<c:url value="/vendor/select2/select2.min.js"/>"></script>
@@ -254,7 +255,7 @@
                                     $(".${parameter.param}").select2({
                                         placeholder: "${parameter.name}",
                                         minimumInputLength: 0,
-                                        delay: 100,
+                                        delay: 0,
                                         allowClear: true,
                                         ajax: {
                                             url: '<c:url value="/scripts/run_script_select"/>',
@@ -321,7 +322,7 @@
                                     $(".${parameter.param}").select2({
                                         placeholder: "${parameter.name}",
                                         minimumInputLength: 0,
-                                        delay: 100,
+                                        delay: 0,
                                         allowClear: true,
                                         ajax: {
                                             url: '<c:url value="/scripts/run_script_select"/>',
@@ -368,9 +369,11 @@
                             <%--                                        Параметр типа HIDDEN обрабатывается на стороне сервера, либо дефолтное значение, либо результат работы скрипта--%>
                         </c:when>
                         <c:when test="${parameter.type == 'boolean'}">
-                            <input name="${parameter.param}" class="tgl tgl-light" id="${parameter.param}"
+                            <c:out value="${parameter.name}"></c:out>
+                            <input name="${parameter.param}" class="tgl tgl-ios" id="${parameter.param}"
                                    type="checkbox" <c:if test="${parameter.required}">required</c:if>/>
-                            <label class="tgl-btn" for="${parameter.param}">${parameter.name}</label>
+                            <label class="tgl-btn" for="${parameter.param}"></label>
+
                             <br>
                         </c:when>
                         <c:when test="${parameter.type == 'int'}">

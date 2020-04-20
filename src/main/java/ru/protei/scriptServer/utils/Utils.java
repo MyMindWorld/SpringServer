@@ -33,6 +33,7 @@ import java.net.URLDecoder;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.passay.DictionaryRule.ERROR_CODE;
 
@@ -170,11 +171,10 @@ public class Utils {
         return null;
     }
 
-    public String createResultsSelect2Json(ArrayList<String> scriptResults,Parameters param) {
-
+    public String createResultsSelect2Json(ArrayList<String> scriptResults, Parameters param, String search) {
         ResultToSelect resultObject = new ResultToSelect();
         int resultIndex = 0;
-                ResultToSelect.Items[] itemsResult = new ResultToSelect.Items[scriptResults.size() + param.values.length];
+        ResultToSelect.Items[] itemsResult = new ResultToSelect.Items[scriptResults.size() + param.values.length];
         for (String result : scriptResults) {
             resultIndex = scriptResults.indexOf(result);
             ResultToSelect.Items itemResult = new ResultToSelect.Items(result, result);
@@ -186,6 +186,16 @@ public class Utils {
             ResultToSelect.Items itemResult = new ResultToSelect.Items(defaultParam, defaultParam);
             itemsResult[defaultParamIndex] = itemResult;
         }
+        // Filter results by search query from select
+        List<ResultToSelect.Items> result =
+                Arrays.stream(itemsResult)
+                        .filter(element ->
+                                element.getResultValue()
+                                        .contains(search))
+                        .collect(Collectors.toList());
+        itemsResult = new ResultToSelect.Items[result.size()];
+        itemsResult = result.toArray(itemsResult);
+
         resultObject.setItems(itemsResult);
 
         ObjectMapper mapper = new ObjectMapper();
@@ -288,8 +298,9 @@ public class Utils {
         return password;
     }
 
-    public String[] createParamsString(Script script, Map<String, String> params) {
-        params.remove("scriptName"); // Аргумент в котором передается от клиента название скрипта
+    public String[] createParamsString(Script script, Map<String, String[]> requestParamsMap) {
+        Map<String, String[]> params = new HashMap<>(requestParamsMap); // Duplicating original map, due to map lock
+        params.remove("scriptName"); // Key containing script name
         // todo refactor to array mb?
         // todo нужна ли здесь валидация
         Parameters[] parametersKeys = stringToListOfParams(script.getParametersJson());
@@ -305,11 +316,11 @@ public class Utils {
             }
         }
         for (String paramKey : params.keySet()) { // сбор констант
-            String paramValue = params.get(paramKey);
+            String[] paramValueArray = params.get(paramKey);
+            String paramValue = String.join("; ", paramValueArray);
             if (paramValue == null) {
                 continue;
-            }
-            else {
+            } else {
                 resultArray.add(paramKey);
                 resultArray.add(paramValue);
             }

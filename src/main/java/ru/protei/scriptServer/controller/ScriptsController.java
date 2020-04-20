@@ -99,7 +99,8 @@ public class ScriptsController {
     @SneakyThrows
     @RequestMapping(value = "/scripts/run_script", method = RequestMethod.POST)
     @ResponseBody
-    public void runScript(@RequestParam Map<String, String> allRequestParams, String scriptName, HttpServletRequest req) {
+    public void runScript(String scriptName, HttpServletRequest req) {
+        Map<String, String[]> allRequestParams = req.getParameterMap();
         Script script = scriptRepository.findByNameEquals(scriptName);
         if (script == null) {
             logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "Running unknown script! '" + scriptName + "'", String.valueOf(allRequestParams));
@@ -114,7 +115,10 @@ public class ScriptsController {
         }
         for (String value : allRequestParams.keySet()
         ) {
-            logger.info(value + " : " + allRequestParams.get(value));
+
+            String joinedString = String.join("; ", allRequestParams.get(value));
+            // TODO research if '[1,2,3]' will be more readable by python
+            logger.info(value + " : " + joinedString);
 
         }
         if (allRequestParams.size() == 0) {

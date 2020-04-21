@@ -53,8 +53,8 @@
         function setConnected(connected) {
             document.getElementById('runScriptButton').disabled = connected;
             document.getElementById('disconnect').disabled = !connected;
-            document.getElementById('conversationDiv').style.visibility
-                = connected ? 'visible' : 'hidden';
+            // document.getElementById('conversationDiv').style.visibility
+            //     = connected ? 'visible' : 'hidden';
             document.getElementById('response').innerHTML = '';
         }
 
@@ -91,16 +91,41 @@
         function sendMessage(scriptName) {
             const text = document.getElementById('text').value;
             stompClient.send("/scriptsWS/chat", {},
-                JSON.stringify({'username': connectionName, 'text': text,'scriptName':scriptName}));
+                JSON.stringify({'username': connectionName, 'text': text, 'scriptName': scriptName}));
         }
 
         function showMessageOutput(messageOutput) {
+            // Тут можно будет менять цвет и стиль сообщений, в зависимости от адреса или содержимого
+            if (messageOutput.modalType != null) {
+                parseModalMessage(messageOutput)
+                return
+            }
             const response = document.getElementById('response');
             const p = document.createElement('p');
             p.style.wordWrap = 'break-word';
             p.appendChild(document.createTextNode(
-                messageOutput.username + ": " + messageOutput.text + " (" + messageOutput.time + ")"));
+                messageOutput.time + " " + messageOutput.username + ": " + messageOutput.text ));
             response.appendChild(p);
+        }
+
+        function parseModalMessage(messageOutput) {
+            if (messageOutput.modalType === "Boolean") {
+                openBooleanModal(messageOutput.text)
+                return
+            } else if (messageOutput.modalType === "BooleanCustom") {
+                openCustomBooleanModal(messageOutput.text.split("/")[0], messageOutput.text.split("/")[1], messageOutput.text.split("/")[2])
+                return
+            } else if (messageOutput.modalType === "InputText") {
+                openInputTextModal(messageOutput.text)
+                return
+            } else if (messageOutput.modalType === "TextArea") {
+                openCustomBooleanModal(messageOutput.text)
+                return
+            } else if (messageOutput.modalType === "ShowInfo") {
+                openInfoModal(messageOutput.text)
+                return
+            }
+
         }
 
         function getFormData($form) {
@@ -426,14 +451,197 @@
 </sec:authorize>
     <%--Показывается только если выбран скрипт и есть роль --%>
 <sec:authorize access="hasAuthority('${script.name}')">
-    <div class="script-content" id="output">
+<pre>
+    <code class="script-content log-content" id="output">
         <p id="response"></p>
-        <div id="conversationDiv">
-            <input type="text" id="text" placeholder="Write a message..."/>
-            <button id="sendMessage" onclick="sendMessage('${script.name}');">Send</button>
-        </div>
-    </div>
+<%--        <div id="conversationDiv">--%>
+<%--            <input type="text" id="text" placeholder="Write a message..."/>--%>
+<%--            <button id="sendMessage" onclick="sendMessage('${script.name}');">Send</button>--%>
+<%--        </div>--%>
+    </code>
+</pre>
 </sec:authorize>
+    <%-- Модальные окна и связанные с ними скрипты --%>
+<div id="booleanModal" class="modal">
+
+    <!-- Modal content -->
+    <div class="modal-content" style="height: auto">
+<%--        <span class="close">&times;</span>--%>
+        <p style="font-size:235%;text-align:center;" id="booleanModalText"></p>
+        <button id="booleanResultYes" class="e" onclick="sendMessageFromModal('${script.name}',1);closeBooleanModal();">
+            <b>Yes</b></button>
+        <button id="booleanResultNo" class="e" onclick="sendMessageFromModal('${script.name}',0);closeBooleanModal();">
+            <b>No</b></button>
+
+    </div>
+
+</div>
+
+<div id="BooleanCustomModal" class="modal">
+
+    <!-- Modal content -->
+    <div class="modal-content" style="height: auto">
+        <p style="font-size:235%;text-align:center;" id="booleanCustomModalText"></p>
+        <button id="booleanCustomYes" class="e"
+                onclick="sendMessageFromModal('${script.name}',1);closeCustomBooleanModal();"><b>Yes</b></button>
+        <button id="booleanCustomNo" class="e"
+                onclick="sendMessageFromModal('${script.name}',0);closeCustomBooleanModal();"><b>No</b></button>
+
+    </div>
+
+</div>
+<div id="InputTextModal" class="modal">
+
+    <!-- Modal content -->
+    <div class="modal-content" style="height: auto">
+        <p style="font-size:235%;text-align:center;" id="InputTextModalText"></p>
+
+        <div class="form__group field" style="width: 100%">
+            <input type="input" class="form__field" placeholder="Name"
+                   style="width: 100%; float: right;"
+                   name="InputTextParam" id='InputTextParamId'/>
+            <label for="InputTextParamId" class="form__label">TEXT</label>
+            <button id="InputTextButton" class="e"
+                    onclick="sendMessageFromModalWithElementText('${script.name}',0,'InputTextParamId');closeInputTextModal();"><b>Submit text</b></button>
+        </div>
+
+    </div>
+
+</div>
+<%--NOT READY--%>
+<%--<div id="TextAreaModal" class="modal">--%>
+
+<%--    <!-- Modal content -->--%>
+<%--    <div class="modal-content" style="height: auto">--%>
+<%--        <p style="font-size:235%;text-align:center;" id="InputTextModalText"></p>--%>
+
+<%--        <div class="form__group field" style="width: 100%">--%>
+<%--            <input type="input" class="form__field" placeholder="Name"--%>
+<%--                   style="width: 100%; float: right;"--%>
+<%--                   name="InputTextParam" id='InputTextParamId'/>--%>
+<%--            <label for="InputTextParamId" class="form__label">TEXT</label>--%>
+<%--            <button id="InputTextButton" class="e"--%>
+<%--                    onclick="sendMessageFromModalWithElementText('${script.name}',0,'InputTextParamId');closeInputTextModal();"><b>Submit text</b></button>--%>
+<%--        </div>--%>
+
+<%--    </div>--%>
+
+<%--</div>--%>
+<div id="InfoModal" class="modal">
+
+    <!-- Modal content -->
+    <div class="modal-content" style="height: auto">
+        <span class="close" id="CloseInfoModal">&times;</span>
+        <p style="font-size:235%;text-align:center;" id="InfoText"></p>
+    </div>
+
+</div>
+<script type="text/javascript">
+    function sendMessageFromModal(scriptName, userAnswer) {
+        stompClient.send("/scriptsWS/chat", {},
+            JSON.stringify({'username': connectionName, 'text': userAnswer, 'scriptName': scriptName}));
+    }
+    function sendMessageFromModalWithElementText(scriptName, userAnswer,modalId) {
+        const getTextFrom = document.getElementById(modalId);
+        stompClient.send("/scriptsWS/chat", {},
+            JSON.stringify({'username': connectionName, 'text': getTextFrom.value, 'scriptName': scriptName}));
+    }
+
+
+    function openBooleanModal(textToShowUser) {
+        // Get the modal
+        const modal = document.getElementById("booleanModal");
+
+        const textToSet = document.getElementById("booleanModalText");
+
+        textToSet.textContent = textToShowUser
+
+        modal.style.display = "block";
+        console.log("Opened boolean Modal")
+    }
+
+    function closeBooleanModal() {
+        // Get the modal
+        const modal = document.getElementById("booleanModal");
+        modal.style.display = "none";
+        console.log("Closed boolean Modal")
+    }
+
+    function openCustomBooleanModal(textToShowUser, ans1, ans2) {
+        // Get the modal
+        const modal = document.getElementById("BooleanCustomModal");
+
+        const textToSet = document.getElementById("booleanCustomModalText");
+
+        const button1 = document.getElementById("booleanCustomYes");
+        const button2 = document.getElementById("booleanCustomNo");
+
+        textToSet.textContent = textToShowUser
+        button1.textContent = ans1
+        button2.textContent = ans2
+
+        modal.style.display = "block";
+        console.log("Opened custom boolean Modal")
+    }
+
+    function closeCustomBooleanModal() {
+        // Get the modal
+        const modal = document.getElementById("BooleanCustomModal");
+        modal.style.display = "none";
+        console.log("Closed custom boolean Modal")
+    }
+
+    function openInputTextModal(textToShowUser) {
+        // Get the modal
+        const modal = document.getElementById("InputTextModal");
+
+        const textToSet = document.getElementById("InputTextModalText");
+        // const textToSet = document.getElementById("InputTextParamId");
+
+
+        textToSet.textContent = textToShowUser
+
+        modal.style.display = "block";
+        console.log("Opened InputText Modal")
+    }
+
+    function closeInputTextModal() {
+        // Get the modal
+        const modal = document.getElementById("InputTextModal");
+        modal.style.display = "none";
+        console.log("Closed InputText Modal")
+    }
+
+//    Тут должна быть textArea
+
+    function openInfoModal(textToShowUser) {
+        console.log("Opening info modal")
+        // Get the modal
+        const modal = document.getElementById("InfoModal");
+        const span = document.getElementById("CloseInfoModal");
+
+        const textToSet = document.getElementById("InfoText");
+
+        textToSet.textContent = textToShowUser
+
+        modal.style.display = "block";
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    }
+
+
+</script>
+
 
 </c:when>
 <c:otherwise> <%-- Если не выбран, дефолтная страница --%>

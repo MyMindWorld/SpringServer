@@ -12,6 +12,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 import ru.protei.scriptServer.config.MessageQueueConfig;
+import ru.protei.scriptServer.model.Enums.ModalType;
 import ru.protei.scriptServer.model.POJO.Message;
 import ru.protei.scriptServer.model.POJO.OutputMessage;
 
@@ -57,7 +58,17 @@ public class ScriptWebSocketController {
         messageObj.setText(message);
         messageObj.setScriptName(scriptName);
         messageObj.setAddressedTo(addressedTo);
-        messageObj.setTime(new SimpleDateFormat("HH:mm").format(new Date()));
+        messageObj.setTime(new SimpleDateFormat("HH:mm:ss:SSS").format(new Date()));
+        sendToSock(messageObj);
+    }
+    public void sendToSockFromServer(String addressedTo, String message, String scriptName, ModalType modalType) {
+        Message messageObj = new Message();
+        messageObj.setModalType(modalType);
+        messageObj.setUsername("SERVER");
+        messageObj.setText(message);
+        messageObj.setScriptName(scriptName);
+        messageObj.setAddressedTo(addressedTo);
+        messageObj.setTime(new SimpleDateFormat("HH:mm:ss:SSS").format(new Date()));
         sendToSock(messageObj);
     }
 
@@ -67,12 +78,12 @@ public class ScriptWebSocketController {
         messageObj.setText(message);
         messageObj.setScriptName(scriptName);
         messageObj.setAddressedTo(addressedTo);
-        messageObj.setTime(new SimpleDateFormat("HH:mm").format(new Date()));
+        messageObj.setTime(new SimpleDateFormat("HH:mm:ss:SSS").format(new Date()));
         sendToSock(messageObj);
     }
 
     public void sendToSockFromUser(Message message) {
-        message.setTime(new SimpleDateFormat("HH:mm").format(new Date()));
+        message.setTime(new SimpleDateFormat("HH:mm:ss:SSS").format(new Date()));
         logger.info("SENDING MESSAGE sendToSock STRING " + message);
         this.simpMessagingTemplate.convertAndSendToUser(message.getUsername(), "/reply/" + message.getScriptName(), message);
     }

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.protei.scriptServer.config.MessageQueueConfig;
 import ru.protei.scriptServer.controller.ScriptWebSocketController;
+import ru.protei.scriptServer.model.Enums.ModalType;
 import ru.protei.scriptServer.model.POJO.Message;
 import ru.protei.scriptServer.model.Script;
 import ru.protei.scriptServer.utils.Utils;
@@ -125,11 +126,15 @@ public class PythonScriptsRunner {
         typeOfModalMatcher.find();
 
         String textForUser = textForUserInModalMatcher.group(1);
-        String typeOfModalToShow = typeOfModalMatcher.group(1);
+        ModalType typeOfModalToShow = ModalType.valueOf(typeOfModalMatcher.group(1));
 
-        scriptWebSocketController.sendToSockFromServer(username, textForUser, scriptName);
+        scriptWebSocketController.sendToSockFromServer(username, textForUser, scriptName,typeOfModalToShow);
+        if (typeOfModalToShow.equals(ModalType.ShowInfo)){
+            return "";// Script is not waiting anything
+        }
         logger.info("Waiting for user reaction!");
         while (!((msg = queueConfig.blockingQueue().take()).getUsername().equals(username) & msg.getScriptName().equals(scriptName))) {
+            // todo ping if client is in script still
             logger.debug(msg.toString());
         }
 

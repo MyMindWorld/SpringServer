@@ -1,0 +1,12 @@
+{
+  "name": "testUnstoppableScript",
+  "display_name": "Не останавливаемый скрипт",
+  "group": "Test",
+  "python_version": "3.7",
+  "venv": "misc",
+  "requirements": "TestRequirements.txt",
+  "script_path": "failing_to_stop.py",
+  "description": "Тестим лист",
+  "requires_terminal": false,
+  "parameters": []
+}

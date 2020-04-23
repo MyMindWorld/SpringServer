@@ -1,7 +1,7 @@
 {
   "name": "TestList",
   "display_name": "Тест листов",
-  "group": "List",
+  "group": "Test",
   "python_version": "5.8",
   "venv": "misc",
   "requirements": "testReq.txt",

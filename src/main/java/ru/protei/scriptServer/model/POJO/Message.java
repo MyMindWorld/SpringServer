@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.protei.scriptServer.model.Enums.ModalType;
+import ru.protei.scriptServer.model.Enums.ServiceMessage;
 
 @Data
 @AllArgsConstructor
@@ -16,6 +17,9 @@ public class Message {
     private ModalType modalType;
     private String text;
     private String time;
+    private String uniqueSessionId;
+    private ServiceMessage serviceMessage;
+
 
     @Override
     public String toString() {

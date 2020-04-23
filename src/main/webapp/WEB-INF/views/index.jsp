@@ -36,6 +36,7 @@
     <script src="<c:url value="/vendor/stomp/stomp.js"/>"></script>
     <script type="text/javascript">
         let stompClient = null;
+        let sessionId = null;
         const connectionName = "<sec:authentication property='principal.username' />";
         // var scriptFormData = new FormData();
         // var test = document.getElementsByName("commandParams")
@@ -53,45 +54,44 @@
         function setConnected(connected) {
             document.getElementById('runScriptButton').disabled = connected;
             document.getElementById('disconnect').disabled = !connected;
-            // document.getElementById('conversationDiv').style.visibility
-            //     = connected ? 'visible' : 'hidden';
-            document.getElementById('response').innerHTML = '';
         }
 
         function connect(scriptName) {
-            const socket = new SockJS('/ScriptServer/chat');
+            document.getElementById('response').innerHTML = '';
+            const socket = new SockJS('/ScriptServer/scriptsSocket');
             stompClient = Stomp.over(socket);
             stompClient.connect({}, function (frame) {
+
                 setConnected(true);
                 console.log('Connected: ' + frame);
                 stompClient.subscribe('/topic/messages/', function (messageOutput) {
                     showMessageOutput(JSON.parse(messageOutput.body));
                 });
-                stompClient.subscribe('/user/' + connectionName + '/errors', function (messageOutput) {
-                    showMessageOutput(JSON.parse(messageOutput.body));
-                });
                 stompClient.subscribe('/user/' + connectionName + '/reply/' + scriptName, function (messageOutput) {
                     showMessageOutput(JSON.parse(messageOutput.body));
                 });
+                let sessionIdRaw = socket._transport.url
+                sessionId = sessionIdRaw.split("/")[6]
+                console.log(sessionId);
+                setTimeout(() => {
+                    runScript(sessionId);
+                }, 50);
             });
-            setTimeout(() => {
-                runScript();
-            }, 50);
 
         }
 
         function disconnect() {
+            setConnected(false);
             if (stompClient != null) {
                 stompClient.disconnect();
             }
-            setConnected(false);
             console.log("Disconnected");
         }
 
         function sendMessage(scriptName) {
             const text = document.getElementById('text').value;
-            stompClient.send("/scriptsWS/chat", {},
-                JSON.stringify({'username': connectionName, 'text': text, 'scriptName': scriptName}));
+            stompClient.send("/scriptsWS/scriptsSocket", {},
+                JSON.stringify({'username': connectionName, 'text': text, 'scriptName': scriptName,'uniqueSessionId':sessionId}));
         }
 
         function showMessageOutput(messageOutput) {
@@ -99,6 +99,9 @@
             if (messageOutput.modalType != null) {
                 parseModalMessage(messageOutput)
                 return
+            }
+            else if (messageOutput.serviceMessage === "Stopped") {
+                disconnect()
             }
             const response = document.getElementById('response');
             const p = document.createElement('p');
@@ -119,7 +122,7 @@
                 openInputTextModal(messageOutput.text)
                 return
             } else if (messageOutput.modalType === "TextArea") {
-                openCustomBooleanModal(messageOutput.text)
+                openTextAreaModal(messageOutput.text)
                 return
             } else if (messageOutput.modalType === "ShowInfo") {
                 openInfoModal(messageOutput.text)
@@ -139,12 +142,37 @@
             return indexed_array;
         }
 
-        function runScript() {
+        function runScript(sessionId) {
             $.ajax({
                 dataType: "json",
                 method: "POST",
                 url: '<c:url value="/scripts/run_script"/>',
                 data: $('#ScriptForm').serialize(),
+                headers: {
+                    'sessionId':sessionId
+                },
+                // data: data,
+                success: function (data) {
+                    console.log("SUCCESS!");
+                    console.log(data)
+                },
+                error: function (data) {
+                    console.log('ERROR OCCURRED! message send : ' + data.toString());
+                }
+
+            });
+            return false;
+        }
+
+        function killScript(sessionId) {
+            $.ajax({
+                dataType: "json",
+                method: "POST",
+                url: '<c:url value="/scripts/kill_script"/>',
+                data: $('#ScriptForm').serialize(),
+                headers: {
+                    'sessionId':sessionId
+                },
                 // data: data,
                 success: function (data) {
                     console.log("SUCCESS!");
@@ -237,7 +265,7 @@
 
         <%-- Показывается только если есть необходимая роль --%>
     <sec:authorize access="hasAuthority('${script.name}')">
-        <h4>${script.display_name}</h4>
+        <h3>${script.display_name}</h3>
         <form name='f' id="ScriptForm" onsubmit="return connect();">
             <input name="scriptName" id='name' type="hidden" value="${script.name}"/>
 
@@ -429,7 +457,7 @@
                 onclick="connect('${script.name}');"
         >Run Script
         </button>
-        <button id="disconnect" class="e" disabled="disabled" onclick="disconnect();">
+        <button id="disconnect" class="e" disabled="disabled" onclick="killScript(sessionId)">
             Disconnect
         </button>
     </sec:authorize>
@@ -465,7 +493,7 @@
 <div id="booleanModal" class="modal">
 
     <!-- Modal content -->
-    <div class="modal-content" style="height: auto">
+    <div class="modal-content" style="height: auto;overflow-y:hidden;">
 <%--        <span class="close">&times;</span>--%>
         <p style="font-size:235%;text-align:center;" id="booleanModalText"></p>
         <button id="booleanResultYes" class="e" onclick="sendMessageFromModal('${script.name}',1);closeBooleanModal();">
@@ -480,7 +508,7 @@
 <div id="BooleanCustomModal" class="modal">
 
     <!-- Modal content -->
-    <div class="modal-content" style="height: auto">
+    <div class="modal-content" style="height: auto;overflow-y:hidden;">
         <p style="font-size:235%;text-align:center;" id="booleanCustomModalText"></p>
         <button id="booleanCustomYes" class="e"
                 onclick="sendMessageFromModal('${script.name}',1);closeCustomBooleanModal();"><b>Yes</b></button>
@@ -493,7 +521,7 @@
 <div id="InputTextModal" class="modal">
 
     <!-- Modal content -->
-    <div class="modal-content" style="height: auto">
+    <div class="modal-content" style="height: auto;overflow-y:hidden;">
         <p style="font-size:235%;text-align:center;" id="InputTextModalText"></p>
 
         <div class="form__group field" style="width: 100%">
@@ -508,25 +536,21 @@
     </div>
 
 </div>
-<%--NOT READY--%>
-<%--<div id="TextAreaModal" class="modal">--%>
+<div id="TextAreaModal" class="modal">
 
-<%--    <!-- Modal content -->--%>
-<%--    <div class="modal-content" style="height: auto">--%>
-<%--        <p style="font-size:235%;text-align:center;" id="InputTextModalText"></p>--%>
+    <!-- Modal content -->
+    <div class="modal-content" style="height: auto">
+        <p style="font-size:235%;text-align:center;" id="TextAreaModalText"></p>
 
-<%--        <div class="form__group field" style="width: 100%">--%>
-<%--            <input type="input" class="form__field" placeholder="Name"--%>
-<%--                   style="width: 100%; float: right;"--%>
-<%--                   name="InputTextParam" id='InputTextParamId'/>--%>
-<%--            <label for="InputTextParamId" class="form__label">TEXT</label>--%>
-<%--            <button id="InputTextButton" class="e"--%>
-<%--                    onclick="sendMessageFromModalWithElementText('${script.name}',0,'InputTextParamId');closeInputTextModal();"><b>Submit text</b></button>--%>
-<%--        </div>--%>
+        <textarea id="TextAreaFieldId" placeholder="Enter text and press submit below" cols="100" rows="10"></textarea>
+        <br>
+        <button id="TextAreaButton" class="e"
+                    onclick="sendMessageFromModalWithElementText('${script.name}',0,'TextAreaFieldId');closeTextAreaModal();"><b>Submit text</b></button>
 
-<%--    </div>--%>
 
-<%--</div>--%>
+    </div>
+
+</div>
 <div id="InfoModal" class="modal">
 
     <!-- Modal content -->
@@ -538,13 +562,13 @@
 </div>
 <script type="text/javascript">
     function sendMessageFromModal(scriptName, userAnswer) {
-        stompClient.send("/scriptsWS/chat", {},
-            JSON.stringify({'username': connectionName, 'text': userAnswer, 'scriptName': scriptName}));
+        stompClient.send("/scriptsWS/scriptsSocket", {},
+            JSON.stringify({'username': connectionName, 'text': userAnswer, 'scriptName': scriptName,'uniqueSessionId':sessionId}));
     }
     function sendMessageFromModalWithElementText(scriptName, userAnswer,modalId) {
         const getTextFrom = document.getElementById(modalId);
-        stompClient.send("/scriptsWS/chat", {},
-            JSON.stringify({'username': connectionName, 'text': getTextFrom.value, 'scriptName': scriptName}));
+        stompClient.send("/scriptsWS/scriptsSocket", {},
+            JSON.stringify({'username': connectionName, 'text': getTextFrom.value, 'scriptName': scriptName,'uniqueSessionId':sessionId}));
     }
 
 
@@ -612,7 +636,25 @@
         console.log("Closed InputText Modal")
     }
 
-//    Тут должна быть textArea
+    function openTextAreaModal(textToShowUser) {
+        // Get the modal
+        const modal = document.getElementById("TextAreaModal");
+
+        const textToSet = document.getElementById("TextAreaModalText");
+
+
+        textToSet.textContent = textToShowUser
+
+        modal.style.display = "block";
+        console.log("Opened TextArea Modal")
+    }
+
+    function closeTextAreaModal() {
+        // Get the modal
+        const modal = document.getElementById("TextAreaModal");
+        modal.style.display = "none";
+        console.log("Closed TextArea Modal")
+    }
 
     function openInfoModal(textToShowUser) {
         console.log("Opening info modal")

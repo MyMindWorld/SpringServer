@@ -4,13 +4,14 @@ import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import ru.protei.scriptServer.model.*;
-import ru.protei.scriptServer.model.POJO.Message;
 import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.service.LogService;
 import ru.protei.scriptServer.service.ScriptsHandler;
@@ -20,6 +21,7 @@ import ru.protei.scriptServer.utils.SystemIntegration.DynamicParamsScriptsRunner
 import ru.protei.scriptServer.utils.Utils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 @Controller
@@ -99,20 +101,20 @@ public class ScriptsController {
     @SneakyThrows
     @RequestMapping(value = "/scripts/run_script", method = RequestMethod.POST)
     @ResponseBody
-    public void runScript(String scriptName, HttpServletRequest req) {
+    public ResponseEntity runScript(@RequestHeader(name = "sessionId")String uniqueSessionId, String scriptName, HttpServletRequest req, HttpServletResponse response) {
         Map<String, String[]> allRequestParams = req.getParameterMap();
         Script script = scriptRepository.findByNameEquals(scriptName);
         if (script == null) {
             logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "Running unknown script! '" + scriptName + "'", String.valueOf(allRequestParams));
-            return;
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Message message = new Message();
         if (!Arrays.toString(principal.getAuthorities().toArray()).contains(script.getName())) { // legshooting
             logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "RUNNING SCRIPT WITHOUT ROLE! '" + script.getName() + "'", String.valueOf(allRequestParams));
             // todo 403 page
-            return;
+            return new ResponseEntity(HttpStatus.FORBIDDEN);
         }
+
         for (String value : allRequestParams.keySet()
         ) {
 
@@ -122,23 +124,63 @@ public class ScriptsController {
 
         }
         if (allRequestParams.size() == 0) {
-            scriptWebSocketController.sendToSockFromServer(principal.getUsername(), "Parameters could not be empty! Or should they...", script.getName());
+            scriptWebSocketController.sendToSockFromServer(principal.getUsername(), "Parameters could not be empty! Or should they...", script.getName(),uniqueSessionId);
         }
         if (script.getVenv() == null) {
-            scriptWebSocketController.sendToSockFromServer(principal.getUsername(), "Using default venv. It's HIGHLY recommended not doing this. Please, specify unique venv name and requirements file", script.getName());
+            scriptWebSocketController.sendToSockFromServer(principal.getUsername(), "Using default venv. It's HIGHLY recommended not doing this. Please, specify unique venv name and requirements file", script.getName(),uniqueSessionId);
             if (script.getRequirements() != null) {
-                scriptWebSocketController.sendToSockFromServer(principal.getUsername(), "Adding requirements to default venv is forbidden! Please use custom venv for this case!", script.getName());
+                scriptWebSocketController.sendToSockFromServer(principal.getUsername(), "Adding requirements to default venv is forbidden! Please use custom venv for this case!", script.getName(),uniqueSessionId);
             }
         }
 
         String[] resultRunString = utils.createParamsString(script, allRequestParams);
-
         logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "Run script '" + script.getName() + "'", Arrays.toString(resultRunString));
         logger.info("Created string : " + Arrays.toString(resultRunString));
-//
-        scriptsHandler.runPythonScript(resultRunString, script, principal.getUsername());
+        new Thread(() -> {
+            scriptsHandler.runPythonScript(resultRunString, script, principal.getUsername(), uniqueSessionId);
+        }, uniqueSessionId + "_" + script.getName() + "-" + req.getRemoteUser()).start();
+        return new ResponseEntity(HttpStatus.OK);
+    }
 
-//        return "redirect:" + req.getHeader("Referer");
+    @SneakyThrows
+    @RequestMapping(value = "/scripts/kill_script", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity killScript(@RequestHeader(name = "sessionId")String uniqueSessionId,String scriptName, HttpServletRequest req) {
+        Map<String, String[]> allRequestParams = req.getParameterMap();
+        Script script = scriptRepository.findByNameEquals(scriptName);
+        if (script == null) {
+            logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "Killing unknown script! '" + scriptName + "'", String.valueOf(allRequestParams));
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!Arrays.toString(principal.getAuthorities().toArray()).contains(script.getName())) { // legshooting
+            logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "KILLING SCRIPT WITHOUT ROLE! '" + script.getName() + "'", String.valueOf(allRequestParams));
+            // todo 403 page
+            return new ResponseEntity(HttpStatus.FORBIDDEN);
+        }
+        String expectedThreadName = uniqueSessionId + "_" + script.getName() + "-" + req.getRemoteUser();
+        logger.info("Getting all threads");
+        Set<Thread> setOfThread = Thread.getAllStackTraces().keySet();
+        for(Thread thread : setOfThread){
+            if(thread.getName().equals(expectedThreadName)){
+                logger.info("Thread to kill was found");
+                thread.interrupt();
+                thread.interrupt();
+                thread.interrupt();
+                thread.interrupt();
+                thread.interrupt();
+                while (thread.isAlive()){
+                    Thread.sleep(1000);
+                    logger.info("Killing still going...");
+                }
+                logger.info("Thread was killed!");
+                return new ResponseEntity(HttpStatus.OK);
+            }
+        }
+        logger.error("Thread '" + expectedThreadName + "' was not found!");
+        return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+
+
     }
 
 }

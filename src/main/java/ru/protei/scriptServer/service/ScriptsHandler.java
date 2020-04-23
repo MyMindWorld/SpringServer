@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import ru.protei.scriptServer.controller.ScriptWebSocketController;
+import ru.protei.scriptServer.model.Enums.ServiceMessage;
 import ru.protei.scriptServer.model.JsonScript;
 import ru.protei.scriptServer.model.Privilege;
 import ru.protei.scriptServer.model.Role;
@@ -150,20 +151,20 @@ public class ScriptsHandler {
             roleService.updateRole("ROLE_ALL_SCRIPTS", allPrivileges, true);
     }
 
-    @SneakyThrows
-    public void runPythonScript(String[] params, Script script, String username) {
+    public void runPythonScript(String[] params, Script script, String username,String uniqueSessionId) {
         if (script.getVenv() == null) {
             script.setVenv(utils.defaultVenvName);
         }
         if (venvRepository.findByNameEquals(script.getVenv()) == null) {
-            scriptWebSocketController.sendToSockFromServer(username, "Creating venv...", script.getName());
+            scriptWebSocketController.sendToSockFromServer(username, "Creating venv...", script.getName(),uniqueSessionId);
             venvManager.createIfNotExists(script.getVenv(), script.getRequirements());
-            scriptWebSocketController.sendToSockFromServer(username, "Venv creation complete!", script.getName());
+            scriptWebSocketController.sendToSockFromServer(username, "Venv creation complete!", script.getName(),uniqueSessionId);
         }
 
-        scriptWebSocketController.sendToSockFromServer(username, "Starting script '" + script.getDisplay_name() + "'", script.getName());
-        pythonScriptsRunner.run(params, utils.getScriptsDirectory(), false, script, script.getVenv(), username);
+        scriptWebSocketController.sendToSockFromServerService(username, "Starting script '" + script.getDisplay_name() + "'", script.getName(),uniqueSessionId, ServiceMessage.Started);
+        pythonScriptsRunner.run(params, utils.getScriptsDirectory(), false, script, script.getVenv(), username,uniqueSessionId);
         logger.info("Exit code : " + pythonScriptsRunner.processExitcode);
+        return;
     }
 
 

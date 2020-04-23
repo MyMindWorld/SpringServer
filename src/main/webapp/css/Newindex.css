@@ -79,6 +79,8 @@ body {
     background: #07cadf;
 }
 .nav ul li a {
+    word-break: break-all;
+    white-space: normal;
     position: relative;
     display: block;
     padding: 0 25px;

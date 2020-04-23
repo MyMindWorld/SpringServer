@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import ru.protei.scriptServer.config.MessageQueueConfig;
 import ru.protei.scriptServer.controller.ScriptWebSocketController;
 import ru.protei.scriptServer.model.Enums.ModalType;
+import ru.protei.scriptServer.model.Enums.ServiceMessage;
 import ru.protei.scriptServer.model.POJO.Message;
 import ru.protei.scriptServer.model.Script;
 import ru.protei.scriptServer.utils.Utils;
@@ -19,7 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
-public class PythonScriptsRunner {
+public class PythonScriptsRunner extends Thread {
     Logger logger = LoggerFactory.getLogger(PythonScriptsRunner.class);
     @Autowired
     Utils utils;
@@ -36,110 +37,151 @@ public class PythonScriptsRunner {
     public Pattern userInputFlagPattern = Pattern.compile("##ScriptServer\\[.*]");
     public Pattern textForUserInModal = Pattern.compile("'(.*)'", Pattern.MULTILINE);
     public Pattern typeOfModal = Pattern.compile("\\[(.*?)\\'", Pattern.MULTILINE);
+    Process p = null;
 
-
-    public void run(String[] commandParams, File directory, boolean passCommandsAsLinesToShellExecutableAfterStartup, Script script, String venvName, String username) {
-        this.runstate = Runstate.RUNNING;
-        // 1 start the process
-        Process p = null;
-        // todo build params refactor
-        try {
-            if (passCommandsAsLinesToShellExecutableAfterStartup) {
-                // open a shell-like process like cmd and pass the arguments/command after opening it
-                // * example:
-                // * open 'cmd' (shell)
-                // * write 'echo "hello world"' and press enter
-                ProcessBuilder pb = new ProcessBuilder(utils.getArgsForRunningScriptInVenv(venvName, script.getScript_path())).directory(directory);
-                p = pb.start();
+    public void run(String[] commandParams, File directory, boolean passCommandsAsLinesToShellExecutableAfterStartup, Script script, String venvName, String username, String uniqueSessionId) {
+        while (!Thread.currentThread().isInterrupted()){
+            this.runstate = Runstate.RUNNING;
+            // 1 start the process
+            // todo build params refactor
+            try {
+                if (passCommandsAsLinesToShellExecutableAfterStartup) {
+                    // open a shell-like process like cmd and pass the arguments/command after opening it
+                    // * example:
+                    // * open 'cmd' (shell)
+                    // * write 'echo "hello world"' and press enter
+                    ProcessBuilder pb = new ProcessBuilder(utils.getArgsForRunningScriptInVenv(venvName, script.getScript_path())).directory(directory);
+                    p = pb.start();
+                    PrintWriter stdin = new PrintWriter(p.getOutputStream());
+                    for (int i = 0; i < commandParams.length; i++) {
+                        String commandstring = commandParams[i];
+                        stdin.println(commandstring);
+                        scriptWebSocketController.sendToSockFromScript(username, commandstring, script.getName(), uniqueSessionId);
+                    }
+                    stdin.close();
+                } else {
+                    // pass the arguments directly during startup to the process
+                    // * example:
+                    // * run 'java -jar myexecutable.jar arg0 arg1 ...'
+                    String[] args = utils.getArgsForRunningScriptInVenv(venvName, script.getScript_path());
+                    String[] execWithArgs = new String[args.length + commandParams.length];
+                    System.arraycopy(args, 0, execWithArgs, 0, args.length);
+                    System.arraycopy(commandParams, 0, execWithArgs, args.length, commandParams.length);
+                    logger.info(Arrays.toString(execWithArgs));
+                    ProcessBuilder pb = new ProcessBuilder(execWithArgs).directory(directory);
+                    p = pb.start();
+                }
+                logger.info("READING START");
+                // 2 print the output
+                InputStream is = p.getInputStream();
+                BufferedReader br = new BufferedReader(new InputStreamReader(is));
+                InputStream eis = p.getErrorStream();
+                BufferedReader ebr = new BufferedReader(new InputStreamReader(eis));
                 PrintWriter stdin = new PrintWriter(p.getOutputStream());
-                for (int i = 0; i < commandParams.length; i++) {
-                    String commandstring = commandParams[i];
-                    stdin.println(commandstring);
-                    scriptWebSocketController.sendToSockFromScript(username, commandstring, script.getName());
-                }
-                stdin.close();
-            } else {
-                // pass the arguments directly during startup to the process
-                // * example:
-                // * run 'java -jar myexecutable.jar arg0 arg1 ...'
-                String[] args = utils.getArgsForRunningScriptInVenv(venvName, script.getScript_path());
-                String[] execWithArgs = new String[args.length + commandParams.length];
-                System.arraycopy(args, 0, execWithArgs, 0, args.length);
-                System.arraycopy(commandParams, 0, execWithArgs, args.length, commandParams.length);
-                logger.info(Arrays.toString(execWithArgs));
-                ProcessBuilder pb = new ProcessBuilder(execWithArgs).directory(directory);
-                p = pb.start();
-            }
-            logger.info("READING START");
-            // 2 print the output
-            InputStream is = p.getInputStream();
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            InputStream eis = p.getErrorStream();
-            BufferedReader ebr = new BufferedReader(new InputStreamReader(eis));
-            PrintWriter stdin = new PrintWriter(p.getOutputStream());
-            String lineStdout = null;
-            String lineStderr = null;
+                String lineStdout = null;
+                String lineStderr = null;
 
-            while (p.isAlive()) {
-                while ((lineStdout = br.readLine()) != null || (lineStderr = ebr.readLine()) != null) {
-                    if (lineStdout != null) {
-                        if (lineStdout.matches(userInputFlagPattern.toString())) {
-                            logger.info("Caught user depending input!");
-                            stdin.println(handleInputFromUser(username, lineStdout, script.getName()));
-                            stdin.flush();
-                            logger.info("Sent text to script, continuing");
+                while (p.isAlive()) {
+                    while ((lineStdout = br.readLine()) != null || (lineStderr = ebr.readLine()) != null) {
+                        if (lineStdout != null) {
+                            if (lineStdout.matches(userInputFlagPattern.toString())) {
+                                logger.info("Caught user depending input!");
+                                stdin.println(handleInputFromUser(username, lineStdout, script.getName(), uniqueSessionId));
+                                stdin.flush();
+                                logger.info("Sent text to script, continuing");
+                            } else {
+                                logger.info(lineStdout);
+                                scriptWebSocketController.sendToSockFromScript(username, lineStdout, script.getName(), uniqueSessionId);
+                                linesSoFarStdout.add(lineStdout);
+                            }
                         } else {
-                            logger.info(lineStdout);
-                            scriptWebSocketController.sendToSockFromScript(username, lineStdout, script.getName());
-                            linesSoFarStdout.add(lineStdout);
+                            logger.info("NOTHING");
                         }
-                    } else {
-                        logger.info("NOTHING");
-                    }
-                    if (lineStderr != null) {
-                        logger.error(lineStderr);
-                        scriptWebSocketController.sendToSockFromScript(username, lineStderr, script.getName());
-                        linesSoFarStderr.add(lineStderr);
+                        if (lineStderr != null) {
+                            logger.error(lineStderr);
+                            scriptWebSocketController.sendToSockFromScript(username, lineStderr, script.getName(), uniqueSessionId);
+                            linesSoFarStderr.add(lineStderr);
+                        }
+                        if (currentThread().isInterrupted()){
+                            killProcess(username, script.getName(), uniqueSessionId);
+                            return;
+                        }
                     }
                 }
+                // 3 when process ends
+                this.processExitcode = p.exitValue();
+                if (processExitcode != 0) {
+                    logger.error("The other process stopped with unexpected exitcode: " + processExitcode);
+                }
+                this.runstate = Runstate.STOPPED;
+                return;
+            } catch (Exception e) {
+                killProcess(username, script.getName(), uniqueSessionId);
+                return;
             }
-            // 3 when process ends
-            this.processExitcode = p.exitValue();
-        } catch (Exception e) {
-            logger.error("Something went wrong!");
-            e.printStackTrace();
         }
-        if (processExitcode != 0) {
-            logger.error("The other process stopped with unexpected exitcode: " + processExitcode);
-        }
-        this.runstate = Runstate.STOPPED;
+        logger.error("INTERRUPTED!!!");
+        killProcess(username, script.getName(), uniqueSessionId);
+        return;
+
     }
 
     @SneakyThrows
-    public String handleInputFromUser(String username, String lineFromPython, String scriptName) {
-        Message msg = null;
-        Matcher userInputFlagMatcher = userInputFlagPattern.matcher(lineFromPython);
-        Matcher textForUserInModalMatcher = textForUserInModal.matcher(lineFromPython);
-        Matcher typeOfModalMatcher = typeOfModal.matcher(lineFromPython);
-        userInputFlagMatcher.find();
-        textForUserInModalMatcher.find();
-        typeOfModalMatcher.find();
+    public String handleInputFromUser(String username, String lineFromPython, String scriptName, String uniqueSessionId) {
+        try {
+            Message msg = null;
+            Matcher userInputFlagMatcher = userInputFlagPattern.matcher(lineFromPython);
+            Matcher textForUserInModalMatcher = textForUserInModal.matcher(lineFromPython);
+            Matcher typeOfModalMatcher = typeOfModal.matcher(lineFromPython);
+            userInputFlagMatcher.find();
+            textForUserInModalMatcher.find();
+            typeOfModalMatcher.find();
 
-        String textForUser = textForUserInModalMatcher.group(1);
-        ModalType typeOfModalToShow = ModalType.valueOf(typeOfModalMatcher.group(1));
+            String textForUser = textForUserInModalMatcher.group(1);
+            ModalType typeOfModalToShow = ModalType.valueOf(typeOfModalMatcher.group(1));
 
-        scriptWebSocketController.sendToSockFromServer(username, textForUser, scriptName,typeOfModalToShow);
-        if (typeOfModalToShow.equals(ModalType.ShowInfo)){
-            return "";// Script is not waiting anything
+            scriptWebSocketController.sendToSockFromServer(username, textForUser, scriptName, typeOfModalToShow, uniqueSessionId);
+            if (typeOfModalToShow.equals(ModalType.ShowInfo)) {
+                return "";// Script is not waiting anything
+            }
+            logger.info("Waiting for user reaction on session id '" + uniqueSessionId + "'");
+
+            while (!((msg = queueConfig.blockingQueue().take()).getUsername().equals(username)
+                    & msg.getScriptName().equals(scriptName)
+                    & msg.getUniqueSessionId().equals(uniqueSessionId))) {
+                // todo ping if client is in script still
+                logger.debug(msg.toString());
+            }
+            logger.info("Returning to script '" + msg.getText() + "'");
+            return msg.getText();
+        } catch (Exception e) {
+            killProcess(username, scriptName, uniqueSessionId);
+            return null;
         }
-        logger.info("Waiting for user reaction!");
-        while (!((msg = queueConfig.blockingQueue().take()).getUsername().equals(username) & msg.getScriptName().equals(scriptName))) {
-            // todo ping if client is in script still
-            logger.debug(msg.toString());
-        }
+    }
 
-        logger.info("Returning to script '" + msg.getText() + "'");
-        return msg.getText();
+    @SneakyThrows
+    public void killProcess(String username, String scriptName, String uniqueSessionId){
+        logger.error("Thread is destroying!");
+        if (p == null){
+            scriptWebSocketController.sendToSockFromServer(username, "Process wasn't spawned, killing was initiated before.", scriptName, uniqueSessionId);
+            return;
+        }
+        p.destroy();
+        scriptWebSocketController.sendToSockFromServer(username, "Stop process message received", scriptName, uniqueSessionId);
+        Integer stopSecs = 0;
+        while (p.isAlive()) {
+            Thread.sleep(1000);
+            stopSecs += 1;
+            scriptWebSocketController.sendToSockFromServer(username, String.format("Process is stopping %d seconds already", stopSecs), scriptName, uniqueSessionId);
+            if (stopSecs > 10) {
+                p.destroyForcibly();
+                // Here we could ask user is it ok to kill process
+                scriptWebSocketController.sendToSockFromServerService(username, String.format("Process was stopped by force.", stopSecs), scriptName, uniqueSessionId, ServiceMessage.Stopped);
+                return;
+            }
+        }
+        scriptWebSocketController.sendToSockFromServerService(username, "Process was stopped successfully!", scriptName, uniqueSessionId, ServiceMessage.Stopped);
     }
 
 }

@@ -27,8 +27,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
 
-        registry.addEndpoint("/chat");
-        registry.addEndpoint("/chat")
+        registry.addEndpoint("/scriptsSocket");
+        registry.addEndpoint("/scriptsSocket")
                 .setHandshakeHandler(new DefaultHandshakeHandler() {
 
                     public boolean beforeHandshake(

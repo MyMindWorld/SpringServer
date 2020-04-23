@@ -1,7 +1,7 @@
 {
   "name": "0 ParameterTest",
   "display_name": "Тест Параметров",
-  "group": "Misc",
+  "group": "Test",
   "script_path": "test.py",
   "python_version": "3.5",
   "working_directory": "./samples",

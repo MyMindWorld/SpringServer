@@ -72,7 +72,7 @@ public class MainPageController {
         if (script == null) {
             return new ModelAndView("ErrorCodes/404");
         }
-        logger.warn("User '" + getUsername() + "' requested script '" + scriptName + "', and displayName : " + script.getDisplay_name());
+        logger.info("User '" + getUsername() + "' requested script '" + scriptName + "', and displayName : " + script.getDisplay_name());
         Parameters[] parameters = utils.stringToListOfParams(script.getParametersJson());
         ModelAndView modelAndView = showMenu(request);
 

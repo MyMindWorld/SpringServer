@@ -1,6 +1,5 @@
 import string
 from random import *
-import os
 import sys
 
 print(sys.argv[1:])
@@ -17,6 +16,9 @@ else:
     if is_changed_mind != "1":
         print(f"##ScriptServer[ShowInfo'Bye Bye then!']")
         exit(1)
+    else:
+        print(f"##ScriptServer[TextArea'Tell me why u asking me to believe you']")
+        input()
 
 answer = ""
 iternum = 0
@@ -24,9 +26,8 @@ while answer != "1":
     iternum += 1
     characters = string.ascii_letters + string.punctuation + string.digits
     password = "".join(choice(characters) for x in range(randint(8, 16)))
-    print(os.getcwd())
     print(f"Your password is {password!r}")
     print(f"##ScriptServer[Boolean'Are you satisfied with password {password!r} ? ({iternum})']")
     answer = input()
-    print("received input")
+    print(f"received input {answer}")
 print("Have a good and secure life with your password!")

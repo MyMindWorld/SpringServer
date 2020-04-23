@@ -52,7 +52,7 @@ public class RoleService {
             logger.info("New role '" + name + "' created");
             return role;
         }
-        return role;
+        return null; // null нужен чтобы пометить что роль уже существовала
     }
 
     @Transactional

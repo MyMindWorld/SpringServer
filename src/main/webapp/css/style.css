@@ -398,6 +398,7 @@ ul.checkbox li.focus  {
   max-height: 80%;
   overflow: auto;
   overflow-y: scroll;
+  box-shadow: 0 0 10px rgba(20, 90, 161, 0.5); /* Параметры тени */
   /*text-align: justify;*/
 }
 

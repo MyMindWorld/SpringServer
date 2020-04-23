@@ -1,7 +1,7 @@
 {
-  "name": "testscriptRun",
-  "display_name": "Тест Рана",
-  "group": "List",
+  "name": "modalTest",
+  "display_name": "Тест модалок",
+  "group": "Test",
   "python_version": "2.5",
   "venv": "EmergVenv",
   "requirements": "TestRequirements.txt",

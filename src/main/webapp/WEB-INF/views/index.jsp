@@ -426,7 +426,7 @@
 
                                 <br>
                             </c:when>
-                            <c:when test="${parameter.type == 'int'}">
+                            <c:when test="${parameter.type == 'number'}">
                                 <input name="${parameter.param}" type="number" id="${parameter.name}"
                                        min=${parameter.min} max=${parameter.max}
                                        <c:if test="${parameter.required}">required</c:if>>

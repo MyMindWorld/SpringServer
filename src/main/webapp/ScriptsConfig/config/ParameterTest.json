@@ -15,19 +15,7 @@
       "name": "Simple Int",
       "default": "test",
       "param": "--simple_int",
-      "type": "int"
-    },
-    {
-      "name": "Simple Boolean",
-      "param": "--simple_bool",
-      "no_value": true,
-      "description": "Boolean One"
-    },
-    {
-      "name": "Simple Text",
-      "required": true,
-      "param": "--simple_text",
-      "description": "Parameter Four"
+      "type": "number"
     },
     {
       "name": "Simple List",
@@ -61,6 +49,7 @@
     {
       "name": "Required Text",
       "required": true,
+      "type": "text",
       "param": "--required_text",
       "description": "Parameter One"
     },
@@ -79,13 +68,14 @@
       "name": "Constrained Int",
       "required": "true",
       "param": "--constrained_int",
-      "type": "int",
+      "type": "number",
       "description": "Parameter Three",
       "min": "-1",
       "max": "123"
     },
     {
       "name": "Default Text",
+      "type": "text",
       "required": true,
       "param": "--def_text",
       "description": "Text with default value and required"
@@ -93,12 +83,13 @@
     {
       "name": "Default Boolean",
       "param": "--def_bool",
-      "no_value": true,
+      "type": "boolean",
       "description": "Boolean Two"
     },
     {
       "name": "Constant Text",
       "param": "--const_text",
+      "type": "hidden",
       "constant": true,
       "description": "Constant value"
     },
@@ -110,12 +101,6 @@
       "values": [
         "test"
       ]
-    },
-    {
-      "name": "Secure Int",
-      "type": "int",
-      "description": "Parameter Nine",
-      "secure": true
     },
     {
       "name": "Secure List",
@@ -142,39 +127,6 @@
         "/home/whoever/wherever/temp/stuff/internal/my_important_file-180214.txt",
         "abcde-fghijk:lmopqr.stuvwx_yzabcd efghij.klmopq-rstuv%wxyz"
       ]
-    },
-    {
-      "name": "Multiselect as secure arguments",
-      "required": true,
-      "type": "multiselect",
-      "description": "Multiselect list as multiple arguments",
-      "secure": true,
-      "values": [
-        "multi1",
-        "multi2",
-        "multi 3"
-      ],
-      "multiple_arguments": true
-    },
-    {
-      "name": "Dependant list",
-      "type": "list",
-      "description": "A list with values depending on other parameters",
-      "values": ["ls /var/${Command-based list}/${Required Text}"]
-    },
-    {
-      "name": "Auth username",
-      "param": "-u"
-    },
-    {
-      "name": "Audit name",
-      "param": "--audit_name",
-      "constant": true
-    },
-    {
-      "name": "Any IP",
-      "param": "--any_ip",
-      "type": "ip"
     },
     {
       "name": "IP v4",

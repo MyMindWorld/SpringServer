@@ -3,6 +3,7 @@ package ru.protei.scriptServer.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -33,6 +34,8 @@ public class MainPageController {
     ScriptRepository scriptRepository;
     @Autowired
     Utils utils;
+    @Value("${app.version}")
+    private String appVersion;
 
     @RequestMapping("/TestPage")
     public ModelAndView testPage() {
@@ -61,6 +64,7 @@ public class MainPageController {
 
         modelAndView.addObject("list", scriptList);
         modelAndView.addObject("groups", groupsList);
+        modelAndView.addObject("AppVersion", appVersion);
 
         return modelAndView;
     }

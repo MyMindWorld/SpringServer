@@ -26,6 +26,7 @@ import ru.protei.scriptServer.model.POJO.ResultToSelect;
 import ru.protei.scriptServer.model.Parameters;
 import ru.protei.scriptServer.model.Script;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,20 +56,34 @@ public class Utils {
     private String defaultVenvRequirementsFileName;
     @Value("${defaultVenvName:defaultVenv}")
     public String defaultVenvName;
+    @Value("${TomcatPath:NotSet}")
+    public String tomcatPath;
     @Autowired
     private ResourceLoader resourceLoader;
+
+    @PostConstruct
+    public void UtilsCreation() {
+        if (tomcatPath.equals("NotSet")) {
+            logger.info("Tomcat path not found, using system property user.dir");
+            tomcatPath = System.getProperty("user.dir") + webappFolder;
+        } else {
+            logger.info("Tomcat path found!");
+            logger.info("Now it set to : '" + tomcatPath + "'");
+        }
+    }
+
     String webappFolder = "/src/main/webapp";  // todo Handle webaps folder
 
     public File getScriptsDirectory() {
-        return new File(System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + scriptsPath + "/");
+        return new File(tomcatPath + scriptServerResourcesPath + scriptsPath + "/");
     }
 
     public File getVenvDirectory() {
-        return new File(System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + venvPath + "/");
+        return new File(tomcatPath + scriptServerResourcesPath + venvPath + "/");
     }
 
     public File getRequirementsDirectory() {
-        return new File(System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + requirementsPath + "/");
+        return new File(tomcatPath + scriptServerResourcesPath + requirementsPath + "/");
     }
 
     public String getPythonExecutable() {
@@ -89,7 +104,7 @@ public class Utils {
 
     public String[] getArgsForRequirementsInstall(File requirementsFile, String venvName) {
         if (SystemUtils.IS_OS_LINUX) {
-            return new String[]{System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + venvPath + "/" + venvName + "/bin/python3", "-m", "pip", "install", "-r", requirementsFile.getAbsolutePath()};
+            return new String[]{tomcatPath + scriptServerResourcesPath + venvPath + "/" + venvName + "/bin/python3", "-m", "pip", "install", "-r", requirementsFile.getAbsolutePath()};
         } else {
             return new String[]{"cmd", "/c", "activate.bat", "&&", "pip", "install", "-r", requirementsFile.getAbsolutePath()};
         }
@@ -97,9 +112,9 @@ public class Utils {
 
     public String[] getArgsForRunningScriptInVenv(String venvName, String scriptPath) {
         if (SystemUtils.IS_OS_LINUX) {
-            return new String[]{System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + venvPath + "/" + venvName + "/bin/python3", "-u", scriptPath};
+            return new String[]{tomcatPath + scriptServerResourcesPath + venvPath + "/" + venvName + "/bin/python3", "-u", scriptPath};
         } else {
-            return new String[]{System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + venvPath + "/" + venvName + "/Scripts/python.exe ", "-u", scriptPath};
+            return new String[]{tomcatPath + scriptServerResourcesPath + venvPath + "/" + venvName + "/Scripts/python.exe ", "-u", scriptPath};
         }
 
     }
@@ -222,9 +237,9 @@ public class Utils {
     public File[] getVenvs() {
         String venvDir = new String();
         if (SystemUtils.IS_OS_LINUX) {
-            venvDir = "./" + System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + venvPath + "/";
+            venvDir = "./" + tomcatPath + scriptServerResourcesPath + venvPath + "/";
         } else {
-            venvDir = System.getProperty("user.dir") + webappFolder + scriptServerResourcesPath + venvPath + "\\";
+            venvDir = tomcatPath + scriptServerResourcesPath + venvPath + "\\";
         }
         logger.info("Looking for venvs in '" + venvDir + "'");
         File[] directories = new File(venvDir).listFiles(File::isDirectory);

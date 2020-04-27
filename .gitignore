@@ -3,3 +3,4 @@
 /target/
 /venv/
 /src/main/webapp/ScriptsConfig/venvDir/
+/logs/ScriptServer/

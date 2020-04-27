@@ -260,3 +260,10 @@ body {
     margin: 10px 0px 0px 10px;
     text-align: center;
 }
+.footer {
+    color: #959595;
+    font-size: 12px;
+    position: absolute;
+    right: 10px;
+    top: 97%;
+}

@@ -86,7 +86,7 @@
 <div id="logActionViewModal" class="modal">
 
     <!-- Modal content -->
-    <div class="modal-content">
+    <div class="modal-content"  style="height: auto">
         <span class="close">&times;</span>
         <table class="content-table-logs" id="toSet">
             <thead>

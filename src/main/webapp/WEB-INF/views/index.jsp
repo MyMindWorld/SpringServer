@@ -462,7 +462,7 @@
             >Run Script
             </button>
             <button id="disconnect" class="e" disabled="disabled" onclick="killScript(sessionId)">
-                Disconnect
+                Stop script
             </button>
         </sec:authorize>
         </div>

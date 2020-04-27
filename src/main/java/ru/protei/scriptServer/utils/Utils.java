@@ -72,7 +72,7 @@ public class Utils {
         }
     }
 
-    String webappFolder = "/src/main/webapp";  // todo Handle webaps folder
+    String webappFolder = "/src/main/webapp";
 
     public File getScriptsDirectory() {
         return new File(tomcatPath + scriptServerResourcesPath + scriptsPath + "/");

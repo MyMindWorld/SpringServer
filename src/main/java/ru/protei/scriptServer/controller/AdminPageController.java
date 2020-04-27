@@ -43,7 +43,7 @@ public class AdminPageController {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    // todo Фикс пустого вфбора чекбоксов в модалках (Js валидация)
+    // todo Фикс пустого выбора чекбоксов в модалках (Js валидация)
     // GET-POST-GET в редиректах, чтобы можно было нажать назад
 
     @RequestMapping("/admin")

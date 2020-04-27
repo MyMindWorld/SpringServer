@@ -42,10 +42,8 @@ public class TestLoginDataLoader {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
+    // Creates two users with default roles for them
     public void fillTestData() {
-
-        userService.deleteAll();
 
         if (alreadySetup)
             return;

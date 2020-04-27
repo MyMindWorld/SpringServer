@@ -23,7 +23,7 @@
     <link rel="stylesheet" type="text/css" href="<c:url value="/vendor/select2/select2.min.css"/>">
     <!--===============================================================================================-->
     <link rel="stylesheet" type="text/css" href="<c:url value="/css/util.css"/>">
-    <link rel="stylesheet" type="text/css" href="<c:url value="/css/main.css"/>">
+    <link rel="stylesheet" type="text/css" href="<c:url value="/css/login.css"/>">
     <!--===============================================================================================-->
 </head>
 <c:if test="${error}">

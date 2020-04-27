@@ -67,9 +67,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/admin/**").hasAuthority("ADMIN_PAGE_USAGE")
                 .antMatchers("/admin/update_scripts").hasAuthority("SCRIPTS_UPDATE")
+                .antMatchers("/admin/scripts/**").hasAuthority("SCRIPTS_UPDATE")
+                .antMatchers("/admin/scripts").hasAuthority("SCRIPTS_UPDATE")
                 .antMatchers("/admin/roles").hasAuthority("ROLES_SETTING")
                 .antMatchers("/admin/users").hasAuthority("ROLES_SETTING")
+
                 .antMatchers("/admin/update_user").hasAuthority("ROLES_SETTING")
+                .antMatchers("/admin/invite_user").hasAuthority("ROLES_SETTING")
+                .antMatchers("/admin/delete_user").hasAuthority("ROLES_SETTING")
+
+                .antMatchers("/admin/update_role").hasAuthority("ROLES_SETTING")
+                .antMatchers("/admin/delete_role").hasAuthority("ROLES_SETTING")
+                .antMatchers("/admin/create_role").hasAuthority("ROLES_SETTING")
+
                 .antMatchers("/admin/server_control").hasAuthority("SERVER_CONTROL")
                 .antMatchers("/api/**").permitAll()
                 .antMatchers("/css/**").permitAll()

@@ -54,10 +54,9 @@ public class MainPageController {
         String allowedScripts = Arrays.toString(principal.getAuthorities().toArray()); // legshooting
         List<Script> scriptList = scriptRepository.findAll();
         List<String> groupsList = new ArrayList<>();
-
-        for (Script script : scriptList) { // todo Sort?
+        // Creating list for displaying
+        for (Script script : scriptList) {
             if ((!groupsList.contains(script.getGroup_name())) & allowedScripts.contains(script.getName())) {
-
                 groupsList.add(script.getGroup_name());
             }
         }

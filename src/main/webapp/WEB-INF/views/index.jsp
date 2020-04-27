@@ -10,21 +10,14 @@
     <%@taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
     <!--===============================================================================================-->
     <link rel="icon" type="image/png" href="<c:url value="/images/icons/favicon.ico"/>"/>
-    <!--===============================================================================================-->
-    <%--    <link rel="stylesheet" type="text/css" href="<c:url value="/vendor/bootstrap/css/bootstrap.min.css"/>">--%>
     <!--=======================================================================================-->
     <link rel="stylesheet" type="text/css" href="<c:url value="/fonts/font-awesome-4.7.0/css/font-awesome.min.css"/>">
     <link rel="stylesheet" type="text/css" href="<c:url value="/fonts/font-awesome-5.12.1/css/all.css"/>">
     <!--=======================================================================================-->
-    <!--=======================================================================================-->
     <link rel="stylesheet" type="text/css" href="<c:url value="/vendor/animate/animate.css"/>">
-    <!--=======================================================================================-->
-    <%--    <link rel="stylesheet" type="text/css" href="<c:url value="/vendor/css-hamburgers/hamburgers.min.css"/>">--%>
     <!--=======================================================================================-->
     <link rel="stylesheet" type="text/css" href="<c:url value="/vendor/select2/select2.min.css"/>">
     <!--===============================================================================================-->
-    <%--    <link rel="stylesheet" type="text/css" href="<c:url value="/css/util.css"/>">--%>
-    <%--    <link rel="stylesheet" type="text/css" href="<c:url value="/css/main.css"/>">--%>
     <link rel="stylesheet" type="text/css" href="<c:url value="/css/Newindex.css"/>">
     <link rel="stylesheet" type="text/css" href="<c:url value="/css/style.css"/>">
     <link rel="stylesheet" type="text/css" href="<c:url value="/css/ToggleButtons.css"/>">

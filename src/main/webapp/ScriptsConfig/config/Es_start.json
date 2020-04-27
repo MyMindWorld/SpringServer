@@ -13,7 +13,6 @@
       "name": "Ветка",
       "param": "--tag",
       "type": "list",
-      "filter_by_search_select": true,
       "script": "cmd /c test.bat ${searchSelect} ${--type} ${тест}",
       "required": true,
       "description": "Выпадающий список версий",

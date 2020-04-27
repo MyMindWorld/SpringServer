@@ -11,7 +11,7 @@ public class Parameters {
     public String name;
     public String param;
     public String script;
-    public boolean filter_by_search_select = false;
+//    public boolean filter_by_search_select = false;
     public boolean no_value;
     public String description;
     public boolean required;

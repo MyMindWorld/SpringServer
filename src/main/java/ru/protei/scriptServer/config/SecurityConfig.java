@@ -42,6 +42,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .jdbcAuthentication()
                 .dataSource(dataSource);
 //        .authoritiesByUsernameQuery("SELECT 'ROLE_ADMIN'");
+        auth
+                .ldapAuthentication()
+                .userDnPatterns("uid={0},ou=Users")
+                .groupSearchBase("ou=Users")
+                .contextSource()
+                .url("ldap://ldap_1.protei/dc=protei,dc=ru")
+                .and()
+                .passwordCompare()
+                .passwordEncoder(new BCryptPasswordEncoder())
+                .passwordAttribute("userPassword");
 //        auth
 //                .ldapAuthentication()
 //                .userDnPatterns("uid={0},ou=people")

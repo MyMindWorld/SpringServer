@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.SneakyThrows;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.passay.CharacterData;
@@ -52,6 +53,8 @@ public class Utils {
     private String venvPath;
     @Value("${requirementsPath:/requirements}")
     private String requirementsPath;
+    @Value("${repoFromGitDownlPath:/gitReposSource}")
+    private String repoFromGitDownlPath;
     @Value("${defaultVenvRequirementsFileName:defaultVenvRequirements.txt}")
     private String defaultVenvRequirementsFileName;
     @Value("${defaultVenvName:defaultVenv}")
@@ -80,6 +83,20 @@ public class Utils {
 
     public File getVenvDirectory() {
         return new File(tomcatPath + scriptServerResourcesPath + venvPath + "/");
+    }
+
+    public File getConfigDirectory() {
+        return new File(tomcatPath + scriptServerResourcesPath + configPath + "/");
+    }
+
+    @SneakyThrows
+    public File getFolderForScriptFromGit(String scriptsRepoName) {
+        File scriptFolder = new File(tomcatPath + scriptServerResourcesPath + repoFromGitDownlPath + "/" + scriptsRepoName + "/");
+        if (scriptFolder.exists()){
+            FileUtils.deleteDirectory(scriptFolder);
+        }
+        scriptFolder.mkdir();
+        return scriptFolder;
     }
 
     public File getRequirementsDirectory() {

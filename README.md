@@ -222,7 +222,7 @@ TEXT_FOR_USER- текст который будет в заголовке
 ---
 ## Использование сервера
 
-Сервер запустится на порту 8080 с эндпоинтом ScriptServer.
+После [инсталляции](https://git.protei.ru/script-server/SpringServer/blob/master/installGuide.md) сервер запустится на порту 8080 с эндпоинтом ScriptServer.
 
 http://127.0.0.1:8080/ScriptServer/
 

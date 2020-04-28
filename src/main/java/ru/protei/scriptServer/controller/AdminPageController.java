@@ -13,7 +13,7 @@ import ru.protei.scriptServer.model.User;
 import ru.protei.scriptServer.repository.*;
 import ru.protei.scriptServer.service.LogService;
 import ru.protei.scriptServer.service.RoleService;
-import ru.protei.scriptServer.service.ScriptsHandler;
+import ru.protei.scriptServer.service.ScriptsService;
 import ru.protei.scriptServer.utils.Utils;
 
 import java.util.List;
@@ -37,7 +37,7 @@ public class AdminPageController {
     @Autowired
     Utils utils;
     @Autowired
-    ScriptsHandler scriptsHandler;
+    ScriptsService scriptsService;
     @Autowired
     LogService logService;
     @Autowired

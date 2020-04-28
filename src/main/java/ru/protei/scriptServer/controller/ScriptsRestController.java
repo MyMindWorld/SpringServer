@@ -13,7 +13,7 @@ import ru.protei.scriptServer.model.Parameters;
 import ru.protei.scriptServer.model.Script;
 import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.service.LogService;
-import ru.protei.scriptServer.service.ScriptsHandler;
+import ru.protei.scriptServer.service.ScriptsService;
 import ru.protei.scriptServer.service.UserService;
 import ru.protei.scriptServer.service.VenvManager;
 import ru.protei.scriptServer.utils.SystemIntegration.DynamicParamsScriptsRunner;
@@ -36,7 +36,7 @@ public class ScriptsRestController {
     @Autowired
     Utils utils;
     @Autowired
-    ScriptsHandler scriptsHandler;
+    ScriptsService scriptsService;
     @Autowired
     LogService logService;
     @Autowired

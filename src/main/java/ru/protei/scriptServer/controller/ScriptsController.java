@@ -14,7 +14,7 @@ import org.springframework.web.servlet.ModelAndView;
 import ru.protei.scriptServer.model.*;
 import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.service.LogService;
-import ru.protei.scriptServer.service.ScriptsHandler;
+import ru.protei.scriptServer.service.ScriptsService;
 import ru.protei.scriptServer.service.UserService;
 import ru.protei.scriptServer.service.VenvManager;
 import ru.protei.scriptServer.utils.SystemIntegration.DynamicParamsScriptsRunner;
@@ -35,7 +35,7 @@ public class ScriptsController {
     @Autowired
     Utils utils;
     @Autowired
-    ScriptsHandler scriptsHandler;
+    ScriptsService scriptsService;
     @Autowired
     LogService logService;
     @Autowired
@@ -57,7 +57,7 @@ public class ScriptsController {
 
     @RequestMapping(value = "/admin/update_scripts", method = RequestMethod.GET)
     public String updateScripts(HttpServletRequest request) {
-        scriptsHandler.updateAllScriptsConfigs();
+        scriptsService.updateAllScriptsConfigs();
         logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Scripts update", "");
 
         return "redirect:/admin/scripts";
@@ -68,7 +68,7 @@ public class ScriptsController {
         logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "All Venv deleting", "");
         venvManager.deleteAllVenvs();
         logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Scripts update", "");
-        scriptsHandler.updateAllScriptsConfigs();
+        scriptsService.updateAllScriptsConfigs();
         logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Creating default venv", "");
         venvManager.createDefaultVenv();
         return "redirect:/admin/scripts";
@@ -76,10 +76,9 @@ public class ScriptsController {
 
     @RequestMapping(value = "/admin/update_scripts_from_gitlab", method = RequestMethod.GET)
     public String updateScriptsFromGitlab(HttpServletRequest request) {
-        scriptsHandler.updateAllScriptsConfigs();
         logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Scripts update from gitlab", "");
-        logger.info("Scripts update from gitlab will be available later!");
-
+        scriptsService.getScriptsFromGit();
+        scriptsService.updateAllScriptsConfigs();
         return "redirect:/admin/scripts";
     }
 
@@ -87,7 +86,7 @@ public class ScriptsController {
     public String updateSpecifiedScriptConfig(HttpServletRequest request, Script scriptToUpdate) {
         Script scriptFromDB = scriptRepository.findByNameEquals(scriptToUpdate.getName());
         if (scriptFromDB != null) {
-            scriptsHandler.updateSpecifiedScriptConfigAndDropVenv(scriptFromDB);
+            scriptsService.updateSpecifiedScriptConfigAndDropVenv(scriptFromDB);
             logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Script '" + scriptFromDB.getName() + "' update", "");
         } else {
             logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Script '" + scriptToUpdate.getName() + "' update", "", "SCRIPT NOT FOUND IN DB!");
@@ -137,7 +136,7 @@ public class ScriptsController {
         logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "Run script '" + script.getName() + "'", Arrays.toString(resultRunString));
         logger.info("Created string : " + Arrays.toString(resultRunString));
         new Thread(() -> {
-            scriptsHandler.runPythonScript(resultRunString, script, principal.getUsername(), uniqueSessionId);
+            scriptsService.runPythonScript(resultRunString, script, principal.getUsername(), uniqueSessionId);
         }, uniqueSessionId + "_" + script.getName() + "-" + req.getRemoteUser()).start();
         return new ResponseEntity(HttpStatus.OK);
     }

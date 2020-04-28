@@ -22,15 +22,6 @@ import java.util.Random;
 public class TestLoginDataLoader {
     Logger logger = LoggerFactory.getLogger(TestLoginDataLoader.class);
 
-    // Находится в отдельном классе тк под вопросом. Нужно ли по умолчанию иметь пользователя или захардкодить на Ldap?
-
-    boolean alreadySetup = false;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private RoleService roleService;
     @Autowired
     private LogService logService;
 
@@ -42,48 +33,8 @@ public class TestLoginDataLoader {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-    // Creates two users with default roles for them
-    public void fillTestData() {
 
-        if (alreadySetup)
-            return;
-        Privilege scripts_view
-                = privilegeService.createPrivilegeIfNotFound("SCRIPTS_VIEW");
-        Privilege admin_page_usage
-                = privilegeService.createPrivilegeIfNotFound("ADMIN_PAGE_USAGE");
-        Privilege scriptsUpdate
-                = privilegeService.createPrivilegeIfNotFound("SCRIPTS_UPDATE");
-        Privilege rolesAdmin
-                = privilegeService.createPrivilegeIfNotFound("ROLES_SETTING");
-        Privilege serverControl
-                = privilegeService.createPrivilegeIfNotFound("SERVER_CONTROL");
-
-        List<Privilege> adminPrivileges = Arrays.asList(
-                scripts_view, admin_page_usage, scriptsUpdate, rolesAdmin, serverControl);
-        Role adminRole = roleService.createRoleIfNotFound("ROLE_ADMIN", adminPrivileges, true);
-        Role userRole = roleService.createRoleIfNotFound("ROLE_USER", Arrays.asList(scripts_view), true);
-        Role roleAll = roleRepository.findByNameEquals("ROLE_ALL_SCRIPTS");
-
-        User admin = new User();
-        admin.setUsername("admin");
-        admin.setLdapName("admin_admin");
-        admin.setPassword(passwordEncoder.encode("admin"));
-        admin.setEmail("admin@admin.com");
-        admin.setRoles(Arrays.asList(adminRole, userRole, roleAll));
-        admin.setEnabled(true);
-
-        User user = new User();
-        user.setUsername("user");
-        user.setLdapName("user_user");
-        user.setPassword(passwordEncoder.encode("user"));
-        user.setEmail("user@user.com");
-        user.setRoles(Arrays.asList(userRole));
-        user.setEnabled(true);
-
-
-        userService.createUserIfNotFound(admin);
-        userService.createUserIfNotFound(user);
-
+    public void fillTestLogsAndPrivileges() {
         Integer logRepSizeForTest = 500;
         Integer privilegeRepSizeForTest = 70;
 
@@ -133,9 +84,6 @@ public class TestLoginDataLoader {
             }
 
         }
-
-
-        alreadySetup = true;
     }
 
 

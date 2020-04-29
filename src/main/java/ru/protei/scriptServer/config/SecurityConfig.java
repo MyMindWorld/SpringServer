@@ -14,6 +14,7 @@ import org.springframework.security.web.authentication.rememberme.JdbcTokenRepos
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.web.context.WebApplicationContext;
 import ru.protei.scriptServer.service.CustomUserDetailsService;
+import ru.protei.scriptServer.service.GitLabOAuth2UserService;
 
 import javax.sql.DataSource;
 import javax.annotation.PostConstruct;
@@ -42,16 +43,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .jdbcAuthentication()
                 .dataSource(dataSource);
 //        .authoritiesByUsernameQuery("SELECT 'ROLE_ADMIN'");
-        auth
-                .ldapAuthentication()
-                .userDnPatterns("uid={0},ou=Users")
-                .groupSearchBase("ou=Users")
-                .contextSource()
-                .url("ldap://ldap_1.protei/dc=protei,dc=ru")
-                .and()
-                .passwordCompare()
-                .passwordEncoder(new BCryptPasswordEncoder())
-                .passwordAttribute("userPassword");
+//        auth
+//                .ldapAuthentication()
+//                .userDnPatterns("uid={0},ou=users")
+//                .groupSearchBase("ou=users")
+//                .groupSearchBase("ou=Users,dc=protei,dc=ru")
+//                .contextSource()
+//                .url("ldap://192.168.100.143/dc=protei,dc=ru")
+//                .and()
+//                .passwordCompare()
+//                .passwordEncoder(new BCryptPasswordEncoder())
+//                .passwordAttribute("userPassword");
 //        auth
 //                .ldapAuthentication()
 //                .userDnPatterns("uid={0},ou=people")
@@ -117,6 +119,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .exceptionHandling()
                 .accessDeniedPage("/ErrorCodes/403");
+//        .and()
+//        .oauth2Login()
+//        .authorizationEndpoint()
+//        .baseUri("/oauth2/authorize")
+//        .and()
+//        .redirectionEndpoint()
+//        .baseUri("/oauth2/callback/*")
+//        .and()
+//        .userInfoEndpoint()
+//        .userService(gitLabOAuth2UserService);
 //                .logoutSuccessHandler(logoutSuccessHandler());
     }
 

@@ -28,6 +28,8 @@ public class VenvManager {
 
         if (defaultRequirements == null) {
             logger.info("Default requirements not found.");
+            Venv createdVenv = createIfNotExists(utils.defaultVenvName,null);
+            return createdVenv;
         } else {
             logger.info("Default requirements found.");
             File destination = new File(utils.getRequirementsDirectory().toString() + "/");
@@ -65,7 +67,6 @@ public class VenvManager {
                 return venvFromRepo;
             }
         }
-
     }
 
     @SneakyThrows
@@ -92,7 +93,7 @@ public class VenvManager {
         }
         logger.info("Finished venv '" + name + "' creation");
         venvRepository.save(venv);
-        if (!requirementsFileName.isEmpty()) {
+        if (requirementsFileName != null) {
             installPackagesInVenv(venv, requirementsFileName);
         } else {
             logger.info("Venv doesn't require packages. Skipping");

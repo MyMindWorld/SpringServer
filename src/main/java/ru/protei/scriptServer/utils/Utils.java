@@ -267,13 +267,13 @@ public class Utils {
     public File getDefaultVenvRequirements() {
         File defaultRequirements;
 
-        try {
-            defaultRequirements = new ClassPathResource(defaultVenvRequirementsFileName).getFile();
+        defaultRequirements = new File(tomcatPath + scriptServerResourcesPath + "/" +  defaultVenvRequirementsFileName);
+
+        if (defaultRequirements.exists()){
             logger.info("Found default requirements in : '" + defaultRequirements.getPath() + "'");
             return defaultRequirements;
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+        logger.error("Default requirements not found in : '" + defaultRequirements.getPath() + "'");
         return null;
     }
 

@@ -24,7 +24,7 @@ public class ScriptServer extends SpringBootServletInitializer {
             configLocation = "classpath:/";
         }
         ConfigurableApplicationContext applicationContext = new SpringApplicationBuilder(ScriptServer.class)
-                .properties("spring.config.name:application,script-server", // Last entry here is prioritized by Spring
+                .properties("spring.config.name:script-server,application", // First entry here is prioritized by Spring
                         "spring.config.location:" + "classpath:/," + configLocation) // Same as above
                 .build()
                 .run(args);

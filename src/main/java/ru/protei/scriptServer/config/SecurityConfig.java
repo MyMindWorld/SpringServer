@@ -14,7 +14,6 @@ import org.springframework.security.web.authentication.rememberme.JdbcTokenRepos
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.web.context.WebApplicationContext;
 import ru.protei.scriptServer.service.CustomUserDetailsService;
-import ru.protei.scriptServer.service.GitLabOAuth2UserService;
 
 import javax.sql.DataSource;
 import javax.annotation.PostConstruct;
@@ -42,28 +41,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationProvider(authenticationProvider())
                 .jdbcAuthentication()
                 .dataSource(dataSource);
-//        .authoritiesByUsernameQuery("SELECT 'ROLE_ADMIN'");
-//        auth
-//                .ldapAuthentication()
-//                .userDnPatterns("uid={0},ou=users")
-//                .groupSearchBase("ou=users")
-//                .groupSearchBase("ou=Users,dc=protei,dc=ru")
-//                .contextSource()
-//                .url("ldap://192.168.100.143/dc=protei,dc=ru")
-//                .and()
-//                .passwordCompare()
-//                .passwordEncoder(new BCryptPasswordEncoder())
-//                .passwordAttribute("userPassword");
-//        auth
-//                .ldapAuthentication()
-//                .userDnPatterns("uid={0},ou=people")
-//                .groupSearchBase("ou=groups")
-//                .contextSource()
-//                .url("ldap://localhost:8389/dc=protei,dc=org")
-//                .and()
-//                .passwordCompare()
-//                .passwordEncoder(new BCryptPasswordEncoder())
-//                .passwordAttribute("userPassword");
+        auth
+                .ldapAuthentication()
+                .userDnPatterns("uid={0},ou=Users,dc=protei,dc=ru") // + ldaps - [LDAP: error code 50 - Insufficient Access Rights]
+//                .groupSearchBase("cn=Users,ou=Groups,dc=protei,dc=ru") // + ldaps - [LDAP: error code 50 - Insufficient Access Rights]
+                .contextSource()
+//                .url("ldaps://192.168.100.143/dc=protei,dc=ru")
+//                .url("ldaps://192.168.100.143")
+                .url("ldaps://ldap1.protei.ru")
+//                .url("ldaps://ldap2.protei.ru")
+//                .url("ldaps://ldap.protei.ru")
+//                .url("ldap://ldap.protei.ru")
+                .port(636)
+                .and()
+                .passwordCompare()
+                .passwordEncoder(passwordEncoder())
+                .passwordAttribute("userPassword");
     }
 
     @Override

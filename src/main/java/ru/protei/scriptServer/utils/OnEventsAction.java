@@ -27,6 +27,8 @@ public class OnEventsAction {
     @Autowired
     VenvManager venvManager;
     @Autowired
+    Utils utils;
+    @Autowired
     private UserService userService;
 
     @Autowired
@@ -44,6 +46,7 @@ public class OnEventsAction {
     @EventListener(ApplicationReadyEvent.class)
     public void beforeStartup() {
         logger.info("AfterStartup invocation started!");
+        utils.createDefaultFolders();
         scriptsService.getScriptsFromGit();
         scriptsService.updateAllScriptsConfigs();
         createAdminUserAndPrivileges();

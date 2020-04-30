@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.protei.scriptServer.model.Script;
 import ru.protei.scriptServer.model.Venv;
 import ru.protei.scriptServer.repository.VenvRepository;
 import ru.protei.scriptServer.utils.Utils;
@@ -28,7 +29,7 @@ public class VenvManager {
 
         if (defaultRequirements == null) {
             logger.info("Default requirements not found.");
-            Venv createdVenv = createIfNotExists(utils.defaultVenvName,null);
+            Venv createdVenv = createIfNotExists(utils.defaultVenvName, null);
             return createdVenv;
         } else {
             logger.info("Default requirements found.");
@@ -43,7 +44,7 @@ public class VenvManager {
             }
         }
         Venv createdVenv = createIfNotExists(utils.defaultVenvName, defaultRequirements.getName());
-        if (defaultRequirements!=null){
+        if (defaultRequirements != null) {
             installPackagesInVenv(createdVenv, defaultRequirements.getName());
         }
         return createdVenv;
@@ -110,8 +111,7 @@ public class VenvManager {
         try {
             requirementsFile = new File(utils.getRequirementsDirectory() + "/" + requirementsFileName);
             FileUtils.readLines(requirementsFile, "utf-8");
-        }
-        catch (FileNotFoundException e){
+        } catch (FileNotFoundException e) {
             logger.error("Requirements '" + requirementsFileName + "' not found");
             return null;
         }
@@ -120,7 +120,7 @@ public class VenvManager {
 //        https://wiki.protei.ru/doku.php?id=protei:qa:python:pypi&s[]=pip
 //        https://wiki.protei.ru/doku.php?id=protei:qa:python:virtualenv&s[]=pip
 
-        Process venvCreatingProc = Runtime.getRuntime().exec(utils.getArgsForRequirementsInstall(requirementsFile,venv.getName()), null, utils.getVenvActivationPath(venv.getName()));
+        Process venvCreatingProc = Runtime.getRuntime().exec(utils.getArgsForRequirementsInstall(requirementsFile, venv.getName()), null, utils.getVenvActivationPath(venv.getName()));
         InputStream is = venvCreatingProc.getInputStream();
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
         InputStream eis = venvCreatingProc.getErrorStream();
@@ -170,6 +170,22 @@ public class VenvManager {
             deleteVenv(venvName);
         }
 
+    }
+
+    @SneakyThrows
+    public void checkVenv(Script script, Venv venv) {
+        File[] allVenvs = utils.getVenvs();
+        for (File venvFromFs : allVenvs) {
+            String venvName = venvFromFs.getName();
+            if (venv.getName().equals(venvName)) {
+                return;
+            }
+        }
+        // If we are here - venv was not found on FS
+        logger.error("Venv was not found on FS! Recreating");
+        venvRepository.delete(venv);
+        createVenv(venv.getName(), script.getRequirements());
+        logger.info("Venv was recreated!");
     }
 
     @SneakyThrows

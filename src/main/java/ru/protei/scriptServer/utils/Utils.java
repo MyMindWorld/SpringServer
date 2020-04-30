@@ -75,7 +75,32 @@ public class Utils {
         }
     }
 
+    public void createDefaultFolders() {
+        logger.info("Creating default folders");
+        createFolderIfNotExists(getRequirementsDirectory());
+        createFolderIfNotExists(getScriptsDirectory());
+        createFolderIfNotExists(getVenvDirectory());
+        createFolderIfNotExists(getConfigDirectory());
+        logger.info("Creation complete!");
+    }
+
     String webappFolder = "/src/main/webapp";
+
+
+    public void createFolderIfNotExists(File folder) {
+        if (folder.exists()) {
+            return;
+        } else {
+            try {
+                FileUtils.forceMkdir(folder);
+            } catch (IOException e) {
+                logger.error("Error during attempt of creation folder " + folder.getName());
+                logger.error(e.getMessage());
+            }
+
+        }
+
+    }
 
     public File getScriptsDirectory() {
         return new File(tomcatPath + scriptServerResourcesPath + scriptsPath + "/");
@@ -92,7 +117,7 @@ public class Utils {
     @SneakyThrows
     public File getFolderForScriptFromGit(String scriptsRepoName) {
         File scriptFolder = new File(tomcatPath + scriptServerResourcesPath + repoFromGitDownlPath + "/" + scriptsRepoName + "/");
-        if (scriptFolder.exists()){
+        if (scriptFolder.exists()) {
             FileUtils.deleteDirectory(scriptFolder);
         }
         scriptFolder.mkdir();
@@ -267,9 +292,9 @@ public class Utils {
     public File getDefaultVenvRequirements() {
         File defaultRequirements;
 
-        defaultRequirements = new File(tomcatPath + scriptServerResourcesPath + "/" +  defaultVenvRequirementsFileName);
+        defaultRequirements = new File(tomcatPath + scriptServerResourcesPath + "/" + defaultVenvRequirementsFileName);
 
-        if (defaultRequirements.exists()){
+        if (defaultRequirements.exists()) {
             logger.info("Found default requirements in : '" + defaultRequirements.getPath() + "'");
             return defaultRequirements;
         }

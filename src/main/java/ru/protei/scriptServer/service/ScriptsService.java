@@ -17,12 +17,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import ru.protei.scriptServer.controller.ScriptWebSocketController;
+import ru.protei.scriptServer.model.*;
 import ru.protei.scriptServer.model.Enums.ServiceMessage;
-import ru.protei.scriptServer.model.JsonScript;
 import ru.protei.scriptServer.model.POJO.GitlabGroupsAnswer;
-import ru.protei.scriptServer.model.Privilege;
-import ru.protei.scriptServer.model.Role;
-import ru.protei.scriptServer.model.Script;
 import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.repository.VenvRepository;
 import ru.protei.scriptServer.utils.SystemIntegration.PythonScriptsRunner;
@@ -168,10 +165,14 @@ public class ScriptsService {
         if (script.getVenv() == null) {
             script.setVenv(utils.defaultVenvName);
         }
-        if (venvRepository.findByNameEquals(script.getVenv()) == null) {
+        Venv venvFromScript = venvRepository.findByNameEquals(script.getVenv());
+        if (venvFromScript == null) {
             scriptWebSocketController.sendToSockFromServer(username, "Creating venv...", script.getName(), uniqueSessionId);
             venvManager.createIfNotExists(script.getVenv(), script.getRequirements());
             scriptWebSocketController.sendToSockFromServer(username, "Venv creation complete!", script.getName(), uniqueSessionId);
+        } else {
+            scriptWebSocketController.sendToSockFromServer(username, "Checking venv...", script.getName(), uniqueSessionId);
+            venvManager.checkVenv(script, venvFromScript);
         }
 
         scriptWebSocketController.sendToSockFromServerService(username, "Starting script '" + script.getDisplay_name() + "'", script.getName(), uniqueSessionId, ServiceMessage.Started);
@@ -200,7 +201,7 @@ public class ScriptsService {
             for (File fileInRepo : repoFolder.listFiles()) {
                 if (fileInRepo.isDirectory() & fileInRepo.getName().equals("scripts")) {
                     for (File scriptsFile : fileInRepo.listFiles()) {
-                        if (scriptsFile.getName().equals(".gitkeep")){
+                        if (scriptsFile.getName().equals(".gitkeep")) {
                             continue;
                         }
                         try {
@@ -216,7 +217,7 @@ public class ScriptsService {
                 }
                 if (fileInRepo.isDirectory() & fileInRepo.getName().equals("config")) {
                     for (File configFile : fileInRepo.listFiles()) {
-                        if (configFile.getName().equals(".gitkeep")){
+                        if (configFile.getName().equals(".gitkeep")) {
                             continue;
                         }
                         try {
@@ -230,7 +231,7 @@ public class ScriptsService {
                 }
                 if (fileInRepo.isDirectory() & fileInRepo.getName().equals("requirements")) {
                     for (File requirementFile : fileInRepo.listFiles()) {
-                        if (requirementFile.getName().equals(".gitkeep")){
+                        if (requirementFile.getName().equals(".gitkeep")) {
                             continue;
                         }
                         try {

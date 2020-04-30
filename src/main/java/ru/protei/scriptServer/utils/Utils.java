@@ -279,7 +279,7 @@ public class Utils {
     public File[] getVenvs() {
         String venvDir = new String();
         if (SystemUtils.IS_OS_LINUX) {
-            venvDir = "./" + tomcatPath + scriptServerResourcesPath + venvPath + "/";
+            venvDir = tomcatPath + scriptServerResourcesPath + venvPath + "/";
         } else {
             venvDir = tomcatPath + scriptServerResourcesPath + venvPath + "\\";
         }

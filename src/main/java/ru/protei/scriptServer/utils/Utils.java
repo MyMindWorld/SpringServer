@@ -29,6 +29,7 @@ import ru.protei.scriptServer.model.Script;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
@@ -264,16 +265,17 @@ public class Utils {
         return null;
     }
 
-    public Resource[] getConfigs() {
-        try {
-            Resource[] resources = ResourcePatternUtils.getResourcePatternResolver(resourceLoader).getResources(scriptServerResourcesPath + configPath + "/*.json");
-            logger.info("Found : '" + resources.length + "' json configs");
-            return resources;
+    public File[] getConfigs() {
+        File dir = getConfigDirectory();
+        File[] files = dir.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.toLowerCase().endsWith(".json");
+            }
+        });
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+        logger.info("Found : '" + files.length + "' json configs");
+        return files;
+
     }
 
     public File[] getVenvs() {

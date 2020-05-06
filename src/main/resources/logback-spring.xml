@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-        <Property name="basePath" value="${sys:catalina.home:-.}/logs/ScriptServer"/>
+        <Property name="basePath" value="${sys:ss.logs.location:-.}/logs/ScriptServer"/>
         <Property name="archivePath" value="${basePath}/archive"/>
 
     <appender name="Console"
@@ -14,7 +14,7 @@
 
     <appender name="RollingFile"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${basePath}/spring-boot-logger.log</file>
+        <file>${basePath}/ScriptServer.log</file>
         <encoder
                 class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <Pattern>%d %p %C{1.} [%t] %m%n</Pattern>

@@ -66,18 +66,18 @@ public class ScriptsService {
             logger.info("Database is now clean");
         }
 
-        Resource[] configs = utils.getConfigs();
+        File[] configs = utils.getConfigs();
         if (configs == null) {
             logger.warn("Scripts folder is empty!");
             return;
         }
 
-        for (Resource config : configs) {
+        for (File config : configs) {
 
             Script script = new Script();
             try {
 
-                JsonScript jsonScript = utils.parseJsonToObject(config.getInputStream());
+                JsonScript jsonScript = utils.parseJsonToObject(FileUtils.openInputStream(config));
                 // todo if parsing straight to db really hard?
                 script.setName(jsonScript.name);
                 script.setGroup_name(jsonScript.group);
@@ -107,15 +107,15 @@ public class ScriptsService {
         logger.info("Database cleanup started!");
         scriptRepository.delete(script);
 
-        Resource[] configs = utils.getConfigs();
+        File[] configs = utils.getConfigs();
         if (configs == null) {
             logger.warn("Scripts folder is empty!");
             return null;
         }
-        for (Resource config : configs) {
+        for (File config : configs) {
             try {
 
-                JsonScript jsonScript = utils.parseJsonToObject(config.getInputStream());
+                JsonScript jsonScript = utils.parseJsonToObject(FileUtils.openInputStream(config));
                 if ((jsonScript.name.equals(script.getName()))) {
                     script.setGroup_name(jsonScript.group);
                     script.setDisplay_name(jsonScript.display_name);

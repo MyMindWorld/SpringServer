@@ -30,7 +30,7 @@
     <script type="text/javascript">
         let stompClient = null;
         let sessionId = null;
-        const connectionName = "<sec:authentication property='principal.username' />";
+        const connectionName =  '<c:out value="${username}"></c:out>'
         // var scriptFormData = new FormData();
         // var test = document.getElementsByName("commandParams")
         const $form = $("#ScriptForm");

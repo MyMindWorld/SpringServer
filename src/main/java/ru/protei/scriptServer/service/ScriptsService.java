@@ -27,6 +27,7 @@ import ru.protei.scriptServer.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.List;
 
 @Service
@@ -183,72 +184,78 @@ public class ScriptsService {
 
     @SneakyThrows
     public void getScriptsFromGit() {
-        GitlabGroupsAnswer[] response =
-                RestAssured.given()
-                        .contentType(ContentType.JSON)
-                        .get(scriptsGitUrl)
-                        .then()
-                        .extract()
-                        .as(GitlabGroupsAnswer[].class);
-        for (GitlabGroupsAnswer repository : response) {
-            File repoFolder = utils.getFolderForScriptFromGit(repository.name);
-            Git.cloneRepository()
-                    .setURI(repository.httpUrlToRepo)
-                    .setDirectory(repoFolder)
-                    .setProgressMonitor(new SimpleProgressMonitor(logger))
-                    .call()
-                    .close();
-            for (File fileInRepo : repoFolder.listFiles()) {
-                if (fileInRepo.isDirectory() & fileInRepo.getName().equals("scripts")) {
-                    for (File scriptsFile : fileInRepo.listFiles()) {
-                        if (scriptsFile.getName().equals(".gitkeep")) {
-                            continue;
-                        }
-                        try {
-                            FileUtils.moveFileToDirectory(scriptsFile, utils.getScriptsDirectory(), true);
-                        } catch (FileExistsException e) {
-                            logger.error("scriptsFile '" + scriptsFile.getName() + "' already exists! Overwriting.");
-                            FileUtils.forceDelete(new File(utils.getScriptsDirectory().toString() + "/" + scriptsFile.getName()));
-                            FileUtils.moveFileToDirectory(scriptsFile, utils.getScriptsDirectory(), true);
+        try {
+            GitlabGroupsAnswer[] response =
+                    RestAssured.given()
+                            .contentType(ContentType.JSON)
+                            .get(scriptsGitUrl)
+                            .then()
+                            .extract()
+                            .as(GitlabGroupsAnswer[].class);
+            for (GitlabGroupsAnswer repository : response) {
+                File repoFolder = utils.getFolderForScriptFromGit(repository.name);
+                Git.cloneRepository()
+                        .setURI(repository.httpUrlToRepo)
+                        .setDirectory(repoFolder)
+                        .setProgressMonitor(new SimpleProgressMonitor(logger))
+                        .call()
+                        .close();
+
+                for (File fileInRepo : repoFolder.listFiles()) {
+                    if (fileInRepo.isDirectory() & fileInRepo.getName().equals("scripts")) {
+                        for (File scriptsFile : fileInRepo.listFiles()) {
+                            if (scriptsFile.getName().equals(".gitkeep")) {
+                                continue;
+                            }
+                            try {
+                                FileUtils.moveFileToDirectory(scriptsFile, utils.getScriptsDirectory(), true);
+                            } catch (FileExistsException e) {
+                                logger.error("scriptsFile '" + scriptsFile.getName() + "' already exists! Overwriting.");
+                                FileUtils.forceDelete(new File(utils.getScriptsDirectory().toString() + "/" + scriptsFile.getName()));
+                                FileUtils.moveFileToDirectory(scriptsFile, utils.getScriptsDirectory(), true);
+
+                            }
 
                         }
-
                     }
-                }
-                if (fileInRepo.isDirectory() & fileInRepo.getName().equals("config")) {
-                    for (File configFile : fileInRepo.listFiles()) {
-                        if (configFile.getName().equals(".gitkeep")) {
-                            continue;
-                        }
-                        try {
-                            FileUtils.moveFileToDirectory(configFile, utils.getConfigDirectory(), true);
-                        } catch (FileExistsException e) {
-                            logger.error("configFile '" + configFile.getName() + "' already exists! Overwriting.");
-                            FileUtils.forceDelete(new File(utils.getConfigDirectory().toString() + "/" + configFile.getName()));
-                            FileUtils.moveFileToDirectory(configFile, utils.getConfigDirectory(), true);
-                        }
-                    }
-                }
-                if (fileInRepo.isDirectory() & fileInRepo.getName().equals("requirements")) {
-                    for (File requirementFile : fileInRepo.listFiles()) {
-                        if (requirementFile.getName().equals(".gitkeep")) {
-                            continue;
-                        }
-                        try {
-                            FileUtils.moveFileToDirectory(requirementFile, utils.getRequirementsDirectory(), true);
-                        } catch (FileExistsException e) {
-                            logger.error("requirementFile '" + requirementFile.getName() + "' already exists! Overwriting.");
-                            FileUtils.forceDelete(new File(utils.getRequirementsDirectory().toString() + "/" + requirementFile.getName()));
-                            FileUtils.moveFileToDirectory(requirementFile, utils.getRequirementsDirectory(), true);
+                    if (fileInRepo.isDirectory() & fileInRepo.getName().equals("config")) {
+                        for (File configFile : fileInRepo.listFiles()) {
+                            if (configFile.getName().equals(".gitkeep")) {
+                                continue;
+                            }
+                            try {
+                                FileUtils.moveFileToDirectory(configFile, utils.getConfigDirectory(), true);
+                            } catch (FileExistsException e) {
+                                logger.error("configFile '" + configFile.getName() + "' already exists! Overwriting.");
+                                FileUtils.forceDelete(new File(utils.getConfigDirectory().toString() + "/" + configFile.getName()));
+                                FileUtils.moveFileToDirectory(configFile, utils.getConfigDirectory(), true);
+                            }
                         }
                     }
+                    if (fileInRepo.isDirectory() & fileInRepo.getName().equals("requirements")) {
+                        for (File requirementFile : fileInRepo.listFiles()) {
+                            if (requirementFile.getName().equals(".gitkeep")) {
+                                continue;
+                            }
+                            try {
+                                FileUtils.moveFileToDirectory(requirementFile, utils.getRequirementsDirectory(), true);
+                            } catch (FileExistsException e) {
+                                logger.error("requirementFile '" + requirementFile.getName() + "' already exists! Overwriting.");
+                                FileUtils.forceDelete(new File(utils.getRequirementsDirectory().toString() + "/" + requirementFile.getName()));
+                                FileUtils.moveFileToDirectory(requirementFile, utils.getRequirementsDirectory(), true);
+                            }
+                        }
+                    }
                 }
-
             }
+        } catch (UnknownHostException e) {
+            logger.error("Git is unavailable! Can't update scripts from git");
+            return;
         }
 
 
     }
+
 
     private static class SimpleProgressMonitor implements ProgressMonitor {
         public Logger logger;

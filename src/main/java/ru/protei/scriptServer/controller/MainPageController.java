@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,9 +49,9 @@ public class MainPageController {
 
     @RequestMapping("/index")
     public ModelAndView showMenu(HttpServletRequest req) {
-        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
         ModelAndView modelAndView = new ModelAndView("index");
-        String allowedScripts = Arrays.toString(principal.getAuthorities().toArray()); // legshooting
+        String allowedScripts = Arrays.toString(loggedInUser.getAuthorities().toArray()); // legshooting
         List<Script> scriptList = scriptRepository.findAll();
         List<String> groupsList = new ArrayList<>();
         // Creating list for displaying
@@ -60,7 +60,7 @@ public class MainPageController {
                 groupsList.add(script.getGroup_name());
             }
         }
-
+        modelAndView.addObject("username",req.getRemoteUser());
         modelAndView.addObject("list", scriptList);
         modelAndView.addObject("groups", groupsList);
         modelAndView.addObject("AppVersion", appVersion);

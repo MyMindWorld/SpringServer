@@ -24,6 +24,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private WebApplicationContext applicationContext;
+
+    @Autowired
+    private CustomLdapAuth customLdapAuth;
+
     private CustomUserDetailsService userDetailsService;
     @Autowired
     private DataSource dataSource;
@@ -40,23 +44,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authenticationProvider(authenticationProvider())
                 .jdbcAuthentication()
-                .dataSource(dataSource);
-        auth
-                .ldapAuthentication()
-                .userDnPatterns("uid={0},ou=Users,dc=protei,dc=ru") // + ldaps - [LDAP: error code 50 - Insufficient Access Rights]
-//                .groupSearchBase("cn=Users,ou=Groups,dc=protei,dc=ru") // + ldaps - [LDAP: error code 50 - Insufficient Access Rights]
-                .contextSource()
-//                .url("ldaps://192.168.100.143/dc=protei,dc=ru")
-//                .url("ldaps://192.168.100.143")
-                .url("ldaps://ldap1.protei.ru")
-//                .url("ldaps://ldap2.protei.ru")
-//                .url("ldaps://ldap.protei.ru")
-//                .url("ldap://ldap.protei.ru")
-                .port(636)
+                .dataSource(dataSource)
                 .and()
-                .passwordCompare()
-                .passwordEncoder(passwordEncoder())
-                .passwordAttribute("userPassword");
+                .authenticationProvider(customLdapAuth);
     }
 
     @Override
@@ -112,17 +102,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .exceptionHandling()
                 .accessDeniedPage("/ErrorCodes/403");
-//        .and()
-//        .oauth2Login()
-//        .authorizationEndpoint()
-//        .baseUri("/oauth2/authorize")
-//        .and()
-//        .redirectionEndpoint()
-//        .baseUri("/oauth2/callback/*")
-//        .and()
-//        .userInfoEndpoint()
-//        .userService(gitLabOAuth2UserService);
-//                .logoutSuccessHandler(logoutSuccessHandler());
     }
 
     @Bean

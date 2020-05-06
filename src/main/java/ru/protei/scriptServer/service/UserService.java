@@ -41,6 +41,23 @@ public class UserService {
     }
 
     @Transactional
+    public User createUser(String username, String password) {
+        User userToCreate = new User();
+        userToCreate.setUsername(username);
+        userToCreate.setPassword(passwordEncoder.encode(password));
+        userToCreate.setLdapName(username);
+        userToCreate.setEmail(username + "@protei.ru");
+        userToCreate.setEnabled(true);
+
+        User userFromRepo = userRepository.findByUsernameEquals(userToCreate.getUsername());
+        if (userFromRepo == null) {
+            return userRepository.save(userToCreate);
+        } else {
+            return null;
+        }
+    }
+
+    @Transactional
     public void deleteAll() {
         logger.warn("Removing all users!!!");
 

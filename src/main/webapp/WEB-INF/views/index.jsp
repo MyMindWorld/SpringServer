@@ -438,7 +438,8 @@
                                        <c:if test="${parameter.required}">required</c:if>/>
                                 <br>
                             </c:when>
-
+                            <c:when test="${parameter.type == 'username'}">
+                            </c:when>
 
                             <c:otherwise>
                                 | UNKNOWN "${parameter.type}" TYPE |

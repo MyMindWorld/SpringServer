@@ -63,6 +63,9 @@ public class MainPageController {
         modelAndView.addObject("username",req.getRemoteUser());
         modelAndView.addObject("list", scriptList);
         modelAndView.addObject("groups", groupsList);
+        if (appVersion.equals("@project.version@")){
+            appVersion = getClass().getPackage().getImplementationVersion();
+        }
         modelAndView.addObject("AppVersion", appVersion);
 
         return modelAndView;

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.passay.CharacterData;
 import org.passay.CharacterRule;
@@ -15,10 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.core.io.support.ResourcePatternUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -28,6 +24,7 @@ import ru.protei.scriptServer.model.Parameters;
 import ru.protei.scriptServer.model.Script;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -357,24 +354,27 @@ public class Utils {
         return password;
     }
 
-    public String[] createParamsString(Script script, Map<String, String[]> requestParamsMap) {
+    public String[] createParamsString(Script script, Map<String, String[]> requestParamsMap, HttpServletRequest req) {
         Map<String, String[]> params = new HashMap<>(requestParamsMap); // Duplicating original map, due to map lock
         params.remove("scriptName"); // Key containing script name
         // todo refactor to array mb?
         // todo нужна ли здесь валидация
         Parameters[] parametersKeys = stringToListOfParams(script.getParametersJson());
         ArrayList<String> resultArray = new ArrayList<String>();
-        for (Parameters paramKey : parametersKeys) { // сбор констант
-            if (paramKey.constant) {
-//                if (paramKey.values) // продумать как назвать параметр для скрипта в конфиге
+        for (Parameters paramKey : parametersKeys) {
+            if (paramKey.isConstant()) {
                 if (params.get(paramKey) == null) {
                     continue;
                 }
                 resultArray.add(paramKey.getParam());
                 resultArray.add(paramKey.getDefaultConstant());
             }
+            if (paramKey.getType().equals("username")){
+                resultArray.add(paramKey.getParam());
+                resultArray.add(req.getRemoteUser());
+            }
         }
-        for (String paramKey : params.keySet()) { // сбор констант
+        for (String paramKey : params.keySet()) {
             String[] paramValueArray = params.get(paramKey);
             String paramValue = String.join("; ", paramValueArray);
             if (paramValue == null) {
@@ -383,15 +383,6 @@ public class Utils {
                 resultArray.add(paramKey);
                 resultArray.add(paramValue);
             }
-//                resultArray.add(paramValue.get(0));
-//            if (paramValue.size()==1){
-//                resultArray.add(paramKey);
-//                resultArray.add(paramValue.get(0));
-//            }
-//            else {
-//                resultArray.add(paramKey);
-//                resultArray.add(StringUtils.join(paramValue, " "));
-//            }
         }
         String[] resultString = new String[resultArray.size()];
         for (int i = 0; i < resultArray.size(); i++) {

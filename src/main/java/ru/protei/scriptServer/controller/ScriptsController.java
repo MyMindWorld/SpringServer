@@ -132,7 +132,7 @@ public class ScriptsController {
             }
         }
 
-        String[] resultRunString = utils.createParamsString(script, allRequestParams);
+        String[] resultRunString = utils.createParamsString(script, allRequestParams,req);
         logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "Run script '" + script.getName() + "'", Arrays.toString(resultRunString));
         logger.info("Created string : " + Arrays.toString(resultRunString));
         new Thread(() -> {

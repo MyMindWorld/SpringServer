@@ -54,3 +54,14 @@ defaultVenvName=defaultVenv
 # Название файла с дефолтными requirements для дефолтного venv, файл должен находиться в одной директории с файлами конфигурации
 defaultVenvRequirementsFileName=defaultVenvRequirements.txt
 ```
+
+## Troubleshooting
+
+
+1. Если при создании венв вылезает следующая ошибка :
+    ```commandline
+       Error: Command '/bin/python3', '-Im', 'ensurepip', '--upgrade', '--default-pip']' returned non-zero exit status 1.
+    ``` 
+   Проверьте что вы корректно установили python, а именно python3-distutils,python3-setuptools и python3-venv
+   
+   

@@ -148,7 +148,7 @@ public class Utils {
 
     public String[] getArgsForRequirementsInstall(File requirementsFile, String venvName) {
         if (SystemUtils.IS_OS_LINUX) {
-            return new String[]{tomcatPath + scriptServerResourcesPath + venvPath + "/" + venvName + "/bin/python3", "-m", "pip", "install", "-r", requirementsFile.getAbsolutePath()};
+            return new String[]{tomcatPath + scriptServerResourcesPath + venvPath + "/" + venvName + "/bin/python3", "-m", "pip3", "install", "-r", requirementsFile.getAbsolutePath()};
         } else {
             return new String[]{"cmd", "/c", "activate.bat", "&&", "pip", "install", "-r", requirementsFile.getAbsolutePath()};
         }
@@ -393,8 +393,10 @@ public class Utils {
             }
             if (paramKey.getType().equals("boolean")) {
                 // From ui key is received only if boolean == True, but argParser doesn't need value, only key presence
-                params.replace(paramKey.getParam(), new String[]{""});
-                resultArray.add(paramKey.getParam());
+                if (params.get(paramKey.getParam()) != new String[]{}){ // checking that we received value
+                    resultArray.add(paramKey.getParam()); // adding key to result string
+                    params.remove(paramKey.getParam()); // removing param for future iteration
+                }
             }
         }
         for (String paramKey : params.keySet()) {

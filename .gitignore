@@ -5,3 +5,6 @@
 /src/main/webapp/ScriptsConfig/venvDir/
 /logs/ScriptServer/
 /src/main/webapp/ScriptsConfig/gitReposSource/
+/src/main/webapp/ScriptsConfig/config/
+/src/main/webapp/ScriptsConfig/requirements/
+/src/main/webapp/ScriptsConfig/scripts/

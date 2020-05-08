@@ -6,15 +6,11 @@ import lombok.SneakyThrows;
 import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.InvalidRemoteException;
-import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.lib.ProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import ru.protei.scriptServer.controller.ScriptWebSocketController;
 import ru.protei.scriptServer.model.*;
@@ -73,7 +69,10 @@ public class ScriptsService {
         }
 
         for (File config : configs) {
-
+            if (config.isDirectory()) {
+                continue;
+            }
+            logger.info("Parsing '" + config.getName() + "','" + config.getAbsolutePath());
             Script script = new Script();
             try {
 
@@ -113,8 +112,11 @@ public class ScriptsService {
             return null;
         }
         for (File config : configs) {
-            try {
+            if (config.isDirectory()) {
+                continue;
+            }
 
+            try {
                 JsonScript jsonScript = utils.parseJsonToObject(FileUtils.openInputStream(config));
                 if ((jsonScript.name.equals(script.getName()))) {
                     script.setGroup_name(jsonScript.group);
@@ -208,12 +210,19 @@ public class ScriptsService {
                                 continue;
                             }
                             try {
-                                FileUtils.moveFileToDirectory(scriptsFile, utils.getScriptsDirectory(), true);
+                                if (scriptsFile.isDirectory()) {
+                                    FileUtils.moveDirectoryToDirectory(scriptsFile, utils.getScriptsDirectory(), true);
+                                } else {
+                                    FileUtils.moveFileToDirectory(scriptsFile, utils.getScriptsDirectory(), true);
+                                }
                             } catch (FileExistsException e) {
                                 logger.error("scriptsFile '" + scriptsFile.getName() + "' already exists! Overwriting.");
                                 FileUtils.forceDelete(new File(utils.getScriptsDirectory().toString() + "/" + scriptsFile.getName()));
-                                FileUtils.moveFileToDirectory(scriptsFile, utils.getScriptsDirectory(), true);
-
+                                if (scriptsFile.isDirectory()) {
+                                    FileUtils.moveDirectoryToDirectory(scriptsFile, utils.getScriptsDirectory(), true);
+                                } else {
+                                    FileUtils.moveFileToDirectory(scriptsFile, utils.getScriptsDirectory(), true);
+                                }
                             }
 
                         }
@@ -224,11 +233,19 @@ public class ScriptsService {
                                 continue;
                             }
                             try {
-                                FileUtils.moveFileToDirectory(configFile, utils.getConfigDirectory(), true);
+                                if (configFile.isDirectory()) {
+                                    FileUtils.moveDirectoryToDirectory(configFile, utils.getConfigDirectory(), true);
+                                } else {
+                                    FileUtils.moveFileToDirectory(configFile, utils.getConfigDirectory(), true);
+                                }
                             } catch (FileExistsException e) {
                                 logger.error("configFile '" + configFile.getName() + "' already exists! Overwriting.");
                                 FileUtils.forceDelete(new File(utils.getConfigDirectory().toString() + "/" + configFile.getName()));
-                                FileUtils.moveFileToDirectory(configFile, utils.getConfigDirectory(), true);
+                                if (configFile.isDirectory()) {
+                                    FileUtils.moveDirectoryToDirectory(configFile, utils.getConfigDirectory(), true);
+                                } else {
+                                    FileUtils.moveFileToDirectory(configFile, utils.getConfigDirectory(), true);
+                                }
                             }
                         }
                     }
@@ -238,11 +255,19 @@ public class ScriptsService {
                                 continue;
                             }
                             try {
-                                FileUtils.moveFileToDirectory(requirementFile, utils.getRequirementsDirectory(), true);
+                                if (requirementFile.isDirectory()) {
+                                    FileUtils.moveDirectoryToDirectory(requirementFile, utils.getRequirementsDirectory(), true);
+                                } else {
+                                    FileUtils.moveFileToDirectory(requirementFile, utils.getRequirementsDirectory(), true);
+                                }
                             } catch (FileExistsException e) {
                                 logger.error("requirementFile '" + requirementFile.getName() + "' already exists! Overwriting.");
                                 FileUtils.forceDelete(new File(utils.getRequirementsDirectory().toString() + "/" + requirementFile.getName()));
-                                FileUtils.moveFileToDirectory(requirementFile, utils.getRequirementsDirectory(), true);
+                                if (requirementFile.isDirectory()) {
+                                    FileUtils.moveDirectoryToDirectory(requirementFile, utils.getRequirementsDirectory(), true);
+                                } else {
+                                    FileUtils.moveFileToDirectory(requirementFile, utils.getRequirementsDirectory(), true);
+                                }
                             }
                         }
                     }
@@ -252,8 +277,6 @@ public class ScriptsService {
             logger.error("Git is unavailable! Can't update scripts from git");
             return;
         }
-
-
     }
 
 

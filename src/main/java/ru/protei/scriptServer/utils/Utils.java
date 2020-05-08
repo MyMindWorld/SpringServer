@@ -112,6 +112,10 @@ public class Utils {
         return new File(tomcatPath + scriptServerResourcesPath + configPath + "/");
     }
 
+    public File getScriptServerResourcesPath() {
+        return new File(tomcatPath + scriptServerResourcesPath + "/");
+    }
+
     @SneakyThrows
     public File getFolderForScriptFromGit(String scriptsRepoName) {
         File scriptFolder = new File(tomcatPath + scriptServerResourcesPath + repoFromGitDownlPath + "/" + scriptsRepoName + "/");
@@ -229,17 +233,27 @@ public class Utils {
     public String createResultsSelect2Json(ArrayList<String> scriptResults, Parameters param, String search) {
         ResultToSelect resultObject = new ResultToSelect();
         int resultIndex = 0;
-        ResultToSelect.Items[] itemsResult = new ResultToSelect.Items[scriptResults.size() + param.values.length];
-        for (String result : scriptResults) {
-            resultIndex = scriptResults.indexOf(result);
-            ResultToSelect.Items itemResult = new ResultToSelect.Items(result, result);
-            itemsResult[resultIndex] = itemResult;
-        }
-        int defaultParamIndex = resultIndex;
-        for (String defaultParam : param.values) {
-            defaultParamIndex++;
-            ResultToSelect.Items itemResult = new ResultToSelect.Items(defaultParam, defaultParam);
-            itemsResult[defaultParamIndex] = itemResult;
+        ResultToSelect.Items[] itemsResult;
+        if (param.getValues() != null) { // Other params might be not initialized
+            itemsResult = new ResultToSelect.Items[scriptResults.size() + param.getValues().length];
+            for (String result : scriptResults) {
+                resultIndex = scriptResults.indexOf(result);
+                ResultToSelect.Items itemResult = new ResultToSelect.Items(result, result);
+                itemsResult[resultIndex] = itemResult;
+            }
+            int defaultParamIndex = resultIndex;
+            for (String defaultParam : param.values) {
+                defaultParamIndex++;
+                ResultToSelect.Items itemResult = new ResultToSelect.Items(defaultParam, defaultParam);
+                itemsResult[defaultParamIndex] = itemResult;
+            }
+        } else {
+            itemsResult = new ResultToSelect.Items[scriptResults.size()];
+            for (String result : scriptResults) {
+                resultIndex = scriptResults.indexOf(result);
+                ResultToSelect.Items itemResult = new ResultToSelect.Items(result, result);
+                itemsResult[resultIndex] = itemResult;
+            }
         }
         // Filter results by search query from select
         List<ResultToSelect.Items> result =
@@ -369,17 +383,29 @@ public class Utils {
                 resultArray.add(paramKey.getParam());
                 resultArray.add(paramKey.getDefaultConstant());
             }
-            if (paramKey.getType().equals("username")){
+            if (paramKey.getType().equals("username")) {
                 resultArray.add(paramKey.getParam());
                 resultArray.add(req.getRemoteUser());
+            }
+            if (paramKey.getType().equals("hidden")) {
+                resultArray.add(paramKey.getParam());
+                resultArray.add(paramKey.getDefaultConstant());
+            }
+            if (paramKey.getType().equals("boolean")) {
+                // From ui key is received only if boolean == True, but argParser doesn't need value, only key presence
+                params.replace(paramKey.getParam(), new String[]{""});
+                resultArray.add(paramKey.getParam());
             }
         }
         for (String paramKey : params.keySet()) {
             String[] paramValueArray = params.get(paramKey);
             String paramValue = String.join("; ", paramValueArray);
-            if (paramValue == null) {
+            if (paramValue.isEmpty()) { // Пропускаем username,hidden,constant
+                logger.debug("Skipping not presented param '" + paramKey + "'");
                 continue;
             } else {
+                logger.debug("Adding to result key '" + paramKey + "'");
+                logger.debug("Adding to result value '" + paramValue + "'");
                 resultArray.add(paramKey);
                 resultArray.add(paramValue);
             }

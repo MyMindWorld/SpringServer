@@ -72,9 +72,9 @@ public class PythonScriptsRunner extends Thread {
             logger.info("READING START");
             // 2 print the output
             InputStream is = p.getInputStream();
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            BufferedReader br = new BufferedReader(new InputStreamReader(is, "windows-1251"));
             InputStream eis = p.getErrorStream();
-            BufferedReader ebr = new BufferedReader(new InputStreamReader(eis));
+            BufferedReader ebr = new BufferedReader(new InputStreamReader(eis, "windows-1251"));
             PrintWriter stdin = new PrintWriter(p.getOutputStream());
             String lineStdout = null;
             String lineStderr = null;
@@ -92,8 +92,6 @@ public class PythonScriptsRunner extends Thread {
                             scriptWebSocketController.sendToSockFromScript(username, lineStdout, script.getName(), uniqueSessionId);
                             linesSoFarStdout.add(lineStdout);
                         }
-                    } else {
-                        logger.info("NOTHING");
                     }
                     if (lineStderr != null) {
                         logger.error(lineStderr);

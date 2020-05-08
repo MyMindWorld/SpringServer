@@ -50,13 +50,13 @@ public class ScriptWebSocketController {
     }
 
     public void sendToSock(Message message) {
-        logger.info("Sending message to socket : " + message.toString());
+        logger.debug("Sending message to socket : " + message.toString());
         this.simpMessagingTemplate.convertAndSendToUser(message.getAddressedTo(), "/reply/" + message.getScriptName(), message);
     }
     // TODO refactor to one method
     public void sendToSock(Message message, String uniqueSessionId) {
         message.setUniqueSessionId(uniqueSessionId);
-        logger.info("Sending message to socket : " + message.toString() + " and sessionId " + uniqueSessionId);
+        logger.debug("Sending message to socket : " + message.toString() + " and sessionId " + uniqueSessionId);
         this.simpMessagingTemplate.convertAndSendToUser(message.getAddressedTo(), "/reply/" + message.getScriptName(), message, createHeaders(uniqueSessionId));
     }
 
@@ -104,7 +104,7 @@ public class ScriptWebSocketController {
 
     public void sendToSockFromUser(Message message) {
         message.setTime(new SimpleDateFormat("HH:mm:ss:SSS").format(new Date()));
-        logger.info("SENDING MESSAGE sendToSock STRING " + message);
+        logger.debug("SENDING MESSAGE sendToSock STRING " + message);
         this.simpMessagingTemplate.convertAndSendToUser(message.getUsername(), "/reply/" + message.getScriptName(), message, createHeaders(message.getUniqueSessionId()));
     }
 
@@ -118,7 +118,7 @@ public class ScriptWebSocketController {
     @MessageMapping("/scriptsSocket")
     public void sendReceivedMessageToWS(Message message) {
         // here message from user is received
-        logger.info("SENDING MESSAGE sendReceivedMessageToWS  " + message.getText());
+        logger.debug("SENDING MESSAGE sendReceivedMessageToWS  " + message.getText());
         queueConfig.blockingQueue().add(message);
         sendToSockFromUser(message);
     }

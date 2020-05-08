@@ -30,6 +30,7 @@
     <script type="text/javascript">
         let stompClient = null;
         let sessionId = null;
+        let color = "black";
         const connectionName =  '<c:out value="${username}"></c:out>'
         // var scriptFormData = new FormData();
         // var test = document.getElementsByName("commandParams")
@@ -50,6 +51,11 @@
         }
 
         function connect(scriptName) {
+            if (!document.forms[0].checkValidity()){
+                document.forms[0].reportValidity();
+                return;
+            }
+
             document.getElementById('response').innerHTML = '';
             const socket = new SockJS('/ScriptServer/scriptsSocket');
             stompClient = Stomp.over(socket);
@@ -93,6 +99,9 @@
         }
 
         function showMessageOutput(messageOutput) {
+            messageOutput.text = messageOutput.text.replace("DEBUG:" + '${script.script_path}' + ":","") // Логгер из сообщения
+            messageOutput.text = messageOutput.text.replace("INFO:" + '${script.script_path}' + ":","")
+            messageOutput.text = messageOutput.text.replace("WARNING:" + '${script.script_path}' + ":","")
             // Тут можно будет менять цвет и стиль сообщений, в зависимости от адреса или содержимого
             if (messageOutput.modalType != null) {
                 parseModalMessage(messageOutput)
@@ -102,6 +111,28 @@
             }
             const response = document.getElementById('response');
             const p = document.createElement('p');
+            console.log(messageOutput.text)
+            if (messageOutput.text.includes("\u001B[34m")){ // Debug
+                color="darkblue" // set all received messages color to blue, until default color received
+                messageOutput.text = messageOutput.text.replace("\u001B[34m","")
+            }
+            if (messageOutput.text.includes("\u001B[32m")){ // Info
+                color="black"
+                messageOutput.text = messageOutput.text.replace("\u001B[32m","")
+            }
+            if (messageOutput.text.includes("\u001B[31m")){ // Err
+                color="red"
+                messageOutput.text = messageOutput.text.replace("\u001B[31m","")
+            }
+
+            p.style.color=color;
+
+            if (messageOutput.text.includes("\u001B[0m")){ // Set Default color back, after color setting because message can be completed
+                color="black"
+                messageOutput.text = messageOutput.text.replace("\u001B[0m","")
+            }
+
+
             p.style.wordWrap = 'break-word';
             p.appendChild(document.createTextNode(
                 messageOutput.time + " " + messageOutput.username + ": " + messageOutput.text));

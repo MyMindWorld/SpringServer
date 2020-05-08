@@ -160,7 +160,6 @@ public class Utils {
         } else {
             return new String[]{tomcatPath + scriptServerResourcesPath + venvPath + "/" + venvName + "/Scripts/python.exe ", "-u", scriptPath};
         }
-
     }
 
     @SneakyThrows
@@ -289,6 +288,14 @@ public class Utils {
 
     }
 
+    public String getCharsetForSystem() {
+        if (SystemUtils.IS_OS_LINUX) {
+            return "utf-8";
+        } else {
+            return "windows-1251";
+        }
+    }
+
     public File[] getVenvs() {
         String venvDir = new String();
         if (SystemUtils.IS_OS_LINUX) {
@@ -393,7 +400,7 @@ public class Utils {
             }
             if (paramKey.getType().equals("boolean")) {
                 // From ui key is received only if boolean == True, but argParser doesn't need value, only key presence
-                if (params.get(paramKey.getParam()) != new String[]{}){ // checking that we received value
+                if (params.get(paramKey.getParam()) != new String[]{}) { // checking that we received value
                     resultArray.add(paramKey.getParam()); // adding key to result string
                     params.remove(paramKey.getParam()); // removing param for future iteration
                 }

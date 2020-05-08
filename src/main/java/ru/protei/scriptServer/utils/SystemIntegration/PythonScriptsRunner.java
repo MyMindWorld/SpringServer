@@ -72,9 +72,9 @@ public class PythonScriptsRunner extends Thread {
             logger.info("READING START");
             // 2 print the output
             InputStream is = p.getInputStream();
-            BufferedReader br = new BufferedReader(new InputStreamReader(is, "windows-1251"));
+            BufferedReader br = new BufferedReader(new InputStreamReader(is, utils.getCharsetForSystem()));
             InputStream eis = p.getErrorStream();
-            BufferedReader ebr = new BufferedReader(new InputStreamReader(eis, "windows-1251"));
+            BufferedReader ebr = new BufferedReader(new InputStreamReader(eis, utils.getCharsetForSystem()));
             PrintWriter stdin = new PrintWriter(p.getOutputStream());
             String lineStdout = null;
             String lineStderr = null;

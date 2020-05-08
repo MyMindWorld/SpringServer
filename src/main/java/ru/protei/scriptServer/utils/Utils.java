@@ -148,7 +148,7 @@ public class Utils {
 
     public String[] getArgsForRequirementsInstall(File requirementsFile, String venvName) {
         if (SystemUtils.IS_OS_LINUX) {
-            return new String[]{tomcatPath + scriptServerResourcesPath + venvPath + "/" + venvName + "/bin/python3", "-m", "pip3", "install", "-r", requirementsFile.getAbsolutePath()};
+            return new String[]{tomcatPath + scriptServerResourcesPath + venvPath + "/" + venvName + "/bin/python3", "-m", "pip", "install", "-r", requirementsFile.getAbsolutePath()};
         } else {
             return new String[]{"cmd", "/c", "activate.bat", "&&", "pip", "install", "-r", requirementsFile.getAbsolutePath()};
         }

@@ -170,6 +170,7 @@ public class ScriptsController {
                 thread.interrupt();
                 while (thread.isAlive()){
                     Thread.sleep(1000);
+                    thread.interrupt();
                     logger.info("Killing still going...");
                 }
                 logger.info("Thread was killed!");

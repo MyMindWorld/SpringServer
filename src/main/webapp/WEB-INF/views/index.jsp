@@ -25,33 +25,24 @@
     <script src="<c:url value="/vendor/jquery/jquery-2.1.3.min.js"/>"></script>
     <script src="<c:url value="/vendor/select2/select2.min.js"/>"></script>
     <link rel="stylesheet" type="text/css" href="<c:url value="/vendor/select2/select2.min.css"/>">
-    <script src="<c:url value="/vendor/sockjs/sockjs.js"/>"></script>
-    <script src="<c:url value="/vendor/stomp/stomp.js"/>"></script>
     <script type="text/javascript">
         let stompClient = null;
         let sessionId = null;
         let color = "black";
-        const connectionName =  '<c:out value="${username}"></c:out>'
-        // var scriptFormData = new FormData();
-        // var test = document.getElementsByName("commandParams")
+        let isConnected = false;
+        const connectionName = '<c:out value="${username}"></c:out>'
         const $form = $("#ScriptForm");
         const data = getFormData($form);
 
-        // function buildPostData(count) {
-        //     for (let element in count) {
-        //         scriptFormData.append('username', '');
-        //     }
-        //
-        //
-        // }
-
         function setConnected(connected) {
+            isConnected = connected;
             document.getElementById('runScriptButton').disabled = connected;
             document.getElementById('disconnect').disabled = !connected;
+            document.getElementById('disconnect').textContent = "Stop script";
         }
 
         function connect(scriptName) {
-            if (!document.forms[0].checkValidity()){
+            if (!document.forms[0].checkValidity()) {
                 document.forms[0].reportValidity();
                 return;
             }
@@ -99,37 +90,35 @@
         }
 
         function showMessageOutput(messageOutput) {
-            messageOutput.text = messageOutput.text.replace("DEBUG:" + '${script.script_path}' + ":","") // Логгер из сообщения
-            messageOutput.text = messageOutput.text.replace("INFO:" + '${script.script_path}' + ":","")
-            messageOutput.text = messageOutput.text.replace("WARNING:" + '${script.script_path}' + ":","")
+            messageOutput.text = messageOutput.text.replace('"[" + ${script.script_path}' + ".INFO]", "") // removing default script info logging message
             // Тут можно будет менять цвет и стиль сообщений, в зависимости от адреса или содержимого
             if (messageOutput.modalType != null) {
                 parseModalMessage(messageOutput)
                 return
             } else if (messageOutput.serviceMessage === "Stopped") {
-                disconnect()
+                // disconnect()
             }
             const response = document.getElementById('response');
             const p = document.createElement('p');
             console.log(messageOutput.text)
-            if (messageOutput.text.includes("\u001B[34m")){ // Debug
-                color="darkblue" // set all received messages color to blue, until default color received
-                messageOutput.text = messageOutput.text.replace("\u001B[34m","")
+            if (messageOutput.text.includes("\u001B[34m")) { // Debug
+                color = "darkblue" // set all received messages color to blue, until default color received
+                messageOutput.text = messageOutput.text.replace("\u001B[34m", "")
             }
-            if (messageOutput.text.includes("\u001B[32m")){ // Info
-                color="black"
-                messageOutput.text = messageOutput.text.replace("\u001B[32m","")
+            if (messageOutput.text.includes("\u001B[32m")) { // Info
+                color = "black"
+                messageOutput.text = messageOutput.text.replace("\u001B[32m", "")
             }
-            if (messageOutput.text.includes("\u001B[31m")){ // Err
-                color="red"
-                messageOutput.text = messageOutput.text.replace("\u001B[31m","")
+            if (messageOutput.text.includes("\u001B[31m")) { // Err
+                color = "red"
+                messageOutput.text = messageOutput.text.replace("\u001B[31m", "")
             }
 
-            p.style.color=color;
+            p.style.color = color;
 
-            if (messageOutput.text.includes("\u001B[0m")){ // Set Default color back, after color setting because message can be completed
-                color="black"
-                messageOutput.text = messageOutput.text.replace("\u001B[0m","")
+            if (messageOutput.text.includes("\u001B[0m")) { // Set Default color back, after color setting because message can be completed
+                color = "black"
+                messageOutput.text = messageOutput.text.replace("\u001B[0m", "")
             }
 
 
@@ -193,6 +182,8 @@
         }
 
         function killScript(sessionId) {
+            document.getElementById('disconnect').disabled = true;
+            document.getElementById('disconnect').textContent = "Stopping...";
             $.ajax({
                 dataType: "json",
                 method: "POST",
@@ -201,12 +192,18 @@
                 headers: {
                     'sessionId': sessionId
                 },
-                // data: data,
-                success: function (data) {
+                success: function () {
                     console.log("SUCCESS!");
-                    console.log(data)
+                    disconnect()
                 },
-                error: function (data) {
+                error: function (jqXHR, exception) {
+                    if (jqXHR.status == 200){
+                        console.log("Script was stopped successfully.")
+                        disconnect()
+                        return
+                    }
+                    console.log(jqXHR.status)
+                    console.log(exception)
                     console.log('ERROR OCCURRED! message send : ' + data.toString());
                 }
 
@@ -214,22 +211,28 @@
             return false;
         }
 
-        const out = document.getElementById("output")
+
         let c = 0
 
         setInterval(function () {
+            if (isConnected == false){
+                return
+            }
+            const out = document.getElementById("output")
             // allow 1px inaccuracy by adding 1
             const isScrolledToBottom = out.scrollHeight - out.clientHeight <= out.scrollTop + 1
             // scroll to bottom if isScrolledToBottom is true
-            if (isScrolledToBottom) {
+            if (!isScrolledToBottom) {
                 out.scrollTop = out.scrollHeight - out.clientHeight
             }
-        }, 500)
+        }, 100)
 
         function format() {
             return Array.prototype.slice.call(arguments).join(' ')
         }
     </script>
+    <script src="<c:url value="/vendor/sockjs/sockjs.js"/>"></script>
+    <script src="<c:url value="/vendor/stomp/stomp.js"/>"></script>
 </head>
 <body>
 
@@ -237,8 +240,10 @@
     <ul>
         <li>
             <sec:authorize access="!hasAuthority('ADMIN_PAGE_USAGE')">
-                <a class='logo' href='<c:url value="/profile"/>'>
-                    <i class="fas fa-user fa-2x" style="color: white;"></i>
+                <a class='logo'
+                    <%--                   href='<c:url value="/profile"--%>
+                />'>
+                <i class="fas fa-user fa-2x" style="color: white;"></i>
                 </a>
             </sec:authorize>
             <sec:authorize access="hasAuthority('ADMIN_PAGE_USAGE')">

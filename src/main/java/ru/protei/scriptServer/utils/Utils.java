@@ -117,10 +117,16 @@ public class Utils {
     }
 
     @SneakyThrows
-    public File getFolderForScriptFromGit(String scriptsRepoName) {
+    public File getFolderForScriptsFromGit(String scriptsRepoName) {
         File scriptFolder = new File(tomcatPath + scriptServerResourcesPath + repoFromGitDownlPath + "/" + scriptsRepoName + "/");
         if (scriptFolder.exists()) {
-            FileUtils.deleteDirectory(scriptFolder);
+            try {
+                FileUtils.deleteDirectory(scriptFolder);
+            }catch (IOException e){
+                logger.error("Error during removing directory for scripts from '" + scriptsRepoName + "'");
+                logger.error(e.getMessage());
+            }
+
         }
         scriptFolder.mkdir();
         return scriptFolder;
@@ -400,7 +406,8 @@ public class Utils {
             }
             if (paramKey.getType().equals("boolean")) {
                 // From ui key is received only if boolean == True, but argParser doesn't need value, only key presence
-                if (params.get(paramKey.getParam()) != new String[]{}) { // checking that we received value
+                if (params.get(paramKey.getParam()) != null) { // checking that we received values
+                    logger.debug("Adding boolean param '" + paramKey.getParam() + "' to results, cause it's value was : '" + params.get(paramKey.getParam())[0] + "'");
                     resultArray.add(paramKey.getParam()); // adding key to result string
                     params.remove(paramKey.getParam()); // removing param for future iteration
                 }

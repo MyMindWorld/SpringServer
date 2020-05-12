@@ -195,7 +195,7 @@ public class ScriptsService {
                             .extract()
                             .as(GitlabGroupsAnswer[].class);
             for (GitlabGroupsAnswer repository : response) {
-                File repoFolder = utils.getFolderForScriptFromGit(repository.name);
+                File repoFolder = utils.getFolderForScriptsFromGit(repository.name);
                 Git.cloneRepository()
                         .setURI(repository.httpUrlToRepo)
                         .setDirectory(repoFolder)

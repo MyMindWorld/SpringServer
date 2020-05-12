@@ -119,7 +119,11 @@ public class ScriptWebSocketController {
     public void sendReceivedMessageToWS(Message message) {
         // here message from user is received
         logger.debug("SENDING MESSAGE sendReceivedMessageToWS  " + message.getText());
-        queueConfig.blockingQueue().add(message);
+        try {
+            queueConfig.blockingQueue().put(message);
+        } catch (InterruptedException e) {
+            logger.error("PUT MESSAGE TO QUEUE FAILED");
+        }
         sendToSockFromUser(message);
     }
 

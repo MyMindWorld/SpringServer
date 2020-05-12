@@ -11,7 +11,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import ru.protei.scriptServer.config.ProcessQueueConfig;
 import ru.protei.scriptServer.model.*;
+import ru.protei.scriptServer.model.Enums.ServiceMessage;
 import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.service.LogService;
 import ru.protei.scriptServer.service.ScriptsService;
@@ -44,6 +46,8 @@ public class ScriptsController {
     ScriptWebSocketController scriptWebSocketController;
     @Autowired
     DynamicParamsScriptsRunner dynamicParamsScriptsRunner;
+    @Autowired
+    ProcessQueueConfig processQueueConfig;
 
     @RequestMapping("/admin/scripts")
     public ModelAndView scriptsPage() {
@@ -100,7 +104,7 @@ public class ScriptsController {
     @SneakyThrows
     @RequestMapping(value = "/scripts/run_script", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity runScript(@RequestHeader(name = "sessionId")String uniqueSessionId, String scriptName, HttpServletRequest req, HttpServletResponse response) {
+    public ResponseEntity runScript(@RequestHeader(name = "sessionId") String uniqueSessionId, String scriptName, HttpServletRequest req, HttpServletResponse response) {
         Map<String, String[]> allRequestParams = req.getParameterMap();
         Script script = scriptRepository.findByNameEquals(scriptName);
         if (script == null) {
@@ -123,16 +127,16 @@ public class ScriptsController {
 
         }
         if (allRequestParams.size() == 0) {
-            scriptWebSocketController.sendToSockFromServer(principal.getUsername(), "Parameters could not be empty! Or should they...", script.getName(),uniqueSessionId);
+            scriptWebSocketController.sendToSockFromServer(principal.getUsername(), "Parameters could not be empty! Or should they...", script.getName(), uniqueSessionId);
         }
         if (script.getVenv() == null) {
-            scriptWebSocketController.sendToSockFromServer(principal.getUsername(), "Using default venv. It's HIGHLY recommended not doing this. Please, specify unique venv name and requirements file", script.getName(),uniqueSessionId);
+            scriptWebSocketController.sendToSockFromServer(principal.getUsername(), "Using default venv. It's HIGHLY recommended not doing this. Please, specify unique venv name and requirements file", script.getName(), uniqueSessionId);
             if (script.getRequirements() != null) {
-                scriptWebSocketController.sendToSockFromServer(principal.getUsername(), "Adding requirements to default venv is forbidden! Please use custom venv for this case!", script.getName(),uniqueSessionId);
+                scriptWebSocketController.sendToSockFromServer(principal.getUsername(), "Adding requirements to default venv is forbidden! Please use custom venv for this case!", script.getName(), uniqueSessionId);
             }
         }
 
-        String[] resultRunString = utils.createParamsString(script, allRequestParams,req);
+        String[] resultRunString = utils.createParamsString(script, allRequestParams, req);
         logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "Run script '" + script.getName() + "'", Arrays.toString(resultRunString));
         logger.info("Created string : " + Arrays.toString(resultRunString));
         new Thread(() -> {
@@ -144,7 +148,7 @@ public class ScriptsController {
     @SneakyThrows
     @RequestMapping(value = "/scripts/kill_script", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity killScript(@RequestHeader(name = "sessionId")String uniqueSessionId,String scriptName, HttpServletRequest req) {
+    public ResponseEntity killScript(@RequestHeader(name = "sessionId") String uniqueSessionId, String scriptName, HttpServletRequest req) {
         Map<String, String[]> allRequestParams = req.getParameterMap();
         Script script = scriptRepository.findByNameEquals(scriptName);
         if (script == null) {
@@ -158,25 +162,65 @@ public class ScriptsController {
             return new ResponseEntity(HttpStatus.FORBIDDEN);
         }
         String expectedThreadName = uniqueSessionId + "_" + script.getName() + "-" + req.getRemoteUser();
-        logger.info("Getting all threads");
+        logger.info("Getting all threads for interrupting");
+        Thread threadWithProcess = null;
         Set<Thread> setOfThread = Thread.getAllStackTraces().keySet();
-        for(Thread thread : setOfThread){
-            if(thread.getName().equals(expectedThreadName)){
-                logger.info("Thread to kill was found");
-                thread.interrupt();
-                while (thread.isAlive()){
-                    Thread.sleep(1000);
-                    thread.interrupt();
-                    logger.info("Killing still going...");
-                }
-                logger.info("Thread was killed!");
-                return new ResponseEntity(HttpStatus.OK);
+        for (Thread thread : setOfThread) {
+            if (thread.getName().equals(expectedThreadName)) {
+                threadWithProcess = thread;
+                threadWithProcess.interrupt();
+                logger.info("Thread was found and interrupted");
             }
         }
-        logger.error("Thread '" + expectedThreadName + "' was not found!");
-        return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        if (threadWithProcess == null){
+            logger.error("Process was not found!");
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
+        String expectedProcessNameInMap = uniqueSessionId + "_" + script.getName() + "-" + req.getRemoteUser();
+        Process scriptProcess = null;
+        HashMap<String, Process> processMap = new HashMap<>();
 
+        for(HashMap<String,Process> mapFromQueue : processQueueConfig.processBlockingQueue()){
+            String procName = (String) mapFromQueue.keySet().toArray()[0];
+            processMap.put(procName,mapFromQueue.get(procName));
+        }
+        for (String procName : processMap.keySet()){
+            if (procName.equals(expectedProcessNameInMap)){
+                scriptProcess = processMap.get(procName);
+                logger.info("Process to kill found!");
+                break;
+            }
+        }
+        if (scriptProcess == null || scriptProcess == null){
+            scriptWebSocketController.sendToSockFromServer(req.getRemoteUser(), "Process wasn't spawned, killing was initiated before.", scriptName, uniqueSessionId);
+            while (threadWithProcess.isAlive()){
+                threadWithProcess.interrupt();
+            }
+            return new ResponseEntity(HttpStatus.OK);
+        }
+        killProcess(scriptProcess,req.getRemoteUser(),scriptName,uniqueSessionId);
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @SneakyThrows
+    public void killProcess(Process p,String username, String scriptName, String uniqueSessionId) {
+        logger.info("Process is destroying!");
+        p.waitFor();
+        scriptWebSocketController.sendToSockFromServer(username, "Stop process message received", scriptName, uniqueSessionId);
+        Integer stopSecs = 0;
+        while (p.isAlive()) {
+            Thread.sleep(1000);
+            stopSecs += 1;
+            scriptWebSocketController.sendToSockFromServer(username, String.format("Process is stopping %d second(s) already", stopSecs), scriptName, uniqueSessionId);
+            if (stopSecs > 10) {
+                p.destroyForcibly();
+                // Here we could ask user is it ok to kill process
+                scriptWebSocketController.sendToSockFromServerService(username, String.format("Process was stopped by force.", stopSecs), scriptName, uniqueSessionId, ServiceMessage.Stopped);
+                return;
+            }
+        }
+        scriptWebSocketController.sendToSockFromServerService(username, "Process was stopped successfully!", scriptName, uniqueSessionId, ServiceMessage.Stopped);
     }
 
 }

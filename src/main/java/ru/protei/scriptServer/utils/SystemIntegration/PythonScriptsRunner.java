@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.protei.scriptServer.config.MessageQueueConfig;
+import ru.protei.scriptServer.config.ProcessQueueConfig;
 import ru.protei.scriptServer.controller.ScriptWebSocketController;
 import ru.protei.scriptServer.model.Enums.ModalType;
 import ru.protei.scriptServer.model.Enums.ServiceMessage;
@@ -16,6 +17,7 @@ import ru.protei.scriptServer.utils.Utils;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,6 +31,8 @@ public class PythonScriptsRunner extends Thread {
     ScriptWebSocketController scriptWebSocketController;
     @Autowired
     MessageQueueConfig queueConfig;
+    @Autowired
+    ProcessQueueConfig processQueueConfig;
 
     public ArrayList<String> linesSoFarStdout = new ArrayList<>();
     public ArrayList<String> linesSoFarStderr = new ArrayList<>();
@@ -37,9 +41,16 @@ public class PythonScriptsRunner extends Thread {
     public Pattern userInputFlagPattern = Pattern.compile("##ScriptServer\\[.*]");
     public Pattern textForUserInModal = Pattern.compile("'(.*)'", Pattern.MULTILINE);
     public Pattern typeOfModal = Pattern.compile("\\[(.*?)\\'", Pattern.MULTILINE);
-    Process p = null;
+    public Process p = null;
 
+    @SneakyThrows
     public void run(String[] commandParams, File directory, boolean passCommandsAsLinesToShellExecutableAfterStartup, Script script, String venvName, String username, String uniqueSessionId) {
+        if (Thread.currentThread().isInterrupted()){
+            String msg = "Process won't start, thread was interrupted";
+            logger.info(msg);
+            scriptWebSocketController.sendToSockFromScript(username, msg, script.getName(), uniqueSessionId);
+            return;
+        }
         this.runstate = Runstate.RUNNING;
         // 1 start the process
         try {
@@ -69,7 +80,9 @@ public class PythonScriptsRunner extends Thread {
                 ProcessBuilder pb = new ProcessBuilder(execWithArgs).directory(directory);
                 p = pb.start();
             }
-            logger.info("READING START");
+            logger.info("Adding process to blocking queue");
+            processQueueConfig.processBlockingQueue().put(new HashMap<String, Process>(){{put(uniqueSessionId + "_" + script.getName() + "-" + username,p);}});
+            logger.info("Starting reading from script");
             // 2 print the output
             InputStream is = p.getInputStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(is, utils.getCharsetForSystem()));
@@ -98,10 +111,9 @@ public class PythonScriptsRunner extends Thread {
                         scriptWebSocketController.sendToSockFromScript(username, lineStderr, script.getName(), uniqueSessionId);
                         linesSoFarStderr.add(lineStderr);
                     }
-                    if (currentThread().isInterrupted()) {
-                        new Thread(() -> {
-                            killProcess(username, script.getName(), uniqueSessionId);
-                        }).start();
+                    if (currentThread().isInterrupted()){
+                        logger.info("Caught interrupt in run thread");
+                        p.destroy();
                     }
                 }
             }
@@ -117,12 +129,8 @@ public class PythonScriptsRunner extends Thread {
 
             return;
         } catch (Exception e) {
-            logger.error("INTERRUPTED");
-            if (e.getClass().equals(IOException.class)) {
-                scriptWebSocketController.sendToSockFromServerService(username, "Process ended with exception: " + e.getMessage(), script.getName(), uniqueSessionId, ServiceMessage.Stopped);
-            } else {
-                killProcess(username, script.getName(), uniqueSessionId);
-            }
+            logger.error("Exception in script run");
+            scriptWebSocketController.sendToSockFromServerService(username, "Process ended with exception: " + e.getMessage(), script.getName(), uniqueSessionId, ServiceMessage.Stopped);
             return;
         }
     }
@@ -150,39 +158,20 @@ public class PythonScriptsRunner extends Thread {
             while (!((msg = queueConfig.blockingQueue().take()).getUsername().equals(username)
                     & msg.getScriptName().equals(scriptName)
                     & msg.getUniqueSessionId().equals(uniqueSessionId))) {
+                queueConfig.blockingQueue().put(msg);
                 // todo ping if client is in script still
                 logger.debug(msg.toString());
+                if (currentThread().isInterrupted()){
+                    logger.info("Caught interrupt in waiting input thread");
+                    return null;
+                }
             }
             logger.info("Returning to script '" + msg.getText() + "'");
             return msg.getText();
         } catch (Exception e) {
-            killProcess(username, scriptName, uniqueSessionId);
+            scriptWebSocketController.sendToSockFromServerService(username, "Exception during input handling" + e.getMessage(), scriptName, uniqueSessionId, ServiceMessage.Stopped);
             return null;
         }
-    }
-
-    @SneakyThrows
-    public void killProcess(String username, String scriptName, String uniqueSessionId) {
-        logger.error("Thread is destroying!");
-        if (p == null) {
-            scriptWebSocketController.sendToSockFromServer(username, "Process wasn't spawned, killing was initiated before.", scriptName, uniqueSessionId);
-            return;
-        }
-        p.destroy();
-        scriptWebSocketController.sendToSockFromServer(username, "Stop process message received", scriptName, uniqueSessionId);
-        Integer stopSecs = 0;
-        while (p.isAlive()) {
-            Thread.sleep(1000);
-            stopSecs += 1;
-            scriptWebSocketController.sendToSockFromServer(username, String.format("Process is stopping %d second(s) already", stopSecs), scriptName, uniqueSessionId);
-            if (stopSecs > 10) {
-                p.destroyForcibly();
-                // Here we could ask user is it ok to kill process
-                scriptWebSocketController.sendToSockFromServerService(username, String.format("Process was stopped by force.", stopSecs), scriptName, uniqueSessionId, ServiceMessage.Stopped);
-                return;
-            }
-        }
-        scriptWebSocketController.sendToSockFromServerService(username, "Process was stopped successfully!", scriptName, uniqueSessionId, ServiceMessage.Stopped);
     }
 
 }

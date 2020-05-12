@@ -164,10 +164,6 @@ public class ScriptsController {
             if(thread.getName().equals(expectedThreadName)){
                 logger.info("Thread to kill was found");
                 thread.interrupt();
-                thread.interrupt();
-                thread.interrupt();
-                thread.interrupt();
-                thread.interrupt();
                 while (thread.isAlive()){
                     Thread.sleep(1000);
                     thread.interrupt();

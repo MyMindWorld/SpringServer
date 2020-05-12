@@ -99,8 +99,9 @@ public class PythonScriptsRunner extends Thread {
                         linesSoFarStderr.add(lineStderr);
                     }
                     if (currentThread().isInterrupted()) {
-                        killProcess(username, script.getName(), uniqueSessionId);
-                        return;
+                        new Thread(() -> {
+                            killProcess(username, script.getName(), uniqueSessionId);
+                        }).start();
                     }
                 }
             }
@@ -173,7 +174,7 @@ public class PythonScriptsRunner extends Thread {
         while (p.isAlive()) {
             Thread.sleep(1000);
             stopSecs += 1;
-            scriptWebSocketController.sendToSockFromServer(username, String.format("Process is stopping %d seconds already", stopSecs), scriptName, uniqueSessionId);
+            scriptWebSocketController.sendToSockFromServer(username, String.format("Process is stopping %d second(s) already", stopSecs), scriptName, uniqueSessionId);
             if (stopSecs > 10) {
                 p.destroyForcibly();
                 // Here we could ask user is it ok to kill process

@@ -12,10 +12,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ru.protei.scriptServer.config.ProcessQueueConfig;
 import ru.protei.scriptServer.controller.ScriptWebSocketController;
 import ru.protei.scriptServer.model.*;
 import ru.protei.scriptServer.model.Enums.ServiceMessage;
 import ru.protei.scriptServer.model.POJO.GitlabGroupsAnswer;
+import ru.protei.scriptServer.model.POJO.RunningScript;
 import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.repository.VenvRepository;
 import ru.protei.scriptServer.utils.SystemIntegration.PythonScriptsRunner;
@@ -24,6 +26,7 @@ import ru.protei.scriptServer.utils.Utils;
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -51,6 +54,8 @@ public class ScriptsService {
     VenvRepository venvRepository;
     @Autowired
     ScriptWebSocketController scriptWebSocketController;
+    @Autowired
+    ProcessQueueConfig processQueueConfig;
 
 
     @SneakyThrows
@@ -164,6 +169,7 @@ public class ScriptsService {
             roleService.updateRole("ROLE_ALL_SCRIPTS", allPrivileges, true);
     }
 
+    @SneakyThrows
     public void runPythonScript(String[] params, Script script, String username, String uniqueSessionId) {
         if (script.getVenv() == null) {
             script.setVenv(utils.defaultVenvName);
@@ -181,6 +187,25 @@ public class ScriptsService {
         scriptWebSocketController.sendToSockFromServerService(username, "Starting script '" + script.getDisplay_name() + "'", script.getName(), uniqueSessionId, ServiceMessage.Started);
         pythonScriptsRunner.run(params, utils.getScriptsDirectory(), false, script, script.getVenv(), username, uniqueSessionId);
         logger.info("Exit code : " + pythonScriptsRunner.processExitcode);
+
+        if (Thread.currentThread().isInterrupted()) {
+            logger.info("Thread is interrupted, removing from queue is not necessary");
+        } else {
+            logger.info("Removing script from queue");
+
+            RunningScript runningScript = new RunningScript();
+            runningScript.setScriptName(script.getName());
+            runningScript.setSessionId(uniqueSessionId);
+            runningScript.setUserName(username);
+            runningScript.setThreadName(Thread.currentThread().getName());
+            HashMap<RunningScript, Process> processMap;
+            while (!((processMap = processQueueConfig.processBlockingQueue().take()).keySet().contains(runningScript))) {
+                processQueueConfig.processBlockingQueue().put(processMap);
+            }
+        }
+
+        logger.info("Run script thread is stopped.");
+
         return;
     }
 

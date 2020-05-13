@@ -14,6 +14,7 @@ import org.springframework.web.servlet.ModelAndView;
 import ru.protei.scriptServer.config.ProcessQueueConfig;
 import ru.protei.scriptServer.model.*;
 import ru.protei.scriptServer.model.Enums.ServiceMessage;
+import ru.protei.scriptServer.model.POJO.RunningScript;
 import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.service.LogService;
 import ru.protei.scriptServer.service.ScriptsService;
@@ -161,7 +162,32 @@ public class ScriptsController {
             // todo 403 page
             return new ResponseEntity(HttpStatus.FORBIDDEN);
         }
-        String expectedThreadName = uniqueSessionId + "_" + script.getName() + "-" + req.getRemoteUser();
+        return killProcessPreparation(uniqueSessionId, script, req.getRemoteUser(), req.getRemoteUser());
+    }
+
+    @SneakyThrows
+    @RequestMapping(value = "/scripts/kill_script_admin", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity killScriptAdmin(String uniqueSessionId, String scriptName, String userStartedScript, HttpServletRequest req) {
+        Map<String, String[]> allRequestParams = req.getParameterMap();
+        Script script = scriptRepository.findByNameEquals(scriptName);
+        if (script == null) {
+            logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "Killing unknown script! '" + scriptName + "'", String.valueOf(allRequestParams));
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!Arrays.toString(principal.getAuthorities().toArray()).contains("SERVER_CONTROL")) { // legshooting
+            logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "KILLING SCRIPT WITHOUT ROLE! '" + script.getName() + "'", String.valueOf(allRequestParams));
+            // todo 403 page
+            return new ResponseEntity(HttpStatus.FORBIDDEN);
+        }
+        return killProcessPreparation(uniqueSessionId, script, userStartedScript, req.getRemoteUser());
+    }
+
+    @SneakyThrows
+    public ResponseEntity killProcessPreparation(String uniqueSessionId, Script script, String userWhoStartedScript, String userWhoStoppedScript) {
+        String expectedThreadName = uniqueSessionId + "_" + script.getName() + "-" + userWhoStartedScript;
+        RunningScript expectedRunningScript = new RunningScript();
         logger.info("Getting all threads for interrupting");
         Thread threadWithProcess = null;
         Set<Thread> setOfThread = Thread.getAllStackTraces().keySet();
@@ -172,55 +198,56 @@ public class ScriptsController {
                 logger.info("Thread was found and interrupted");
             }
         }
-        if (threadWithProcess == null){
+        if (threadWithProcess == null) {
             logger.error("Process was not found!");
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        String expectedProcessNameInMap = uniqueSessionId + "_" + script.getName() + "-" + req.getRemoteUser();
-        Process scriptProcess = null;
-        HashMap<String, Process> processMap = new HashMap<>();
 
-        for(HashMap<String,Process> mapFromQueue : processQueueConfig.processBlockingQueue()){
-            String procName = (String) mapFromQueue.keySet().toArray()[0];
-            processMap.put(procName,mapFromQueue.get(procName));
-        }
-        for (String procName : processMap.keySet()){
-            if (procName.equals(expectedProcessNameInMap)){
-                scriptProcess = processMap.get(procName);
+        Process scriptProcess = null;
+        HashMap<RunningScript, Process> processMap = utils.getCopyOfProcessQueue();
+        for (RunningScript runningScript : processMap.keySet()) {
+            if (runningScript.getThreadName().equals(expectedThreadName)) {
+                scriptProcess = processMap.get(runningScript);
+                expectedRunningScript = runningScript;
                 logger.info("Process to kill found!");
                 break;
             }
         }
-        if (scriptProcess == null || scriptProcess == null){
-            scriptWebSocketController.sendToSockFromServer(req.getRemoteUser(), "Process wasn't spawned, killing was initiated before.", scriptName, uniqueSessionId);
-            while (threadWithProcess.isAlive()){
+        if (scriptProcess == null) {
+            scriptWebSocketController.sendToSockFromServer(userWhoStartedScript, "Process wasn't spawned, killing was initiated before.", script.getName(), uniqueSessionId);
+            while (threadWithProcess.isAlive()) {
                 threadWithProcess.interrupt();
             }
             return new ResponseEntity(HttpStatus.OK);
         }
-        killProcess(scriptProcess,req.getRemoteUser(),scriptName,uniqueSessionId);
+        killProcess(scriptProcess, userWhoStartedScript, userWhoStoppedScript, script.getName(), uniqueSessionId);
+        logger.info("Process is killed and now is being removed from queue");
+        while (!((processMap = processQueueConfig.processBlockingQueue().take()).keySet().contains(expectedRunningScript))) {
+            processQueueConfig.processBlockingQueue().put(processMap);
+        }
+        logger.info("Process was removed from queue");
         return new ResponseEntity(HttpStatus.OK);
     }
 
     @SneakyThrows
-    public void killProcess(Process p,String username, String scriptName, String uniqueSessionId) {
+    public void killProcess(Process p, String userWhoStartedScript, String userWhoStoppedScript, String scriptName, String uniqueSessionId) {
         logger.info("Process is destroying!");
-        p.waitFor();
-        scriptWebSocketController.sendToSockFromServer(username, "Stop process message received", scriptName, uniqueSessionId);
+        p.destroy();
+        scriptWebSocketController.sendToSockFromServer(userWhoStartedScript, "Stop process message received from '" + userWhoStoppedScript + "'", scriptName, uniqueSessionId);
         Integer stopSecs = 0;
         while (p.isAlive()) {
             Thread.sleep(1000);
             stopSecs += 1;
-            scriptWebSocketController.sendToSockFromServer(username, String.format("Process is stopping %d second(s) already", stopSecs), scriptName, uniqueSessionId);
+            scriptWebSocketController.sendToSockFromServer(userWhoStartedScript, String.format("Process is stopping %d second(s) already", stopSecs), scriptName, uniqueSessionId);
             if (stopSecs > 10) {
                 p.destroyForcibly();
                 // Here we could ask user is it ok to kill process
-                scriptWebSocketController.sendToSockFromServerService(username, String.format("Process was stopped by force.", stopSecs), scriptName, uniqueSessionId, ServiceMessage.Stopped);
+                scriptWebSocketController.sendToSockFromServerService(userWhoStartedScript, String.format("Process was stopped by force.", stopSecs), scriptName, uniqueSessionId, ServiceMessage.Stopped);
                 return;
             }
         }
-        scriptWebSocketController.sendToSockFromServerService(username, "Process was stopped successfully!", scriptName, uniqueSessionId, ServiceMessage.Stopped);
+        scriptWebSocketController.sendToSockFromServerService(userWhoStartedScript, "Process was stopped successfully!", scriptName, uniqueSessionId, ServiceMessage.Stopped);
     }
 
 }

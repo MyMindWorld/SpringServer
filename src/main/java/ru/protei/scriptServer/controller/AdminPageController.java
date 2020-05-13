@@ -43,8 +43,6 @@ public class AdminPageController {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    // todo Фикс пустого выбора чекбоксов в модалках (Js валидация)
-    // GET-POST-GET в редиректах, чтобы можно было нажать назад
 
     @RequestMapping("/admin")
     public ModelAndView adminPage() {
@@ -64,6 +62,8 @@ public class AdminPageController {
     @RequestMapping("/admin/server_control")
     public ModelAndView serverControlPage() {
         ModelAndView modelAndView = new ModelAndView("ServerControlPage");
+
+        modelAndView.addObject("processMap", utils.getCopyOfProcessQueue());
 
         return modelAndView;
     }

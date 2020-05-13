@@ -7,9 +7,23 @@
     <%@taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
     <meta <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>>
     <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
-    <style>
-        <%@include file="/css/style.css" %>
-    </style>
+    <!--===============================================================================================-->
+    <link rel="icon" type="image/png" href="<c:url value="/images/icons/favicon.ico"/>"/>
+    <!--=======================================================================================-->
+    <link rel="stylesheet" type="text/css" href="<c:url value="/fonts/font-awesome-4.7.0/css/font-awesome.min.css"/>">
+    <link rel="stylesheet" type="text/css" href="<c:url value="/fonts/font-awesome-5.12.1/css/all.css"/>">
+    <!--=======================================================================================-->
+    <link rel="stylesheet" type="text/css" href="<c:url value="/vendor/animate/animate.css"/>">
+    <!--=======================================================================================-->
+    <link rel="stylesheet" type="text/css" href="<c:url value="/vendor/select2/select2.min.css"/>">
+    <!--===============================================================================================-->
+<%--    <link rel="stylesheet" type="text/css" href="<c:url value="/css/Newindex.css"/>">--%>
+    <link rel="stylesheet" type="text/css" href="<c:url value="/css/style.css"/>">
+    <link rel="stylesheet" type="text/css" href="<c:url value="/css/ToggleButtons.css"/>">
+    <!--===============================================================================================-->
+    <script src="<c:url value="/vendor/jquery/jquery-2.1.3.min.js"/>"></script>
+    <script src="<c:url value="/vendor/select2/select2.min.js"/>"></script>
+    <link rel="stylesheet" type="text/css" href="<c:url value="/vendor/select2/select2.min.css"/>">
 </head>
 
 <body>
@@ -62,240 +76,68 @@
 <table class="content-table" id="SearchableTable">
     <thead>
     <tr>
-        <th>Name</th>
-        <th>Group</th>
-        <th>DisplayName</th>
-        <th>Python</th>
-        <th>Venv</th>
-        <th>Requirements</th>
+        <th>Running script</th>
+        <th>User</th>
+        <th>Session Id</th>
         <th>Action</th>
     </tr>
     </thead>
+    <c:forEach items="${processMap}" var="process">
+    <tr>
+        <td>
+            <c:out value="${process.key.scriptName}"/>
+        </td>
+        <td>
+            <c:out value="${process.key.userName}"/>
+        </td>
+        <td>
+            <c:out value="${process.key.sessionId}"/>
+        </td>
+        <td>
+            <button id="notifyUserButton" class="e" onclick="openModal('${role.name}',
+                    [<c:forEach items="${role.privileges}"
+                                var="role_privelege">${role_privelege.id},</c:forEach>]);">Notify user
+            </button>
+            <button id="killProcessButton" class="e" onclick="killScript('${process.key.sessionId}','${process.key.scriptName}','${process.key.userName}');">Kill process
+            </button>
+        </td>
+        </c:forEach>
 
 </table>
-<style>
-    .tgl {
-        display: none;
-    }
-    .tgl, .tgl:after, .tgl:before, .tgl *, .tgl *:after, .tgl *:before, .tgl + .tgl-btn {
-        box-sizing: border-box;
-    }
-    .tgl::-moz-selection, .tgl:after::-moz-selection, .tgl:before::-moz-selection, .tgl *::-moz-selection, .tgl *:after::-moz-selection, .tgl *:before::-moz-selection, .tgl + .tgl-btn::-moz-selection {
-        background: none;
-    }
-    .tgl::selection, .tgl:after::selection, .tgl:before::selection, .tgl *::selection, .tgl *:after::selection, .tgl *:before::selection, .tgl + .tgl-btn::selection {
-        background: none;
-    }
-    .tgl + .tgl-btn {
-        outline: 0;
-        display: block;
-        width: 4em;
-        height: 2em;
-        position: relative;
-        cursor: pointer;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        zoom: 0.8;
-    }
-    .tgl + .tgl-btn:after, .tgl + .tgl-btn:before {
-        position: relative;
-        display: block;
-        content: "";
-        width: 50%;
-        height: 100%;
-    }
-    .tgl + .tgl-btn:after {
-        left: 0;
-    }
-    .tgl + .tgl-btn:before {
-        display: none;
-    }
-    .tgl:checked + .tgl-btn:after {
-        left: 50%;
-    }
+<script>
+    function killScript(uniqueSessionIdStr,scriptNameStr,userStartedScriptStr) {
+        console.log(uniqueSessionIdStr)
+        console.log(scriptNameStr)
+        console.log(userStartedScriptStr)
+        let payload = {
+            scriptName:scriptNameStr,
+            uniqueSessionId : uniqueSessionIdStr,
+            userStartedScript : userStartedScriptStr
+        }
 
-    .tgl-light + .tgl-btn {
-        background: #f0f0f0;
-        border-radius: 2em;
-        padding: 2px;
-        -webkit-transition: all .4s ease;
-        transition: all .4s ease;
-    }
-    .tgl-light + .tgl-btn:after {
-        border-radius: 50%;
-        background: #fff;
-        -webkit-transition: all .2s ease;
-        transition: all .2s ease;
-    }
-    .tgl-light:checked + .tgl-btn {
-        background: #9FD6AE;
-    }
+        $.ajax({
+            dataType: "json",
+            method: "POST",
+            url: '<c:url value="/scripts/kill_script_admin"/>',
+            data: payload,
+            success: function () {
+                console.log("SUCCESS!");
+                disconnect()
+            },
+            error: function (jqXHR, exception) {
+                if (jqXHR.status == 200){
+                    alert("Script was stopped successfully.")
+                    document.location.reload(true);
+                    return
+                }
+                console.log(jqXHR.status)
+                console.log(exception)
+                alert(exception);
+                document.location.reload(true);
+            }
 
-    .tgl-ios + .tgl-btn {
-        background: #fbfbfb;
-        border-radius: 2em;
-        padding: 2px;
-        -webkit-transition: all .4s ease;
-        transition: all .4s ease;
-        border: 1px solid #e8eae9;
+        });
+        return false;
     }
-    .tgl-ios + .tgl-btn:after {
-        border-radius: 2em;
-        background: #fbfbfb;
-        -webkit-transition: left 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), padding 0.3s ease, margin 0.3s ease;
-        transition: left 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), padding 0.3s ease, margin 0.3s ease;
-        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 4px 0 rgba(0, 0, 0, 0.08);
-    }
-    .tgl-ios + .tgl-btn:hover:after {
-        will-change: padding;
-    }
-    .tgl-ios + .tgl-btn:active {
-        box-shadow: inset 0 0 0 2em #e8eae9;
-    }
-    .tgl-ios + .tgl-btn:active:after {
-        padding-right: .8em;
-    }
-    .tgl-ios:checked + .tgl-btn {
-        background: #86d993;
-    }
-    .tgl-ios:checked + .tgl-btn:active {
-        box-shadow: none;
-    }
-    .tgl-ios:checked + .tgl-btn:active:after {
-        margin-left: -.8em;
-    }
-
-    .tgl-skewed + .tgl-btn {
-        overflow: hidden;
-        -webkit-transform: skew(-10deg);
-        transform: skew(-10deg);
-        -webkit-backface-visibility: hidden;
-        backface-visibility: hidden;
-        -webkit-transition: all .2s ease;
-        transition: all .2s ease;
-        font-family: sans-serif;
-        background: #888;
-    }
-    .tgl-skewed + .tgl-btn:after, .tgl-skewed + .tgl-btn:before {
-        -webkit-transform: skew(10deg);
-        transform: skew(10deg);
-        display: inline-block;
-        -webkit-transition: all .2s ease;
-        transition: all .2s ease;
-        width: 100%;
-        text-align: center;
-        position: absolute;
-        line-height: 2em;
-        font-weight: bold;
-        color: #fff;
-        text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
-    }
-    .tgl-skewed + .tgl-btn:after {
-        left: 100%;
-        content: attr(data-tg-on);
-    }
-    .tgl-skewed + .tgl-btn:before {
-        left: 0;
-        content: attr(data-tg-off);
-    }
-    .tgl-skewed + .tgl-btn:active {
-        background: #888;
-    }
-    .tgl-skewed + .tgl-btn:active:before {
-        left: -10%;
-    }
-    .tgl-skewed:checked + .tgl-btn {
-        background: #86d993;
-    }
-    .tgl-skewed:checked + .tgl-btn:before {
-        left: -100%;
-    }
-    .tgl-skewed:checked + .tgl-btn:after {
-        left: 0;
-    }
-    .tgl-skewed:checked + .tgl-btn:active:after {
-        left: 10%;
-    }
-
-    .tgl-flat + .tgl-btn {
-        padding: 2px;
-        -webkit-transition: all .2s ease;
-        transition: all .2s ease;
-        background: #fff;
-        border: 4px solid #f2f2f2;
-        border-radius: 2em;
-    }
-    .tgl-flat + .tgl-btn:after {
-        -webkit-transition: all .2s ease;
-        transition: all .2s ease;
-        background: #f2f2f2;
-        content: "";
-        border-radius: 1em;
-    }
-    .tgl-flat:checked + .tgl-btn {
-        border: 4px solid #7FC6A6;
-    }
-    .tgl-flat:checked + .tgl-btn:after {
-        left: 50%;
-        background: #7FC6A6;
-    }
-
-    .tgl-flip + .tgl-btn {
-        padding: 2px;
-        -webkit-transition: all .2s ease;
-        transition: all .2s ease;
-        font-family: sans-serif;
-        -webkit-perspective: 100px;
-        perspective: 100px;
-    }
-    .tgl-flip + .tgl-btn:after, .tgl-flip + .tgl-btn:before {
-        display: inline-block;
-        -webkit-transition: all .4s ease;
-        transition: all .4s ease;
-        width: 100%;
-        text-align: center;
-        position: absolute;
-        line-height: 2em;
-        font-weight: bold;
-        color: #fff;
-        position: absolute;
-        top: 0;
-        left: 0;
-        -webkit-backface-visibility: hidden;
-        backface-visibility: hidden;
-        border-radius: 4px;
-    }
-    .tgl-flip + .tgl-btn:after {
-        content: attr(data-tg-on);
-        background: #02C66F;
-        -webkit-transform: rotateY(-180deg);
-        transform: rotateY(-180deg);
-    }
-    .tgl-flip + .tgl-btn:before {
-        background: #FF3A19;
-        content: attr(data-tg-off);
-    }
-    .tgl-flip + .tgl-btn:active:before {
-        -webkit-transform: rotateY(-20deg);
-        transform: rotateY(-20deg);
-    }
-    .tgl-flip:checked + .tgl-btn:before {
-        -webkit-transform: rotateY(180deg);
-        transform: rotateY(180deg);
-    }
-    .tgl-flip:checked + .tgl-btn:after {
-        -webkit-transform: rotateY(0);
-        transform: rotateY(0);
-        left: 0;
-        background: #7FC6A6;
-    }
-    .tgl-flip:checked + .tgl-btn:active:after {
-        -webkit-transform: rotateY(20deg);
-        transform: rotateY(20deg);
-    }
-
-</style>
-
+</script>
 </html>

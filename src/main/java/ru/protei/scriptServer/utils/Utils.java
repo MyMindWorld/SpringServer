@@ -14,12 +14,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import ru.protei.scriptServer.config.ProcessQueueConfig;
 import ru.protei.scriptServer.model.JsonScript;
 import ru.protei.scriptServer.model.POJO.ResultToSelect;
+import ru.protei.scriptServer.model.POJO.RunningScript;
 import ru.protei.scriptServer.model.Parameters;
 import ru.protei.scriptServer.model.Script;
 
@@ -60,7 +61,7 @@ public class Utils {
     @Value("${TomcatPath:NotSet}")
     public String tomcatPath;
     @Autowired
-    private ResourceLoader resourceLoader;
+    private ProcessQueueConfig processQueueConfig;
 
     @PostConstruct
     public void UtilsCreation() {
@@ -122,7 +123,7 @@ public class Utils {
         if (scriptFolder.exists()) {
             try {
                 FileUtils.deleteDirectory(scriptFolder);
-            }catch (IOException e){
+            } catch (IOException e) {
                 logger.error("Error during removing directory for scripts from '" + scriptsRepoName + "'");
                 logger.error(e.getMessage());
             }
@@ -431,6 +432,16 @@ public class Utils {
             resultString[i] = resultArray.get(i);
         }
         return resultString;
+    }
+
+    public HashMap<RunningScript, Process> getCopyOfProcessQueue() {
+        HashMap<RunningScript, Process> processMap = new HashMap<>();
+
+        for (HashMap<RunningScript, Process> mapFromQueue : processQueueConfig.processBlockingQueue()) {
+            RunningScript runningScript = (RunningScript) mapFromQueue.keySet().toArray()[0];
+            processMap.put(runningScript, mapFromQueue.get(runningScript));
+        }
+        return processMap;
     }
 
 }

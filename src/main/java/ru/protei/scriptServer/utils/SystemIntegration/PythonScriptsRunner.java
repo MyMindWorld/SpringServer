@@ -11,6 +11,7 @@ import ru.protei.scriptServer.controller.ScriptWebSocketController;
 import ru.protei.scriptServer.model.Enums.ModalType;
 import ru.protei.scriptServer.model.Enums.ServiceMessage;
 import ru.protei.scriptServer.model.POJO.Message;
+import ru.protei.scriptServer.model.POJO.RunningScript;
 import ru.protei.scriptServer.model.Script;
 import ru.protei.scriptServer.utils.Utils;
 
@@ -81,7 +82,12 @@ public class PythonScriptsRunner extends Thread {
                 p = pb.start();
             }
             logger.info("Adding process to blocking queue");
-            processQueueConfig.processBlockingQueue().put(new HashMap<String, Process>(){{put(uniqueSessionId + "_" + script.getName() + "-" + username,p);}});
+            RunningScript runningScript = new RunningScript();
+            runningScript.setScriptName(script.getName());
+            runningScript.setSessionId(uniqueSessionId);
+            runningScript.setUserName(username);
+            runningScript.setThreadName(Thread.currentThread().getName());
+            processQueueConfig.processBlockingQueue().put(new HashMap<RunningScript, Process>(){{put(runningScript,p);}});
             logger.info("Starting reading from script");
             // 2 print the output
             InputStream is = p.getInputStream();
@@ -97,7 +103,13 @@ public class PythonScriptsRunner extends Thread {
                     if (lineStdout != null) {
                         if (lineStdout.matches(userInputFlagPattern.toString())) {
                             logger.info("Caught user depending input!");
-                            stdin.println(handleInputFromUser(username, lineStdout, script.getName(), uniqueSessionId));
+                            String userAnswer = handleInputFromUser(username, lineStdout, script.getName(), uniqueSessionId);
+                            if (userAnswer == null){
+                                logger.error("Received null input, destroying");
+                                p.destroy();
+
+                            }
+                            stdin.println(userAnswer);
                             stdin.flush();
                             logger.info("Sent text to script, continuing");
                         } else {
@@ -113,6 +125,7 @@ public class PythonScriptsRunner extends Thread {
                     }
                     if (currentThread().isInterrupted()){
                         logger.info("Caught interrupt in run thread");
+                        scriptWebSocketController.sendToSockFromServer(username, "Process is stopping...", script.getName(), uniqueSessionId);
                         p.destroy();
                     }
                 }
@@ -168,8 +181,8 @@ public class PythonScriptsRunner extends Thread {
             }
             logger.info("Returning to script '" + msg.getText() + "'");
             return msg.getText();
-        } catch (Exception e) {
-            scriptWebSocketController.sendToSockFromServerService(username, "Exception during input handling" + e.getMessage(), scriptName, uniqueSessionId, ServiceMessage.Stopped);
+        } catch (Throwable e) {
+            scriptWebSocketController.sendToSockFromServer(username, "Exception during input handling '" + e.getCause() + "'", scriptName, uniqueSessionId);
             return null;
         }
     }

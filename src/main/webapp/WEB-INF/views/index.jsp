@@ -96,7 +96,7 @@
                 parseModalMessage(messageOutput)
                 return
             } else if (messageOutput.serviceMessage === "Stopped") {
-                // disconnect()
+                disconnect()
             }
             const response = document.getElementById('response');
             const p = document.createElement('p');

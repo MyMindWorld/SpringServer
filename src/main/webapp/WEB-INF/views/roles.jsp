@@ -4,6 +4,7 @@
     <title>Admin</title>
     <%@taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
     <meta <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>>
+    <link rel="icon" type="image/png" href="<c:url value="/images/icons/favicon.ico"/>"/>
     <link rel="stylesheet" type="text/css" href="<c:url value="/css/style.css"/>">
 </head>
 

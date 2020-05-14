@@ -143,6 +143,10 @@ public class PythonScriptsRunner extends Thread {
             return;
         } catch (Exception e) {
             logger.error("Exception in script run");
+            if (e.getMessage().contains("Stream closed")){ // Process was stopped manually
+                scriptWebSocketController.sendToSockFromServer(username, "Process ended with exception: " + e.getMessage(), script.getName(), uniqueSessionId);
+                return;
+            }
             scriptWebSocketController.sendToSockFromServerService(username, "Process ended with exception: " + e.getMessage(), script.getName(), uniqueSessionId, ServiceMessage.Stopped);
             return;
         }

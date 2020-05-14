@@ -215,10 +215,12 @@ public class ScriptsController {
             }
         }
         if (scriptProcess == null) {
+            logger.info("Process wasn't spawned, Interrupting thread");
             scriptWebSocketController.sendToSockFromServer(userWhoStartedScript, "Process wasn't spawned, killing was initiated before.", script.getName(), uniqueSessionId);
             while (threadWithProcess.isAlive()) {
                 threadWithProcess.interrupt();
             }
+            logger.info("Thread with process was interrupted and killed.");
             return new ResponseEntity(HttpStatus.OK);
         }
         killProcess(scriptProcess, userWhoStartedScript, userWhoStoppedScript, script.getName(), uniqueSessionId);
@@ -239,6 +241,7 @@ public class ScriptsController {
         while (p.isAlive()) {
             Thread.sleep(1000);
             stopSecs += 1;
+            logger.debug("Process is alive : " + p.isAlive());
             scriptWebSocketController.sendToSockFromServer(userWhoStartedScript, String.format("Process is stopping %d second(s) already", stopSecs), scriptName, uniqueSessionId);
             if (stopSecs > 10) {
                 p.destroyForcibly();

@@ -66,7 +66,7 @@ public class DynamicParamsScriptsRunner {
             this.processExitcode = p.exitValue();
         } catch (Exception e) {
             logger.error("Something went wrong!");
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
 
         if (processExitcode != 0) {

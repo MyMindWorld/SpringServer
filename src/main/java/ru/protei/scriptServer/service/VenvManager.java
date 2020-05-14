@@ -182,7 +182,7 @@ public class VenvManager {
             }
         }
         // If we are here - venv was not found on FS
-        logger.error("Venv was not found on FS! Recreating");
+        logger.warn("Venv was not found on FS! Recreating");
         venvRepository.delete(venv);
         createVenv(venv.getName(), script.getRequirements());
         logger.info("Venv was recreated!");

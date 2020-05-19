@@ -24,6 +24,7 @@
     <script src="<c:url value="/vendor/jquery/jquery-2.1.3.min.js"/>"></script>
     <script src="<c:url value="/vendor/select2/select2.min.js"/>"></script>
     <link rel="stylesheet" type="text/css" href="<c:url value="/vendor/select2/select2.min.css"/>">
+    <script src="<c:url value="/js/loading-spinner.js"/>"></script>
 </head>
 
 <body>
@@ -105,7 +106,10 @@
 
 </table>
 <script>
+    Spinner();
+    Spinner.hide();
     function killScript(uniqueSessionIdStr,scriptNameStr,userStartedScriptStr) {
+        Spinner.show();
         console.log(uniqueSessionIdStr)
         console.log(scriptNameStr)
         console.log(userStartedScriptStr)
@@ -126,12 +130,14 @@
             },
             error: function (jqXHR, exception) {
                 if (jqXHR.status == 200){
+                    Spinner.hide();
                     alert("Script was stopped successfully.")
                     document.location.reload(true);
                     return
                 }
                 console.log(jqXHR.status)
                 console.log(exception)
+                Spinner.hide();
                 alert(exception);
                 document.location.reload(true);
             }

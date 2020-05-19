@@ -8,6 +8,7 @@
     <meta <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>>
     <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
     <link rel="icon" type="image/png" href="<c:url value="/images/icons/favicon.ico"/>"/>
+    <script src="<c:url value="/js/loading-spinner.js"/>"></script>
     <style>
         <%@include file="/css/style.css" %>
     </style>
@@ -34,9 +35,9 @@
 </div>
 
 <sec:authorize access="hasAuthority('SCRIPTS_UPDATE')">
-    <a href="<c:url value="/admin/update_scripts"/>" class="e" style="width:120px;">Update Scripts</a>
-    <a href="<c:url value="/admin/update_scripts_and_drop_venv"/>" class="e" style="width:200px">Update Scripts & clear venv</a>
-    <a href="<c:url value="/admin/update_scripts_from_gitlab"/>" class="e" style="width:200px">Update Scripts from GitLab</a>
+    <a href="<c:url value="/admin/update_scripts"/>" class="e" onclick="Spinner();Spinner.show()" style="width:120px;">Update Scripts</a>
+    <a href="<c:url value="/admin/update_scripts_and_drop_venv"/>" class="e" onclick="Spinner();Spinner.show()" style="width:200px">Update Scripts & clear venv</a>
+    <a href="<c:url value="/admin/update_scripts_from_gitlab"/>" class="e" onclick="Spinner();Spinner.show()" style="width:200px">Update Scripts from GitLab</a>
     <br>
     <br>
 </sec:authorize>

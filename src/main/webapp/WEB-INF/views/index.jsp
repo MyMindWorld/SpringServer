@@ -242,7 +242,7 @@
             <sec:authorize access="!hasAuthority('ADMIN_PAGE_USAGE')">
                 <a class='logo'
                     <%--                   href='<c:url value="/profile"--%>
-                />'>
+                />
                 <i class="fas fa-user fa-2x" style="color: white;"></i>
                 </a>
             </sec:authorize>

@@ -36,7 +36,7 @@ public class ScriptsService {
     Logger logger = LoggerFactory.getLogger(ScriptsService.class);
     @Value("#{servletContext.contextPath}")
     private String servletContextPath;
-    @Value("${scriptsGitUrl}")
+    @Value("${scriptsGitUrl:NONE}") // todo default param
     private String scriptsGitUrl;
     @Autowired
     ScriptRepository scriptRepository;
@@ -212,6 +212,10 @@ public class ScriptsService {
     }
 
     public void getScriptsFromGit() {
+        if (scriptsGitUrl.contains("NONE")){
+            logger.info("Skipping scripts update");
+            return;
+        }
         try {
             InetAddress.getByName("www.git.protei.ru");
             GitlabGroupsAnswer[] response =

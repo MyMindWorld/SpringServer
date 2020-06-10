@@ -123,6 +123,7 @@
 
 
             p.style.wordWrap = 'break-word';
+            p.style.width = '100%';
             p.appendChild(document.createTextNode(
                 messageOutput.time + " " + messageOutput.username + ": " + messageOutput.text));
             response.appendChild(p);

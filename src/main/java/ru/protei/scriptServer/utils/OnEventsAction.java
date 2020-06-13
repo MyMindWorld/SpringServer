@@ -3,6 +3,7 @@ package ru.protei.scriptServer.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -43,11 +44,16 @@ public class OnEventsAction {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Value("#{new Boolean('${updateScriptsOnStartup:false}')}")
+    private Boolean updateScriptsOnStartup;
+
     @EventListener(ApplicationReadyEvent.class)
     public void beforeStartup() {
         logger.info("AfterStartup invocation started!");
         utils.createDefaultFolders();
-        scriptsService.getScriptsFromGit();
+        if (updateScriptsOnStartup){
+            scriptsService.getScriptsFromGit();
+        }
         scriptsService.updateAllScriptsConfigs();
         createAdminUserAndPrivileges();
         venvManager.createDefaultVenv();

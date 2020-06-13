@@ -198,7 +198,7 @@
                     disconnect()
                 },
                 error: function (jqXHR, exception) {
-                    if (jqXHR.status == 200){
+                    if (jqXHR.status == 200) {
                         console.log("Script was stopped successfully.")
                         disconnect()
                         return
@@ -216,7 +216,7 @@
         let c = 0
 
         setInterval(function () {
-            if (isConnected == false){
+            if (isConnected == false) {
                 return
             }
             const out = document.getElementById("output")
@@ -236,20 +236,21 @@
     <script src="<c:url value="/vendor/stomp/stomp.js"/>"></script>
 </head>
 <body>
-
 <div class='nav'>
     <ul>
         <li>
             <sec:authorize access="!hasAuthority('ADMIN_PAGE_USAGE')">
-                <a class='logo'
-                    <%--                   href='<c:url value="/profile"--%>
+                <a class='logo' id="profileOpener"
+
                 />
                 <i class="fas fa-user fa-2x" style="color: white;"></i>
                 </a>
             </sec:authorize>
             <sec:authorize access="hasAuthority('ADMIN_PAGE_USAGE')">
-                <a class='logo' href="<c:url value="/admin"/>" style="color: white">
-                    <i class="fas fa-user-shield fa-2x"></i>
+                <a class='logo'
+                   href="<c:url value="/admin"/>"
+                   style="color: white">
+                    <i ondrag="openUserMenu()" class="fas fa-user-shield fa-2x"></i>
                 </a>
             </sec:authorize>
         </li>
@@ -282,16 +283,73 @@
 
     </ul>
 </div>
-<%--<h3>--%>
-<%--    Hello, <sec:authentication property="name"/>!--%>
-<%--</h3>--%>
-
+<nav id="navMenu" style="left: -100%; box-shadow: 0 0 10px rgba(0,0,0,0.5);">
+    <ul>
+        <li>Привет, <sec:authentication property="name"/>!</li>
+        <br/>
+        <li style="cursor: pointer;color: #0070b4" onclick="resetPass()">Тут можно запросить изменение пароля</li>
+        <br/>
+        <br/>
+        <li style="cursor: pointer;color: #0070b4"
+            onclick="openInNewTab('https://youtrack.protei.ru/newIssue?project=EQA&summary=%D0%9E%D0%A8%D0%98%D0%91%D0%9A%D0%90%5C%D0%91%D0%90%D0%93%D0%90%5C%D0%98%D0%97%D0%9C%D0%95%D0%9D%D0%98%D0%A2%D0%95%D0%9A%D0%A1%D0%A2%20%D0%B2%20%D1%81%D0%BA%D1%80%D0%B8%D0%BF%D1%82%20%D1%81%D0%B5%D1%80%D0%B2%D0%B5%D1%80%D0%B5&description=%D0%A8%D0%B0%D0%B3%D0%B8%20%D0%B2%D0%BE%D1%81%D0%BF%D1%80%D0%BE%D0%B8%D0%B7%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%B8%D1%8F%3A%0A1.%0A2.%0A3.%0A%0A%D0%9E%D0%B6%D0%B8%D0%B4%D0%B0%D0%B5%D0%BC%D1%8B%D0%B9%20%D1%80%D0%B5%D0%B7%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%82%3A%0A%D0%A4%D0%B0%D0%BA%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9%20%D1%80%D0%B5%D0%B7%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%82%3A&c=Type%20Bug&c=Subsystem%20infrastructure&c=Assignee%20gromov_p');"
+        >Здесь зарепортить найденный баг
+        </li>
+        <br/>
+        <br/>
+        <li style="cursor: pointer;color: #0070b4"
+            onclick="openInNewTab('https://mattermost.protei.ru/qa/channels/scriptserver');">Связаться с пользователями
+        </li>
+    </ul>
+</nav>
 <script>
-    $(".nav li").hover(function () {
-        $(this).children("ul").stop().delay(20).animate({height: "toggle", opacity: "toggle"}, 200);
-    });
-</script>
+    function resetPass() {
+        const serverContext = "<c:url value="/"/>"
+        $.post('<c:url value="/user/resetSelfPassword"/>',
+            function (data) {
+                window.location.href =
+                    serverContext + "login?message=" + data.message;
+            })
+            .fail(function (data) {
+                if (data.responseJSON.error.indexOf("MailError") > -1) {
+                    window.location.href = serverContext + "emailError.html";
+                } else {
+                    window.location.href =
+                        serverContext + "login?message=" + data.responseJSON.message;
+                }
+            })
+            .done(function (data) {
+                window.location.href =
+                    serverContext + "login?messageSuccess=You should receive an Password Reset Email shortly";
+            })
+    };
 
+    function openInNewTab(url) {
+        var win = window.open(url, '_blank');
+        win.focus();
+    }
+
+    $(".nav li").hover(function () {
+        $(this).children("ul").delay(20).animate({height: "toggle", opacity: "toggle"}, 200);
+    });
+    $('#profileOpener').click(function () {
+        openUserMenu()
+    });
+
+    function openUserMenu() {
+        console.log("opening")
+        if (document.getElementById('navMenu').style.left == '-100%') {
+            $('#navMenu').animate({left: "0%"}, 250);
+        } else {
+            console.log("else")
+            $('#navMenu').animate({left: "-100%"}, 250);
+        }
+        setTimeout(function () {
+            $('#navMenu').toggleClass('visible');
+            document.getElementById('navMenu').style.display = 'block'
+        }, 260);
+
+    }
+</script>
 
 <c:choose>
     <c:when test="${script!=null}"> <%-- Проверка выбран ли какой-нибудь скрипт --%>
@@ -747,9 +805,12 @@
             <br>
             <br>
             Доступ к необходимым скриптам можно запросить у руководителя вашей группы<br>
-            (Cake is a lie!)
+            <p style="color: #9b9b9b">(Cake is a lie!)</p>
         </div>
         <footer class="footer">Версия : <c:out value="${AppVersion}"/></footer>
+        <script>
+            openUserMenu()
+        </script>
     </c:otherwise>
 </c:choose>
 </body>

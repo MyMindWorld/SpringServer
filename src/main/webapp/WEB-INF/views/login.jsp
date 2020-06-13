@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="th" uri="http://jakarta.apache.org/taglibs/standard/permittedTaglibs" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,19 +24,33 @@
     <link rel="stylesheet" type="text/css" href="<c:url value="/vendor/select2/select2.min.css"/>">
     <!--===============================================================================================-->
     <link rel="stylesheet" type="text/css" href="<c:url value="/css/util.css"/>">
+    <link rel="stylesheet" type="text/css" href="<c:url value="/css/style.css"/>">
     <link rel="stylesheet" type="text/css" href="<c:url value="/css/login.css"/>">
+    <script src="<c:url value="/js/loading-spinner.js"/>"></script>
     <!--===============================================================================================-->
 </head>
-<c:if test="${error}">
-    <div class="alertError">
-        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-        Login or password is incorrect!
-    </div>
-</c:if>
 <body>
 
 
 <div class="limiter">
+    <c:if test="${error}">
+        <div class="alertError" style="margin-bottom:0px">
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+            Login or password is incorrect!
+        </div>
+    </c:if>
+    <c:if test="${message != null}">
+        <div class="alertError" style="margin-bottom:0px">
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+            <c:out value="${message}"/>
+        </div>
+    </c:if>
+    <c:if test="${messageSuccess != null}">
+        <div class="alertSuccess" style="margin-bottom:0px">
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+            <c:out value="${messageSuccess}"/>
+        </div>
+    </c:if>
 
     <div class="container-login100" style="background-image: url('images/img-01.jpg');">
         <div class="wrap-login100 p-t-190 p-b-30">
@@ -65,7 +80,7 @@
                 </div>
 
                 <div class="container-login100-form-btn p-t-10">
-<%--                    <td>Remember Me: <input type="checkbox" name="remember-me"/></td>--%>
+                    <%--                    <td>Remember Me: <input type="checkbox" name="remember-me"/></td>--%>
                     <button class="login100-form-btn" type="submit">
 
                         Login
@@ -73,7 +88,7 @@
                 </div>
 
                 <div class="text-center w-full p-t-25 p-b-230">
-                    <a onclick="openModal()">
+                    <a onclick="openModal()" style="cursor: pointer;">
                         Forgot Username / Password?
                     </a>
                 </div>
@@ -92,32 +107,66 @@
 <div id="updateUserModal" class="modal">
 
     <!-- Modal content -->
-    <div class="modal-content">
-        <span class="close">&times;</span>
-<%--        <h3><i class="fa fa-lock fa-4x"></i></h3>--%>
-        <h2 class="text-center">Forgot Password?</h2>
-        <p>You can reset your password here.</p>
+    <div class="modal-content" style="overflow-y:unset;height:unset;max-width: 30%">
+        <span class="close" style="
+        position: absolute;
+        right: 5%;">&times;</span>
+        <h2 class="text-center"><i class="fa fa-lock fa-1x"></i> Forgot Password?</h2>
+        <h3></h3>
 
-        <form name='forgotPassword' class="form__group field" action=
-        <c:url value='/forgotPassword'/> method='POST'>
+        <form name='forgotPassword' class="form__group field" style="width: unset">
 
             <fieldset>
                 <div class="form-group">
                     <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-envelope color-blue"></i></span>
+                        <span class="input-group-addon"><i class="fa fa-envelope" aria-hidden="true"></i></span>
 
-                        <input id="emailInput" placeholder="email address" class="form-control" type="email"
+                        <input id="emailInput" placeholder="email address" class="form-control" type="email" data-validate="Password is required"
                                oninvalid="setCustomValidity('Please enter a valid email address!')"
-                               onchange="try{setCustomValidity('')}catch(e){}" required="">
+                               onchange="try{setCustomValidity('')}catch(e){}"
+                               required
+                               value=""
+                        onsubmit="setCustomValidity('Please enter a valid email address!')">
                     </div>
                 </div>
                 <div class="form-group">
-                    <input class="btn btn-lg btn-primary btn-block" value="Send My Password" type="submit">
+                    <input class="btn btn-lg btn-primary btn-block" value="Send My Password" style="cursor: pointer;" onclick="resetPass()">
                 </div>
             </fieldset>
 
         </form>
     </div>
+    <script>
+        const postAddr = "<c:url value="/user/resetPassword"/>"
+        const serverContext = "<c:url value="/"/>"
+
+        function resetPass() {
+
+            var email = $("#emailInput").val();
+            if (email == ''){
+                return
+            }
+            $.post(postAddr, {email: email},
+                function (data) {
+                    window.location.href =
+                        serverContext + "login?message=" + data.message;
+                })
+                .fail(function (data) {
+                    if (data.responseJSON.error.indexOf("MailError") > -1) {
+                        window.location.href = serverContext + "emailError.html";
+                    } else {
+                        window.location.href =
+                            serverContext + "login?message=" + data.responseJSON.message;
+                    }
+                })
+                .done(function (data) {
+                    window.location.href =
+                        serverContext + "login?messageSuccess=You should receive an Password Reset Email shortly";
+                })
+        };
+
+
+    </script>
 
 </div>
 

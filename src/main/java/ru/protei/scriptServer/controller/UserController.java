@@ -70,13 +70,11 @@ public class UserController {
 
         user.setEmail(user.getUsername() + "@protei.ru");
         user.setLdapName(user.getUsername());
-//        String newPassword = utils.generateSecurePassword(); // Do not forget to bring this baby back)
-        String newPassword = user.getUsername();
+        String newPassword = utils.generateSecurePassword();
         user.setPassword(passwordEncoder.encode(newPassword));
         user.setRoles(roles);
-        // send invite link
+        // todo send invite link
 
-        logger.info("password for " + user.getUsername() + " is set to '" + newPassword + "'"); // obv needs to be deleted
         userRepository.save(user); // prop register method
 
         model.addAttribute("success", true);
@@ -98,7 +96,7 @@ public class UserController {
     }
 
 
-    @RequestMapping(value = "/admin/update_user", method = RequestMethod.POST)
+    @RequestMapping(value = "/admin/update_user_roles", method = RequestMethod.POST)
     public ModelAndView updateUserPost(User user, @RequestParam("roleVarUpdate") List<Long> rolesRaw, Model model, HttpServletRequest request) {
         logger.info("Received role update from : '" + getUsername() + "' updating user " + user.getUsername());
         Iterable<Long> iterable = rolesRaw;

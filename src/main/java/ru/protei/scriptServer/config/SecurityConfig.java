@@ -67,7 +67,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/admin/roles").hasAuthority("ROLES_SETTING")
                 .antMatchers("/admin/users").hasAuthority("ROLES_SETTING")
 
-                .antMatchers("/admin/update_user").hasAuthority("ROLES_SETTING")
+                .antMatchers("/admin/update_user_roles").hasAuthority("ROLES_SETTING")
                 .antMatchers("/admin/invite_user").hasAuthority("ROLES_SETTING")
                 .antMatchers("/admin/delete_user").hasAuthority("ROLES_SETTING")
 
@@ -83,6 +83,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/js/**").permitAll()
                 .antMatchers("/vendor/**").permitAll()
                 .antMatchers("/login*").permitAll()
+                .antMatchers("/user/resetPassword").anonymous()
+                .antMatchers("/user/changePassword").anonymous()
+                .antMatchers("/user/savePassword").anonymous()
                 .antMatchers("/index/**").authenticated()
                 .anyRequest().authenticated()
                 .and()

@@ -3,6 +3,7 @@ package ru.protei.scriptServer.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -11,6 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import ru.protei.scriptServer.controller.AdminPageController;
+import ru.protei.scriptServer.model.Privilege;
 import ru.protei.scriptServer.model.User;
 import ru.protei.scriptServer.repository.UserRepository;
 import ru.protei.scriptServer.service.UserService;
@@ -31,27 +33,34 @@ public class CustomLdapAuth implements AuthenticationProvider {
     UserRepository userRepository;
     @Autowired
     UserService userService;
+    @Value("#{new Boolean('${enableLdapAuth:false}')}")
+    private Boolean enableLdapAuth;
 
     @Override
     public Authentication authenticate(Authentication authentication)
             throws AuthenticationException {
+        if (!enableLdapAuth) {
+            logger.debug("Skipping ldap auth.");
+            return null;
+        }
 
         String username = authentication.getName();
-
         boolean authenticated = ldapAuth(username, authentication.getCredentials().toString());
+        List<GrantedAuthority> grantedAuths = new ArrayList<>();
 
         if (authenticated) {
 
             User user = userRepository.findByUsernameEquals(username);
             if (user != null) {
-                logger.error("Ldap user found in database. Something went wrong!");
+                logger.error("Ldap user found in database. Changing user password to LDAP");
+                userService.changeUserPassword(user, authentication.getCredentials().toString());
+                for (Privilege privilege : userService.getAllPrivilegesFromUser(user)) {
+                    grantedAuths.add(new SimpleGrantedAuthority(privilege.getName()));
+                }
             } else {
                 user = userService.createUser(username, authentication.getCredentials().toString());
+                grantedAuths.add(new SimpleGrantedAuthority("ROLE_USER"));
             }
-
-
-            List<GrantedAuthority> grantedAuths = new ArrayList<>();
-            grantedAuths.add(new SimpleGrantedAuthority("ROLE_USER"));
 
             Authentication auth = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), grantedAuths);
             return auth;

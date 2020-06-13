@@ -6,23 +6,26 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+
 .nav {
     position: absolute;
     display: inline-block;
     background: #FFFFFF;
     border-radius: 3px;
     border-top: 2px solid #0070b4;
-    left:50%;
-    transform:translate(-50%);
+    left: 50%;
+    transform: translate(-50%);
     height: 60px;
-    z-index:1000;
+    z-index: 1000;
     /*box-shadow: 0 0 10px rgba(20, 90, 161, 0.5); !* Параметры тени *!*/
 }
+
 .nav ul {
     list-style: none;
     margin: 0;
     padding: 0;
 }
+
 .nav ul li {
     position: relative;
     display: inline-block;
@@ -31,11 +34,13 @@ body {
     vertical-align: middle;
     float: left;
 }
+
 .nav ul li:first-child,
 .nav ul li:nth-child(2),
 .nav ul li:last-child {
     /*border-left: 0;*/
 }
+
 .nav ul li:nth-child(2) a:before,
 .nav ul li:nth-last-child(2) a:before,
 .nav ul li:nth-child(2) a:after,
@@ -46,6 +51,7 @@ body {
     -o-transition: all 0.3s linear 0s;
     transition: all 0.3s linear 0s;
 }
+
 .nav ul li:nth-child(2) > a:before {
     z-index: 1;
     position: absolute;
@@ -58,6 +64,7 @@ body {
     border-right: 15px solid #FFFFFF;
     border-top: 60px solid transparent;
 }
+
 .nav ul li:nth-last-child(2) a:after {
     position: absolute;
     z-index: 1;
@@ -70,14 +77,17 @@ body {
     border-left: 15px solid #FFFFFF;
     border-bottom: 60px solid transparent;
 }
+
 .nav ul li:last-child a {
     background: #0070b4;
     padding: 0 25px 0 30px;
     color: #FFFFFF;
 }
+
 .nav ul li:last-child a:hover {
     background: #07cadf;
 }
+
 .nav ul li a {
     word-break: break-all;
     white-space: normal;
@@ -94,15 +104,19 @@ body {
     -o-transition: all 0.3s linear 0s;
     transition: all 0.3s linear 0s;
 }
+
 .nav ul li a:hover {
     background: #f2f2f2;
 }
+
 .nav ul li a:hover:before {
     border-right: 15px solid #f2f2f2;
 }
+
 .nav ul li a:hover:after {
     border-left: 15px solid #f2f2f2;
 }
+
 .nav ul li a.logo {
     background: #0070b4;
     width: 30px;
@@ -111,15 +125,19 @@ body {
     line-height: 1;
     vertical-align: middle;
 }
+
 .nav ul li a.logo:hover {
     background: #07cadf;
 }
+
 .nav ul li a.logo img {
     width: 100%;
 }
+
 .nav ul li a i {
     margin: 0 0 0 6px;
 }
+
 .nav ul li .menu {
     display: none;
     position: absolute;
@@ -130,7 +148,9 @@ body {
     border-bottom: 3px solid #0070b4;
     border-radius: 0 0 3px 3px;
     overflow: hidden;
+    /*    todo fix overflow*/
 }
+
 .nav ul li .menu li {
     display: block;
     width: 100%;
@@ -138,10 +158,12 @@ body {
     margin: 0;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
+
 .nav ul li .menu li:nth-child(2),
 .nav ul li .menu li:nth-last-child(2) {
     height: 45px;
 }
+
 .nav ul li .menu li:nth-child(2) a:before,
 .nav ul li .menu li:nth-last-child(2) a:before,
 .nav ul li .menu li:nth-child(2) a:after,
@@ -149,6 +171,7 @@ body {
     content: "";
     display: none;
 }
+
 .nav ul li .menu li a {
     background: #FFFFFF;
     padding: 0 15px 0 30px;
@@ -156,14 +179,17 @@ body {
     line-height: 45px;
     text-align: left;
 }
+
 .nav ul li .menu li a:hover {
     background: #f2f2f2;
 }
+
 .info {
     width: 300px;
     margin: 50px auto;
     text-align: center;
 }
+
 .info h1 {
     margin: 0;
     padding: 0;
@@ -171,17 +197,21 @@ body {
     font-weight: 400;
     color: #333333;
 }
+
 .info span {
     color: #666666;
     font-size: 12px;
 }
+
 .info span a {
     color: #000000;
     text-decoration: none;
 }
+
 .info span .fa {
     color: #0070b4;
 }
+
 .info span .spoilers {
     color: #999999;
     margin-top: 5px;
@@ -190,7 +220,7 @@ body {
 
 /*body {*/
 /*    background: #54c8c1;*/
-.script-params{
+.script-params {
     position: relative;
     top: 70px;
     float: left; /* Обтекание справа */
@@ -198,17 +228,44 @@ body {
     width: 300px; /* Ширина колонки */
     padding: 5px; /* Поля вокруг текста */
     margin: 10px 10px 20px 5px; /* Значения отступов */
-    float:left;
+    float: left;
 
 
 }
-}
-.script-params input,label,select,ul,button {
+
+.script-params input, label, select, ul, button {
     margin: 10px; /* Отступы вокруг элемента */
     padding: 10px; /* Поля вокруг текста */
-    float:left;
+    float: left;
 }
-.field {clear:both; text-align:left;}
+
+.field {
+    clear: both;
+    text-align: left;
+}
+
+#navMenu {
+    position: absolute;
+    background: #DDD;
+    padding: 10px;
+    left: -100%;
+    z-index: 1000;
+}
+
+#navMenu.visible {
+    left: 0;
+}
+
+#navMenu ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#navMenu li {
+    margin: 0;
+    padding: 0;
+}
 
 /*}*/
 .script-content {
@@ -218,7 +275,7 @@ body {
     /*top: 20px;*/
     width: 75%;
     /*overflow-x: auto;*/
-    height:auto;
+    height: auto;
     /*height: 160px;*/
     padding: 10px;
     background: #d7d7d7;
@@ -226,12 +283,13 @@ body {
     top: 100px;
     bottom: 35px;
     margin-left: 350px;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.5); /* Параметры тени */
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5); /* Параметры тени */
     /*transform: translate(-50%, -50%);*/
 
 }
-.script-content p{
-    width: 100%;
+
+.script-content p {
+    width: 98%;
     color: rgb(14, 11, 11);
     font-family: Monospace;
     margin: 10px 0px 0px 10px;
@@ -242,24 +300,27 @@ body {
     padding: 10px 20px;
     background: #e9e9e9;
     position: fixed;
-    top: 70px;
-    margin:auto;
+    top: 30%;
+    margin: auto;
     width: 100%;
     /*transform: translate(-50%, -50%);*/
 
 }
-.blank_message img{
+
+.blank_message img {
     position: relative;
     top: 70px;
     padding: 5px; /* Поля вокруг текста */
     margin: 10px 10px 20px 5px; /* Значения отступов */
 }
-.blank_message p{
+
+.blank_message p {
     color: rgb(255, 255, 255);
     font-family: Monospace;
     margin: 10px 0px 0px 10px;
     text-align: center;
 }
+
 .footer {
     color: #959595;
     font-size: 12px;

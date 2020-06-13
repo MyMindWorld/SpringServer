@@ -444,4 +444,8 @@ public class Utils {
         return processMap;
     }
 
+    public String getAppUrl(HttpServletRequest request){
+        return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+    }
+
 }

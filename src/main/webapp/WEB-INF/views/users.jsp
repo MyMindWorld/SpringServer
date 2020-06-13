@@ -138,7 +138,7 @@
         <span class="close">&times;</span>
         <p style="font-size:235%;text-align:center;"id="ModalWindowUsername">Updating HERE SHOULD BE USERNAME roles</p>
         <form name='f' class="form__group field" action=
-        <c:url value='/admin/update_user'/> method='POST' onsubmit="return validateAddUserForm('roleVarUpdate')">
+        <c:url value='/admin/update_user_roles'/> method='POST' onsubmit="return validateAddUserForm('roleVarUpdate')">
 
             <input name="username" id='username' type="hidden" value=""/>
 

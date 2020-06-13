@@ -59,9 +59,11 @@ public class AuthController {
             throw new UserNotFoundException(userEmail);
         }
         String token = UUID.randomUUID().toString();
+        logger.info("Sending email with password reset token to '" + userEmail +"'");
         userService.createPasswordResetTokenForUser(user, token);
         mailSender.send(userService.constructResetTokenEmail(utils.getAppUrl(request),
                 request.getLocale(), token, user));
+        logger.info("Email sent successfully");
         return "/login";
     }
 

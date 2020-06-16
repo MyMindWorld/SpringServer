@@ -233,10 +233,11 @@ body {
 
 }
 
-.script-params input, label, select, ul, button {
-    margin: 10px; /* Отступы вокруг элемента */
-    padding: 10px; /* Поля вокруг текста */
-    float: left;
+.script-params input, label, select, ul, button {+
+    /* todo styles!*/
+    /*margin: 10px; !* Отступы вокруг элемента *!*/
+    /*padding: 3px; !* Поля вокруг текста *!*/
+    /*float: left;*/
 }
 
 .field {

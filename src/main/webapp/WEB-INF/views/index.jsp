@@ -291,7 +291,7 @@
         <br/>
         <br/>
         <li style="cursor: pointer;color: #0070b4"
-            onclick="openInNewTab('https://youtrack.protei.ru/newIssue?project=EQA&summary=%D0%9E%D0%A8%D0%98%D0%91%D0%9A%D0%90%5C%D0%91%D0%90%D0%93%D0%90%5C%D0%98%D0%97%D0%9C%D0%95%D0%9D%D0%98%D0%A2%D0%95%D0%9A%D0%A1%D0%A2%20%D0%B2%20%D1%81%D0%BA%D1%80%D0%B8%D0%BF%D1%82%20%D1%81%D0%B5%D1%80%D0%B2%D0%B5%D1%80%D0%B5&description=%D0%A8%D0%B0%D0%B3%D0%B8%20%D0%B2%D0%BE%D1%81%D0%BF%D1%80%D0%BE%D0%B8%D0%B7%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%B8%D1%8F%3A%0A1.%0A2.%0A3.%0A%0A%D0%9E%D0%B6%D0%B8%D0%B4%D0%B0%D0%B5%D0%BC%D1%8B%D0%B9%20%D1%80%D0%B5%D0%B7%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%82%3A%0A%D0%A4%D0%B0%D0%BA%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9%20%D1%80%D0%B5%D0%B7%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%82%3A&c=Type%20Bug&c=Subsystem%20infrastructure&c=Assignee%20gromov_p');"
+            onclick="openInNewTab('https://youtrack.protei.ru/newIssue?project=EQA&summary=%D0%9E%D0%A8%D0%98%D0%91%D0%9A%D0%90%5C%D0%91%D0%90%D0%93%D0%90%5C%D0%98%D0%97%D0%9C%D0%95%D0%9D%D0%98%D0%A2%D0%95%D0%9A%D0%A1%D0%A2%20%D0%B2%20%D1%81%D0%BA%D1%80%D0%B8%D0%BF%D1%82%20%D1%81%D0%B5%D1%80%D0%B2%D0%B5%D1%80%D0%B5&description=%D0%A8%D0%B0%D0%B3%D0%B8%20%D0%B2%D0%BE%D1%81%D0%BF%D1%80%D0%BE%D0%B8%D0%B7%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%B8%D1%8F%3A%0A1.%0A2.%0A3.%0A%0A%D0%9E%D0%B6%D0%B8%D0%B4%D0%B0%D0%B5%D0%BC%D1%8B%D0%B9%20%D1%80%D0%B5%D0%B7%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%82%3A%0A%D0%A4%D0%B0%D0%BA%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9%20%D1%80%D0%B5%D0%B7%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%82%3A&c=Type%20Bug&c=Subsystem%20Script-Server&c=Assignee%20gromov_p');"
         >Здесь зарепортить найденный баг
         </li>
         <br/>
@@ -506,6 +506,26 @@
                                            style="width: 100%; float: right;"
                                            name="${parameter.param}" id='${parameter.param}'
                                            maxlength="${parameter.max}"
+                                           <c:if test="${parameter.required}">required</c:if>/>
+                                    <label for="${parameter.param}" class="form__label">${parameter.name}</label>
+                                </div>
+                            </c:when>
+                            <c:when test="${parameter.type == 'ip4'}">
+                                <div class="form__group field" style="width: 100%">
+                                    <input type="input" class="form__field" placeholder="Name"
+                                           style="width: 100%; float: right;"
+                                           name="${parameter.param}" id='${parameter.param}'
+                                           pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"
+                                           <c:if test="${parameter.required}">required</c:if>/>
+                                    <label for="${parameter.param}" class="form__label">${parameter.name}</label>
+                                </div>
+                            </c:when>
+                            <c:when test="${parameter.type == 'ip6'}">
+                                <div class="form__group field" style="width: 100%">
+                                    <input type="input" class="form__field" placeholder="Name"
+                                           style="width: 100%; float: right;"
+                                           name="${parameter.param}" id='${parameter.param}'
+                                           pattern="^((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?$"
                                            <c:if test="${parameter.required}">required</c:if>/>
                                     <label for="${parameter.param}" class="form__label">${parameter.name}</label>
                                 </div>

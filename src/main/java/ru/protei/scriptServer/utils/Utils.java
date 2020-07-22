@@ -19,9 +19,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import ru.protei.scriptServer.config.ProcessQueueConfig;
 import ru.protei.scriptServer.model.POJO.JsonScript;
+import ru.protei.scriptServer.model.POJO.Parameters;
 import ru.protei.scriptServer.model.POJO.ResultToSelect;
 import ru.protei.scriptServer.model.POJO.RunningScript;
-import ru.protei.scriptServer.model.POJO.Parameters;
 import ru.protei.scriptServer.model.Script;
 import ru.protei.scriptServer.service.StorageService;
 
@@ -95,6 +95,11 @@ public class Utils {
         logger.info("Getting all files from : '" + folder.getAbsolutePath() + "'");
         assert folder.isDirectory() == true;
         assert folder.exists() == true;
+        if (folder.listFiles() == null) {
+            logger.info("Folder is empty, trying to add separator");
+            folder = new File(folder.getAbsolutePath() + File.separator);
+        }
+        assert folder.listFiles() != null;
         List<String> files = new ArrayList<>();
         for (File fileEntry : folder.listFiles()) {
             if (fileEntry.isDirectory()) {
@@ -445,7 +450,7 @@ public class Utils {
                 resultArray.add(
                         storageService.findFileForScriptWithName(
                                 receivedParams.get(paramKey.getParam())[0]
-                                ,script.getName()));
+                                , script.getName()));
                 receivedParams.remove(paramKey.getParam()); // removing param from future iteration
             }
         }

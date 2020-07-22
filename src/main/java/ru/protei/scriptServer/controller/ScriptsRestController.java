@@ -4,13 +4,12 @@ import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import ru.protei.scriptServer.model.Parameters;
+import ru.protei.scriptServer.model.POJO.Parameters;
 import ru.protei.scriptServer.model.Script;
+import ru.protei.scriptServer.model.User;
 import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.service.LogService;
 import ru.protei.scriptServer.service.ScriptsService;
@@ -63,8 +62,8 @@ public class ScriptsRestController {
 
         }
         Script script = scriptRepository.findByNameEquals(scriptName);
-        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!Arrays.toString(principal.getAuthorities().toArray()).contains(script.getName())) { // legshooting
+        User user = userService.getUserByName(req.getRemoteUser());
+        if (!userService.checkPrivilege(user, scriptName)) {
             logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "RUNNING SCRIPT WITHOUT ROLE! '" + scriptName + "'", paramName);
             // todo 403 page
             return null;

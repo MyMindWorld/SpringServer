@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import ru.protei.scriptServer.config.ProcessQueueConfig;
 import ru.protei.scriptServer.model.*;
@@ -112,8 +113,9 @@ public class ScriptsController {
             logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "Running unknown script! '" + scriptName + "'", String.valueOf(allRequestParams));
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
-        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!Arrays.toString(principal.getAuthorities().toArray()).contains(script.getName())) { // legshooting
+
+        User user = userService.getUserByName(req.getRemoteUser());
+        if (!userService.checkPrivilege(user, script.getName())) {
             logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "RUNNING SCRIPT WITHOUT ROLE! '" + script.getName() + "'", String.valueOf(allRequestParams));
             // todo 403 page
             return new ResponseEntity(HttpStatus.FORBIDDEN);
@@ -128,12 +130,12 @@ public class ScriptsController {
 
         }
         if (allRequestParams.size() == 0) {
-            scriptWebSocketController.sendToSockFromServer(principal.getUsername(), "Parameters could not be empty! Or should they...", script.getName(), uniqueSessionId);
+            scriptWebSocketController.sendToSockFromServer(user.getUsername(), "Parameters could not be empty! Or should they...", script.getName(), uniqueSessionId);
         }
         if (script.getVenv() == null) {
-            scriptWebSocketController.sendToSockFromServer(principal.getUsername(), "Using default venv. It's HIGHLY recommended not doing this. Please, specify unique venv name and requirements file", script.getName(), uniqueSessionId);
+            scriptWebSocketController.sendToSockFromServer(user.getUsername(), "Using default venv. It's HIGHLY recommended not doing this. Please, specify unique venv name and requirements file", script.getName(), uniqueSessionId);
             if (script.getRequirements() != null) {
-                scriptWebSocketController.sendToSockFromServer(principal.getUsername(), "Adding requirements to default venv is forbidden! Please use custom venv for this case!", script.getName(), uniqueSessionId);
+                scriptWebSocketController.sendToSockFromServer(user.getUsername(), "Adding requirements to default venv is forbidden! Please use custom venv for this case!", script.getName(), uniqueSessionId);
             }
         }
 
@@ -141,7 +143,7 @@ public class ScriptsController {
         logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "Run script '" + script.getName() + "'", Arrays.toString(resultRunString));
         logger.info("Created string : " + Arrays.toString(resultRunString));
         new Thread(() -> {
-            scriptsService.runPythonScript(resultRunString, script, principal.getUsername(), uniqueSessionId);
+            scriptsService.runPythonScript(resultRunString, script, user.getUsername(), uniqueSessionId);
         }, uniqueSessionId + "_" + script.getName() + "-" + req.getRemoteUser()).start();
         return new ResponseEntity(HttpStatus.OK);
     }
@@ -156,8 +158,8 @@ public class ScriptsController {
             logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "Killing unknown script! '" + scriptName + "'", String.valueOf(allRequestParams));
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
-        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!Arrays.toString(principal.getAuthorities().toArray()).contains(script.getName())) { // legshooting
+        User user = userService.getUserByName(req.getRemoteUser());
+        if (!userService.checkPrivilege(user, script.getName())) {
             logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "KILLING SCRIPT WITHOUT ROLE! '" + script.getName() + "'", String.valueOf(allRequestParams));
             // todo 403 page
             return new ResponseEntity(HttpStatus.FORBIDDEN);
@@ -175,8 +177,8 @@ public class ScriptsController {
             logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "Killing unknown script! '" + scriptName + "'", String.valueOf(allRequestParams));
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
-        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!Arrays.toString(principal.getAuthorities().toArray()).contains("SERVER_CONTROL")) { // legshooting
+        User user = userService.getUserByName(req.getRemoteUser());
+        if (!userService.checkPrivilege(user, "SERVER_CONTROL")) {
             logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "KILLING SCRIPT WITHOUT ROLE! '" + script.getName() + "'", String.valueOf(allRequestParams));
             // todo 403 page
             return new ResponseEntity(HttpStatus.FORBIDDEN);

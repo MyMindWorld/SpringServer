@@ -11,10 +11,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
-import ru.protei.scriptServer.model.Parameters;
+import ru.protei.scriptServer.model.POJO.Parameters;
 import ru.protei.scriptServer.model.Script;
 import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.repository.UserRepository;
+import ru.protei.scriptServer.service.StorageService;
 import ru.protei.scriptServer.utils.Utils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,10 +37,12 @@ public class MainPageController {
     Utils utils;
     @Value("${app.version}")
     private String appVersion;
+    @Autowired
+    StorageService storageService;
 
     @RequestMapping("/TestPage")
     public ModelAndView testPage() {
-        return new ModelAndView("TestPage");
+        return new ModelAndView("TestPage").addObject("files", storageService.getAllResourceFiles());
     }
 
     @RequestMapping("/")
@@ -60,10 +63,10 @@ public class MainPageController {
                 groupsList.add(script.getGroup_name());
             }
         }
-        modelAndView.addObject("username",req.getRemoteUser());
+        modelAndView.addObject("username", req.getRemoteUser());
         modelAndView.addObject("list", scriptList);
         modelAndView.addObject("groups", groupsList);
-        if (appVersion.equals("@project.version@")){
+        if (appVersion.equals("@project.version@")) {
             appVersion = getClass().getPackage().getImplementationVersion();
         }
         modelAndView.addObject("AppVersion", appVersion);
@@ -78,7 +81,7 @@ public class MainPageController {
         if (script == null) {
             return new ModelAndView("ErrorCodes/404");
         }
-        logger.info("User '" + getUsername() + "' requested script '" + scriptName + "', and displayName : " + script.getDisplay_name());
+        logger.info("User '" + getUsername() + "' requested script '" + scriptName + "', and displayName : " + script.getDisplayName());
         Parameters[] parameters = utils.stringToListOfParams(script.getParametersJson());
         ModelAndView modelAndView = showMenu(request);
 

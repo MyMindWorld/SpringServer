@@ -81,7 +81,7 @@
             <c:out value="${script.group_name}"/>
         </td>
         <td>
-            <c:out value="${script.display_name}"/>
+            <c:out value="${script.displayName}"/>
         </td>
         <td>
             <c:out value="${script.python_version}"/>
@@ -93,7 +93,7 @@
             <c:out value="${script.requirements}"/>
         </td>
         <td>
-            <button id="updateScript" class="e" onclick="openModalUpdate('${script.name}','${script.display_name}');">Update config</button>
+            <button id="updateScript" class="e" onclick="openModalUpdate('${script.name}','${script.displayName}');">Update config</button>
         </td>
         </c:forEach>
 </table>

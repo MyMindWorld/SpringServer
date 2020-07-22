@@ -12,4 +12,5 @@ import java.util.List;
 @Repository
 public interface ScriptRepository extends JpaRepository<Script, String> {
     Script findByNameEquals(String name);
+    Script findByDisplayNameEquals(String name);
 }

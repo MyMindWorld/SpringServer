@@ -268,7 +268,7 @@
                     <c:if test="${item.group_name == group}">
                         <sec:authorize access="hasAuthority('${item.name}')">
                             <li>
-                                <a href='<c:url value="/index/${item.name}"/>'>${item.display_name}</a>
+                                <a href='<c:url value="/index/${item.name}"/>'>${item.displayName}</a>
                             </li>
                         </sec:authorize>
                     </c:if>
@@ -357,7 +357,7 @@
         <%-- Показывается только если есть необходимая роль --%>
         <sec:authorize access="hasAuthority('${script.name}')">
             <div class="script-params">
-            <h3>${script.display_name}</h3>
+            <h3>${script.displayName}</h3>
             <form name='f' id="ScriptForm" onsubmit="return connect();">
                 <input name="scriptName" id='name' type="hidden" value="${script.name}"/>
 
@@ -381,6 +381,52 @@
                                     $(document).ready(function () {
                                         $(".${parameter.param}").select2({
                                             placeholder: "${parameter.name}"
+                                        });
+                                    });
+                                </script>
+                            </c:when>
+                            <c:when test="${parameter.type == 'fileSelect'}">
+                                <label class="col-sm-2 control-label" for="${parameter.param}">
+                                    <c:out value="${parameter.name}"></c:out>
+
+                                    <select id="${parameter.param}" name="${parameter.param}" class="${parameter.param}"
+                                            style="width: 100%; padding-left: 50px;"
+                                            <c:if test="${parameter.required}">required</c:if>>
+                                    </select>
+                                </label>
+                                <script>
+                                    $(document).ready(function () {
+                                        var select = $('.${parameter.param}');
+                                        $(".${parameter.param}").select2({
+                                            placeholder: "${parameter.name}",
+                                            minimumInputLength: 0,
+                                            delay: 0,
+                                            allowClear: true,
+                                            ajax: {
+                                                url: '<c:url value="/files/get_all_for_select"/>',
+                                                dataType: "json",
+                                                type: "GET",
+                                                data: function (params) {
+                                                    return {
+                                                        search: params.term,
+                                                        scriptName: '${script.name}',
+                                                        // page: params.page || 1,
+
+                                                    };
+
+                                                },
+                                                processResults: function (data) {
+                                                    console.log(data)
+                                                    return {
+                                                        results: $.map(data.items, function (item) {
+                                                            return {
+                                                                text: item.resultValue,
+                                                                id: item.resultText
+                                                            }
+                                                        })
+                                                    };
+                                                }
+                                            }
                                         });
                                     });
                                 </script>
@@ -574,6 +620,20 @@
                 Stop script
             </button>
         </sec:authorize>
+        <c:set var="contains" value="false"/>
+        <c:forEach var="parameter" items="${parameters}">
+            <c:if test="${parameter.type eq 'fileSelect'}">
+                <c:set var="contains" value="true"/>
+            </c:if>
+        </c:forEach>
+        <c:if test="${contains}">
+            <button id="uploadFileButton" class="e" onclick="window.open('<c:url
+                    value='/files/control'/>')">
+                Upload File
+            </button>
+        </c:if>
+
+
         </div>
         <script>
             $('#ScriptForm').on('submit', function () {

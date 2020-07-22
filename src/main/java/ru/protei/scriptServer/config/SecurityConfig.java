@@ -60,22 +60,31 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .alwaysRemember(true)
                 .and()
                 .authorizeRequests()
+                // Base admin page
                 .antMatchers("/admin/**").hasAuthority("ADMIN_PAGE_USAGE")
                 .antMatchers("/admin/update_scripts").hasAuthority("SCRIPTS_UPDATE")
                 .antMatchers("/admin/scripts/**").hasAuthority("SCRIPTS_UPDATE")
                 .antMatchers("/admin/scripts").hasAuthority("SCRIPTS_UPDATE")
                 .antMatchers("/admin/roles").hasAuthority("ROLES_SETTING")
                 .antMatchers("/admin/users").hasAuthority("ROLES_SETTING")
-
+                // Users
                 .antMatchers("/admin/update_user_roles").hasAuthority("ROLES_SETTING")
                 .antMatchers("/admin/invite_user").hasAuthority("ROLES_SETTING")
                 .antMatchers("/admin/delete_user").hasAuthority("ROLES_SETTING")
-
+                // Roles
                 .antMatchers("/admin/update_role").hasAuthority("ROLES_SETTING")
                 .antMatchers("/admin/delete_role").hasAuthority("ROLES_SETTING")
                 .antMatchers("/admin/create_role").hasAuthority("ROLES_SETTING")
-
+                // Server control
                 .antMatchers("/admin/server_control").hasAuthority("SERVER_CONTROL")
+                // Files
+                .antMatchers("/files/control").hasAuthority("FILES_UPLOAD")
+                .antMatchers("/files/get_all").permitAll()
+                .antMatchers("/files/get_all_for_select").permitAll()
+                .antMatchers("/files/upload_file").hasAuthority("FILES_UPLOAD")
+                .antMatchers("/files/edit_file").hasAuthority("FILES_EDIT")
+                .antMatchers("/files/delete_file").hasAuthority("FILES_EDIT")
+                // Base endpoints
                 .antMatchers("/api/**").permitAll()
                 .antMatchers("/css/**").permitAll()
                 .antMatchers("/fonts/**").permitAll()

@@ -18,6 +18,7 @@ import ru.protei.scriptServer.controller.ScriptWebSocketController;
 import ru.protei.scriptServer.model.*;
 import ru.protei.scriptServer.model.Enums.ServiceMessage;
 import ru.protei.scriptServer.model.POJO.GitlabGroupsAnswer;
+import ru.protei.scriptServer.model.POJO.JsonScript;
 import ru.protei.scriptServer.model.POJO.RunningScript;
 import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.repository.VenvRepository;
@@ -29,7 +30,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
-import java.util.List;
 
 @Service
 public class ScriptsService {
@@ -43,7 +43,7 @@ public class ScriptsService {
     @Autowired
     private PrivilegeService privilegeService;
     @Autowired
-    private RoleService roleService;
+    public RoleService roleService;
     @Autowired
     LogService logService;
     @Autowired
@@ -87,7 +87,7 @@ public class ScriptsService {
                 // todo if parsing straight to db really hard?
                 script.setName(jsonScript.name);
                 script.setGroup_name(jsonScript.group);
-                script.setDisplay_name(jsonScript.display_name);
+                script.setDisplayName(jsonScript.display_name);
                 script.setVenv(jsonScript.venv);
                 script.setPython_version(jsonScript.python_version);
                 script.setRequirements(jsonScript.requirements);
@@ -105,7 +105,7 @@ public class ScriptsService {
 
 
         }
-        updateRoleAllScripts();
+        roleService.updateRoleAllPrivileges();
     }
 
     @SneakyThrows
@@ -127,7 +127,7 @@ public class ScriptsService {
                 JsonScript jsonScript = utils.parseJsonToObject(FileUtils.openInputStream(config));
                 if ((jsonScript.name.equals(script.getName()))) {
                     script.setGroup_name(jsonScript.group);
-                    script.setDisplay_name(jsonScript.display_name);
+                    script.setDisplayName(jsonScript.display_name);
                     script.setVenv(jsonScript.venv);
                     script.setPython_version(jsonScript.python_version);
                     script.setRequirements(jsonScript.requirements);
@@ -163,14 +163,6 @@ public class ScriptsService {
     }
 
 
-    public void updateRoleAllScripts() {
-        List<Privilege> allPrivileges = privilegeService.returnAllPrivileges();
-
-        Role role_all = roleService.createRoleIfNotFound("ROLE_ALL_SCRIPTS", allPrivileges, true);
-        if (role_all == null)
-            roleService.updateRole("ROLE_ALL_SCRIPTS", allPrivileges, true);
-    }
-
     @SneakyThrows
     public void runPythonScript(String[] params, Script script, String username, String uniqueSessionId) {
         if (script.getVenv() == null) {
@@ -186,7 +178,7 @@ public class ScriptsService {
             venvManager.checkVenv(script, venvFromScript);
         }
 
-        scriptWebSocketController.sendToSockFromServerService(username, "Starting script '" + script.getDisplay_name() + "'", script.getName(), uniqueSessionId, ServiceMessage.Started);
+        scriptWebSocketController.sendToSockFromServerService(username, "Starting script '" + script.getDisplayName() + "'", script.getName(), uniqueSessionId, ServiceMessage.Started);
         pythonScriptsRunner.run(params, utils.getScriptsDirectory(), false, script, script.getVenv(), username, uniqueSessionId);
         logger.info("Exit code : " + pythonScriptsRunner.processExitcode);
 

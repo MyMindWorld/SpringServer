@@ -22,6 +22,8 @@ public class RoleService {
 
     @Autowired
     private RoleRepository roleRepository;
+    @Autowired
+    private PrivilegeService privilegeService;
 
 
     @Transactional
@@ -122,4 +124,11 @@ public class RoleService {
     }
 
 
+    public void updateRoleAllPrivileges() {
+        List<Privilege> allPrivileges = privilegeService.returnAllPrivileges();
+
+        Role role_all = createRoleIfNotFound("ALL_PRIVILEGES_ROLE", allPrivileges, true);
+        if (role_all == null)
+            updateRole("ALL_PRIVILEGES_ROLE", allPrivileges, true);
+    }
 }

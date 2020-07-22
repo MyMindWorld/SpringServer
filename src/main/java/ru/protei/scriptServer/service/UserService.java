@@ -9,12 +9,10 @@ import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.protei.scriptServer.model.PasswordResetToken;
-import ru.protei.scriptServer.model.Privilege;
-import ru.protei.scriptServer.model.Role;
-import ru.protei.scriptServer.model.User;
+import ru.protei.scriptServer.model.*;
 import ru.protei.scriptServer.repository.PasswordTokenRepository;
 import ru.protei.scriptServer.repository.RoleRepository;
+import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.repository.UserRepository;
 
 import javax.transaction.Transactional;
@@ -28,16 +26,13 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
+    private ScriptRepository scriptRepository;
+
+    @Autowired
     private PasswordTokenRepository passwordTokenRepository;
 
     @Autowired
-    private RoleService roleService;
-
-    @Autowired
     public RoleRepository roleRepository;
-
-    @Autowired
-    private PrivilegeService privilegeService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -48,6 +43,38 @@ public class UserService {
 
     @Autowired
     private Environment env;
+
+    @Transactional
+    public boolean checkPrivilege(User user, String privilege) {
+        return user.getRoles()
+                .stream().filter(role -> role.getPrivileges()
+                        .stream().filter(privilegeFromRole -> privilegeFromRole.getName().equals(privilege)).findFirst().isPresent())
+                .findFirst().isPresent();
+    }
+
+    @Transactional
+    public List<Script> getAllAvailableScriptsForUser(User user) {
+        List<Script> scriptList = scriptRepository.findAll();
+        List<Script> allowedScripts = new ArrayList<>();
+        Collection<Privilege> allPrivilegesFromUser = getAllPrivilegesFromUser(user);
+        for (Script script : scriptList) {
+            if (allPrivilegesFromUser.stream()
+                    .filter(privilege -> privilege.getName().equals(script.getName()))
+                    .findFirst().isPresent()) {
+                allowedScripts.add(script);
+            }
+        }
+        return allowedScripts;
+    }
+
+    public List<String> getAllAvailableScriptsForUserAsString(User user) {
+        List<Script> allowedScripts = getAllAvailableScriptsForUser(user);
+        List<String> allowedScriptsAsString = new ArrayList<>();
+        for (Script script : allowedScripts) {
+            allowedScriptsAsString.add(script.getName());
+        }
+        return allowedScriptsAsString;
+    }
 
     @Transactional
     public Collection<Privilege> getAllPrivilegesFromUser(User user) {

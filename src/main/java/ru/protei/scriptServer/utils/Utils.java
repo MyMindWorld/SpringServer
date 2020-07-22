@@ -92,6 +92,9 @@ public class Utils {
     }
 
     public List<String> getFilesListFromFolder(File folder) {
+        logger.info("Getting all files from : '" + folder.getAbsolutePath() + "'");
+        assert folder.isDirectory() == true;
+        assert folder.exists() == true;
         List<String> files = new ArrayList<>();
         for (File fileEntry : folder.listFiles()) {
             if (fileEntry.isDirectory()) {

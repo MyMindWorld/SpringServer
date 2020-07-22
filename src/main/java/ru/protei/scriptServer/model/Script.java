@@ -2,12 +2,9 @@ package ru.protei.scriptServer.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "Scripts")
@@ -20,7 +17,7 @@ public class Script {
     @Column(columnDefinition = "LONGTEXT")
     private String group_name;
     @NotBlank
-    private String display_name;
+    private String displayName;
     @NotBlank
     private String python_version;
     private String venv;
@@ -37,6 +34,6 @@ public class Script {
     }
 
     public String toString() {
-        return "display_name : '" + display_name + "' Name : '" + name + "'";
+        return "display_name : '" + displayName + "' Name : '" + name + "'";
     }
 }

@@ -1,4 +1,4 @@
-package ru.protei.scriptServer.model;
+package ru.protei.scriptServer.model.POJO;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;

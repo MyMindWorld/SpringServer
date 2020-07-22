@@ -18,11 +18,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import ru.protei.scriptServer.config.ProcessQueueConfig;
-import ru.protei.scriptServer.model.JsonScript;
+import ru.protei.scriptServer.model.POJO.JsonScript;
 import ru.protei.scriptServer.model.POJO.ResultToSelect;
 import ru.protei.scriptServer.model.POJO.RunningScript;
-import ru.protei.scriptServer.model.Parameters;
+import ru.protei.scriptServer.model.POJO.Parameters;
 import ru.protei.scriptServer.model.Script;
+import ru.protei.scriptServer.service.StorageService;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -60,8 +61,12 @@ public class Utils {
     public String defaultVenvName;
     @Value("${TomcatPath:NotSet}")
     public String tomcatPath;
+    @Value("${upload.path:/userResources}")
+    private String userResourcesDir;
     @Autowired
     private ProcessQueueConfig processQueueConfig;
+    @Autowired
+    private StorageService storageService;
 
     @PostConstruct
     public void UtilsCreation() {
@@ -72,6 +77,8 @@ public class Utils {
             logger.info("Tomcat path found!");
             logger.info("Now it set to : '" + tomcatPath + "'");
         }
+
+        assert !tomcatPath.equals("NotSet");
     }
 
     public void createDefaultFolders() {
@@ -80,7 +87,20 @@ public class Utils {
         createFolderIfNotExists(getScriptsDirectory());
         createFolderIfNotExists(getVenvDirectory());
         createFolderIfNotExists(getConfigDirectory());
+        createFolderIfNotExists(getUserResourcesDir());
         logger.info("Creation complete!");
+    }
+
+    public List<String> getFilesListFromFolder(File folder) {
+        List<String> files = new ArrayList<>();
+        for (File fileEntry : folder.listFiles()) {
+            if (fileEntry.isDirectory()) {
+                files.addAll(getFilesListFromFolder(fileEntry));
+            } else {
+                files.add(fileEntry.getName());
+            }
+        }
+        return files;
     }
 
     String webappFolder = "/src/main/webapp";
@@ -99,6 +119,10 @@ public class Utils {
 
         }
 
+    }
+
+    public File getUserResourcesDir() {
+        return new File(tomcatPath + scriptServerResourcesPath + userResourcesDir + "/");
     }
 
     public File getScriptsDirectory() {
@@ -240,7 +264,7 @@ public class Utils {
         ResultToSelect resultObject = new ResultToSelect();
         int resultIndex = 0;
         ResultToSelect.Items[] itemsResult;
-        if (param.getValues() != null) { // Other params might be not initialized
+        if (param == null ? false : param.getValues() != null) { // Other params might be not initialized or present at all
             itemsResult = new ResultToSelect.Items[scriptResults.size() + param.getValues().length];
             for (String result : scriptResults) {
                 resultIndex = scriptResults.indexOf(result);
@@ -383,15 +407,15 @@ public class Utils {
     }
 
     public String[] createParamsString(Script script, Map<String, String[]> requestParamsMap, HttpServletRequest req) {
-        Map<String, String[]> params = new HashMap<>(requestParamsMap); // Duplicating original map, due to map lock
-        params.remove("scriptName"); // Key containing script name
+        Map<String, String[]> receivedParams = new HashMap<>(requestParamsMap); // Duplicating original map, due to map lock
+        receivedParams.remove("scriptName"); // Key containing script name
         // todo refactor to array mb?
         // todo нужна ли здесь валидация
-        Parameters[] parametersKeys = stringToListOfParams(script.getParametersJson());
+        Parameters[] configParams = stringToListOfParams(script.getParametersJson());
         ArrayList<String> resultArray = new ArrayList<String>();
-        for (Parameters paramKey : parametersKeys) {
+        for (Parameters paramKey : configParams) {
             if (paramKey.isConstant()) {
-                if (params.get(paramKey) == null) {
+                if (receivedParams.get(paramKey) == null) {
                     continue;
                 }
                 resultArray.add(paramKey.getParam());
@@ -407,15 +431,23 @@ public class Utils {
             }
             if (paramKey.getType().equals("boolean")) {
                 // From ui key is received only if boolean == True, but argParser doesn't need value, only key presence
-                if (params.get(paramKey.getParam()) != null) { // checking that we received values
-                    logger.debug("Adding boolean param '" + paramKey.getParam() + "' to results, cause it's value was : '" + params.get(paramKey.getParam())[0] + "'");
+                if (receivedParams.get(paramKey.getParam()) != null) { // checking that we received values
+                    logger.debug("Adding boolean param '" + paramKey.getParam() + "' to results, cause it's value was : '" + receivedParams.get(paramKey.getParam())[0] + "'");
                     resultArray.add(paramKey.getParam()); // adding key to result string
-                    params.remove(paramKey.getParam()); // removing param for future iteration
+                    receivedParams.remove(paramKey.getParam()); // removing param from future iteration
                 }
             }
+            if (paramKey.getType().equals("fileSelect")) {
+                resultArray.add(paramKey.getParam());
+                resultArray.add(
+                        storageService.findFileForScriptWithName(
+                                receivedParams.get(paramKey.getParam())[0]
+                                ,script.getName()));
+                receivedParams.remove(paramKey.getParam()); // removing param from future iteration
+            }
         }
-        for (String paramKey : params.keySet()) {
-            String[] paramValueArray = params.get(paramKey);
+        for (String paramKey : receivedParams.keySet()) {
+            String[] paramValueArray = receivedParams.get(paramKey);
             String paramValue = String.join("; ", paramValueArray);
             if (paramValue.isEmpty()) { // Пропускаем username,hidden,constant
                 logger.debug("Skipping not presented param '" + paramKey + "'");
@@ -444,7 +476,7 @@ public class Utils {
         return processMap;
     }
 
-    public String getAppUrl(HttpServletRequest request){
+    public String getAppUrl(HttpServletRequest request) {
         return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
     }
 

@@ -51,7 +51,7 @@ public class OnEventsAction {
     public void beforeStartup() {
         logger.info("AfterStartup invocation started!");
         utils.createDefaultFolders();
-        if (updateScriptsOnStartup){
+        if (updateScriptsOnStartup) {
             scriptsService.getScriptsFromGit();
         }
         scriptsService.updateAllScriptsConfigs();
@@ -71,12 +71,16 @@ public class OnEventsAction {
                 = privilegeService.createPrivilegeIfNotFound("ROLES_SETTING");
         Privilege serverControl
                 = privilegeService.createPrivilegeIfNotFound("SERVER_CONTROL");
+        Privilege filesUpload
+                = privilegeService.createPrivilegeIfNotFound("FILES_UPLOAD");
+        Privilege filesEdit
+                = privilegeService.createPrivilegeIfNotFound("FILES_EDIT");
 
         List<Privilege> adminPrivileges = Arrays.asList(
-                scripts_view, admin_page_usage, scriptsUpdate, rolesAdmin, serverControl);
+                scripts_view, admin_page_usage, scriptsUpdate, rolesAdmin, serverControl, filesUpload, filesEdit);
         Role adminRole = roleService.createRoleIfNotFound("ROLE_ADMIN", adminPrivileges, true);
-        Role userRole = roleService.createRoleIfNotFound("ROLE_USER", Arrays.asList(scripts_view), true);
-        Role roleAll = roleRepository.findByNameEquals("ROLE_ALL_SCRIPTS");
+        Role userRole = roleService.createRoleIfNotFound("ROLE_USER", Arrays.asList(scripts_view), false);
+        Role roleAll = roleRepository.findByNameEquals("ALL_PRIVILEGES_ROLE");
 
         User admin = new User();
         admin.setUsername("admin");
@@ -87,6 +91,7 @@ public class OnEventsAction {
         admin.setEnabled(true);
 
         userService.createUserIfNotFound(admin);
+        roleService.updateRoleAllPrivileges();
 
     }
 }

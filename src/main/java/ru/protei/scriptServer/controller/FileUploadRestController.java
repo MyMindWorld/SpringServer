@@ -19,7 +19,6 @@ import ru.protei.scriptServer.service.StorageService;
 import ru.protei.scriptServer.service.UserService;
 import ru.protei.scriptServer.utils.Utils;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 
 @Log
@@ -62,52 +61,6 @@ public class FileUploadRestController {
         Resource file = storageService.loadAsResource(fileId);
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=\"" + file.getFilename() + "\"").body(file);
-    }
-
-    @SneakyThrows
-    @PostMapping("/files/upload_file/{scriptName}")
-    public ResponseEntity<?> handleFileUpload(@RequestParam("file") MultipartFile file, @PathVariable String scriptName, HttpServletRequest req) {
-        Script scriptFromDB = scriptRepository.findByNameEquals(scriptName);
-        if (scriptFromDB == null) {
-            throw new Exception("Valid Script should be specified!");
-        }
-        User user = userService.getUserByName(req.getRemoteUser());
-
-        if (storageService.isFilePresent(file)) {
-            if (!userService.checkPrivilege(user, "FILES_EDIT") || !userService.checkPrivilege(user, scriptName)) {
-                logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "UPLOADING FILE WITHOUT ROLE!", file.getOriginalFilename());
-                return new ResponseEntity(HttpStatus.FORBIDDEN);
-            }
-            logService.logAction(user.getUsername(), req.getRemoteAddr(), "Update file", storageService.getUploadPath(file, scriptName).toString());
-        } else {
-            logService.logAction(user.getUsername(), req.getRemoteAddr(), "Add new file", storageService.getUploadPath(file, scriptName).toString());
-        }
-        storageService.uploadFile(file, user.getUsername(), scriptName);
-
-
-        return ResponseEntity.ok().body("You successfully uploaded " + file.getOriginalFilename() + "!");
-    }
-
-    @PostMapping("/files/delete_file")
-    @SneakyThrows
-    public ResponseEntity<?> handleFileDelete(UserFile file, HttpServletRequest req) {
-        UserFile userFile = storageService.findFileById(file.getId());
-        if (userFile == null) {
-            throw new Exception("Valid file should be specified!");
-        }
-
-        User user = userService.getUserByName(req.getRemoteUser());
-        if (!userService.checkPrivilege(user, "FILES_EDIT")) {
-            logService.logAction(req.getRemoteUser(), req.getRemoteAddr(), "REMOVING FILE WITHOUT ROLE!", file.getName());
-            return new ResponseEntity(HttpStatus.FORBIDDEN);
-        }
-
-        logService.logAction(user.getUsername(), req.getRemoteAddr(), "Delete file", storageService.getUploadPath(file.getName(), file.getScript()).toString());
-
-        storageService.deleteFile(userFile);
-
-
-        return ResponseEntity.ok().body("You successfully deleted " + file.getName() + "!");
     }
 
     @ExceptionHandler(StorageException.class)

@@ -39,11 +39,11 @@ public class StorageService {
         return userFileRepository.findByIdEquals(id);
     }
 
-    public boolean isFilePresent(MultipartFile file) {
+    public boolean isFilePresent(MultipartFile file, String scriptName) {
         Path copyLocation = Paths
                 .get(utils.getUserResourcesDir() + File.separator + StringUtils.cleanPath(file.getOriginalFilename()));
 
-        return userFileRepository.findByFullPathEquals(copyLocation.toString()) != null;
+        return userFileRepository.findByFullPathEquals(getUploadPath(file, scriptName).toString()) != null;
     }
 
     public Path getUploadPath(MultipartFile file) {
@@ -122,7 +122,7 @@ public class StorageService {
     }
 
     @SneakyThrows
-    public String findFileForScriptWithName(String fileName,String scriptName) {
-        return userFileRepository.findByNameEqualsAndScriptEquals(fileName,scriptName).getFullPath();
+    public String findFileForScriptWithName(String fileName, String scriptName) {
+        return userFileRepository.findByNameEqualsAndScriptEquals(fileName, scriptName).getFullPath();
     }
 }

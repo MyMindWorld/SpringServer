@@ -95,6 +95,7 @@
         <th>Action</th>
     </tr>
     </thead>
+    <tbody>
     <c:forEach items="${files}" var="file">
     <tr>
         <td>
@@ -122,11 +123,17 @@
             </button>
         </td>
         </c:forEach>
+    </tbody>
 </table>
 
 <script type="text/javascript">
 
     function validateFileUpload() {
+        var matchingFiles = $("tr").filter(function () {
+            console.log($(this).text())
+            return $(this).text().includes(document.getElementById("fileToUpload").files[0].name) &&
+                $(this).text().includes(document.getElementById("ScriptSelect").value);
+        }).closest("tr");
 
         document.upload_file.action = "/ScriptServer/files/upload_file/" + document.getElementById("ScriptSelect").value
 
@@ -134,8 +141,10 @@
             alert("Please choose file!"); // todo normal error
             return false
         }
-
-        return true
+        if (matchingFiles.length > 0) {
+            return confirm("Вы уверены что хотите перезаписать файл?");
+        }
+        return true;
     }
 
 </script>
@@ -145,7 +154,7 @@
     <!-- Modal content -->
     <div class="modal-content" style="height: auto;overflow-y: unset">
         <span class="close">&times;</span>
-        <p style="font-size:235%;text-align:center;" id="DeleteModalWindowRole">'ERROR!'</p>
+        <p style="font-size:235%;text-align:center;" id="DeleteFileModalWindow">'ERROR!'</p>
         <form name='f' class="form__group field" action=
         <c:url value='/files/delete_file'/> method='POST'>
 
@@ -165,7 +174,7 @@
 
     function openModalDelete(id, roleName) {
         modalDelete.style.display = "block";
-        document.getElementById('DeleteModalWindowRole').innerHTML = "Are you sure want to delete file <b>" + roleName.toString() + "</b> ?";
+        document.getElementById('DeleteFileModalWindow').innerHTML = "Are you sure want to delete file <b>" + roleName.toString() + "</b> ?";
         document.getElementById('fileDeleteName').value = roleName;
         document.getElementById('fileIdDelete').value = id;
 
@@ -185,8 +194,6 @@
 
     }
 </script>
-
-
 <script type="text/javascript">
     console.log("Sort enabling start");
     const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;

@@ -17,7 +17,7 @@
 
     <groupId>ru.protei.ScriptServer</groupId>
     <artifactId>ScriptServer</artifactId>
-    <version>0.0.10</version>
+    <version>0.0.11</version>
     <name>ScriptServer</name>
     <packaging>war</packaging>
 

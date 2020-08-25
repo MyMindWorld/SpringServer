@@ -96,6 +96,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user/changePassword").anonymous()
                 .antMatchers("/user/savePassword").anonymous()
                 .antMatchers("/index/**").authenticated()
+                .antMatchers("/Planner/**").authenticated()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()

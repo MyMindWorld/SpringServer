@@ -40,10 +40,6 @@ public class MainPageController {
     @Autowired
     StorageService storageService;
 
-    @RequestMapping("/TestPage")
-    public ModelAndView testPage() {
-        return new ModelAndView("TestPage").addObject("files", storageService.getAllResourceFiles());
-    }
 
     @RequestMapping("/")
     public ModelAndView redirectToIndex(HttpServletRequest req) {

@@ -20,7 +20,6 @@ import ru.protei.scriptServer.utils.Utils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -47,8 +46,8 @@ public class ScriptsRestController {
 
     @SneakyThrows
     @RequestMapping(value = "/scripts/run_script_select", method = RequestMethod.GET)
-    public String runScriptForSelect(String scriptName, String paramName,String search,String formData, HttpServletRequest req) {
-        if(search == null){
+    public String runScriptForSelect(String scriptName, String paramName, String search, String formData, HttpServletRequest req) {
+        if (search == null) {
             search = "";
         }
         logger.info("scriptName '" + scriptName + "'");
@@ -71,8 +70,8 @@ public class ScriptsRestController {
         Parameters[] paramsList = utils.stringToListOfParams(script.getParametersJson());
         for (Parameters param : paramsList) {
             if (param.name.equals(paramName)) {
-                ArrayList<String> scriptResult = dynamicParamsScriptsRunner.run(utils.buildSelectQueryRun(param.getScript(),search,formQuery), utils.getScriptsDirectory());
-                return utils.createResultsSelect2Json(scriptResult,param,search);
+                ArrayList<String> scriptResult = dynamicParamsScriptsRunner.run(utils.buildSelectQueryRun(param.getScript(), search, formQuery), utils.getScriptsDirectory());
+                return utils.createResultsSelect2Json(scriptResult, param, search);
             }
         }
         logger.info("Returning nothing");

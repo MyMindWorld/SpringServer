@@ -27,10 +27,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
-    @Qualifier("messageSource")
-    @Autowired
-    private MessageSource messages;
-
     @Autowired
     private RoleRepository roleRepository;
 

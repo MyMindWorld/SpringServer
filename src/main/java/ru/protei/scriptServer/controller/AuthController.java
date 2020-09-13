@@ -28,9 +28,10 @@ import java.util.UUID;
 @Controller
 public class AuthController {
     Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     @Autowired
     UserService userService;
-    @Qualifier("messageSource") // todo verify qualifier
+    @Qualifier("messageSource")
     @Autowired
     private MessageSource messages;
     @Autowired

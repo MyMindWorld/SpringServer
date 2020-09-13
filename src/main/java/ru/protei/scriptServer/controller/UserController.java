@@ -3,6 +3,7 @@ package ru.protei.scriptServer.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +17,7 @@ import ru.protei.scriptServer.repository.*;
 import ru.protei.scriptServer.service.LogService;
 import ru.protei.scriptServer.service.RoleService;
 import ru.protei.scriptServer.service.ScriptsService;
+import ru.protei.scriptServer.service.UserService;
 import ru.protei.scriptServer.utils.Utils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,6 +48,10 @@ public class UserController {
     LogService logService;
     @Autowired
     PasswordEncoder passwordEncoder;
+    @Autowired
+    JavaMailSender mailSender;
+    @Autowired
+    UserService userService;
 
     @RequestMapping(value = "/admin/invite_user", method = RequestMethod.POST)
     public ModelAndView sendInvite(User user, @RequestParam("roleVar") List<Long> rolesRaw, Model model, HttpServletRequest request) {
@@ -73,7 +79,8 @@ public class UserController {
         String newPassword = utils.generateSecurePassword();
         user.setPassword(passwordEncoder.encode(newPassword));
         user.setRoles(roles);
-        // todo send invite link
+        mailSender.send(userService.constructInviteEmail(utils.getAppUrl(request),
+                request.getLocale(), user));
 
         userRepository.save(user); // prop register method
 
@@ -126,6 +133,7 @@ public class UserController {
 
         if (userFromRepo != null) {
             logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Delete user", userFromRepo.toString());
+            userService.removeAllUserPasswordResetTokens(userFromRepo);
             userRepository.delete(userFromRepo);
             model.addAttribute("success", true);
             model.addAttribute("successMessage", "Deleted user '" + userFromRepo.getUsername() + "' successfully!");

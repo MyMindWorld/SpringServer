@@ -56,7 +56,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .rememberMe()
                 .tokenRepository(persistentTokenRepository())
                 .userDetailsService(userDetailsService)
-//                .tokenValiditySeconds(1209600) // Discuss? IMHO always - ok.
                 .alwaysRemember(true)
                 .and()
                 .authorizeRequests()
@@ -107,7 +106,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .failureForwardUrl("/login?error=true")
                 .defaultSuccessUrl("/index", true)
                 .failureUrl("/login?error=true")
-//                .failureHandler(authenticationFailureHandler())
                 .and()
                 .logout()
                 .logoutUrl("/perform_logout")

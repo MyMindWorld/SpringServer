@@ -163,6 +163,11 @@ public class UserService {
         passwordTokenRepository.deleteByTokenEquals(token);
     }
 
+    @Transactional
+    public void removeAllUserPasswordResetTokens(User user) {
+        passwordTokenRepository.deleteByUserEquals(user);
+    }
+
     private boolean isTokenFound(PasswordResetToken passToken) {
         return passToken != null;
     }
@@ -170,6 +175,14 @@ public class UserService {
     private boolean isTokenExpired(PasswordResetToken passToken) {
         final Calendar cal = Calendar.getInstance();
         return passToken.getExpiryDate().before(cal.getTime());
+    }
+
+    public SimpleMailMessage constructInviteEmail(
+            String contextPath, Locale locale, User user) {
+        String url = contextPath + "/login";
+        String message = messages.getMessage("message.inviteToScriptServer",
+                null, locale);
+        return constructEmail(message, message + " \r\n" + url, user);
     }
 
     public SimpleMailMessage constructResetTokenEmail(

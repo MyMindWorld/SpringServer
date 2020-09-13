@@ -46,9 +46,10 @@ public class CustomLdapAuth implements AuthenticationProvider {
 
         String username = authentication.getName();
         boolean authenticated = ldapAuth(username, authentication.getCredentials().toString());
-        List<GrantedAuthority> grantedAuths = new ArrayList<>();
+
 
         if (authenticated) {
+            List<GrantedAuthority> grantedAuths = new ArrayList<>();
 
             User user = userRepository.findByUsernameEquals(username);
             if (user != null) {

@@ -46,7 +46,7 @@ public class PythonScriptsRunner extends Thread {
 
     @SneakyThrows
     public void run(String[] commandParams, File directory, boolean passCommandsAsLinesToShellExecutableAfterStartup, Script script, String venvName, String username, String uniqueSessionId) {
-        if (Thread.currentThread().isInterrupted()){
+        if (Thread.currentThread().isInterrupted()) {
             String msg = "Process won't start, thread was interrupted";
             logger.info(msg);
             scriptWebSocketController.sendToSockFromScript(username, msg, script.getName(), uniqueSessionId);
@@ -87,7 +87,9 @@ public class PythonScriptsRunner extends Thread {
             runningScript.setSessionId(uniqueSessionId);
             runningScript.setUserName(username);
             runningScript.setThreadName(Thread.currentThread().getName());
-            processQueueConfig.processBlockingQueue().put(new HashMap<RunningScript, Process>(){{put(runningScript,p);}});
+            processQueueConfig.processBlockingQueue().put(new HashMap<RunningScript, Process>() {{
+                put(runningScript, p);
+            }});
             logger.info("Starting reading from script");
             // 2 print the output
             InputStream is = p.getInputStream();
@@ -104,7 +106,7 @@ public class PythonScriptsRunner extends Thread {
                         if (lineStdout.matches(userInputFlagPattern.toString())) {
                             logger.info("Caught user depending input!");
                             String userAnswer = handleInputFromUser(username, lineStdout, script.getName(), uniqueSessionId);
-                            if (userAnswer == null){
+                            if (userAnswer == null) {
                                 logger.error("Received null input, destroying");
                                 p.destroy();
 
@@ -123,7 +125,7 @@ public class PythonScriptsRunner extends Thread {
                         scriptWebSocketController.sendToSockFromScript(username, lineStderr, script.getName(), uniqueSessionId);
                         linesSoFarStderr.add(lineStderr);
                     }
-                    if (currentThread().isInterrupted()){
+                    if (currentThread().isInterrupted()) {
                         logger.info("Caught interrupt in run thread");
                         scriptWebSocketController.sendToSockFromServer(username, "Process is stopping...", script.getName(), uniqueSessionId);
                         p.destroy();
@@ -143,7 +145,7 @@ public class PythonScriptsRunner extends Thread {
             return;
         } catch (Exception e) {
             logger.error("Exception in script run");
-            if (e.getMessage().contains("Stream closed")){ // Process was stopped manually
+            if (e.getMessage().contains("Stream closed")) { // Process was stopped manually
                 scriptWebSocketController.sendToSockFromServer(username, "Process ended with exception: " + e.getMessage(), script.getName(), uniqueSessionId);
                 return;
             }
@@ -178,7 +180,7 @@ public class PythonScriptsRunner extends Thread {
                 queueConfig.blockingQueue().put(msg);
                 // todo ping if client is in script still
                 logger.debug(msg.toString());
-                if (currentThread().isInterrupted()){
+                if (currentThread().isInterrupted()) {
                     logger.info("Caught interrupt in waiting input thread");
                     return null;
                 }

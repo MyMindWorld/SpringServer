@@ -53,6 +53,7 @@ public class ScriptWebSocketController {
         logger.debug("Sending message to socket : " + message.toString());
         this.simpMessagingTemplate.convertAndSendToUser(message.getAddressedTo(), "/reply/" + message.getScriptName(), message);
     }
+
     // TODO refactor to one method
     public void sendToSock(Message message, String uniqueSessionId) {
         message.setUniqueSessionId(uniqueSessionId);
@@ -68,7 +69,7 @@ public class ScriptWebSocketController {
         messageObj.setScriptName(scriptName);
         messageObj.setAddressedTo(addressedTo);
         messageObj.setTime(new SimpleDateFormat("HH:mm:ss:SSS").format(new Date()));
-        sendToSock(messageObj,uniqueSessionId);
+        sendToSock(messageObj, uniqueSessionId);
     }
 
     public void sendToSockFromServer(String addressedTo, String message, String scriptName, String uniqueSessionId) {

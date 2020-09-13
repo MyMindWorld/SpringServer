@@ -7,8 +7,6 @@ import org.springframework.stereotype.Service;
 import ru.protei.scriptServer.model.LogEntity;
 import ru.protei.scriptServer.repository.LogRepository;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Service
@@ -35,11 +33,10 @@ public class LogService {
         logEntity.setAction(strings[2]);
         logEntity.setParams(strings[3]);
         logEntity.setDate(date);
-        if (strings.length>4){
+        if (strings.length > 4) {
             logEntity.setErrorLog(strings[4]);
             logger.error("Logging ERROR action '" + logEntity.toString() + '"');
-        }
-        else {
+        } else {
             logger.info("Logging action '" + logEntity.toString() + '"');
         }
 

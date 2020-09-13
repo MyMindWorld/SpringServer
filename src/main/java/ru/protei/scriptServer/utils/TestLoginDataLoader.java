@@ -5,17 +5,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import ru.protei.scriptServer.model.Privilege;
-import ru.protei.scriptServer.model.Role;
-import ru.protei.scriptServer.model.User;
 import ru.protei.scriptServer.repository.RoleRepository;
 import ru.protei.scriptServer.service.LogService;
 import ru.protei.scriptServer.service.PrivilegeService;
-import ru.protei.scriptServer.service.RoleService;
-import ru.protei.scriptServer.service.UserService;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 @Component

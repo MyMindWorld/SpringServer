@@ -1,12 +1,14 @@
 package ru.protei.scriptServer.model;
 
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.Collection;
 
 @Entity
 @Data
+@ToString
 public class Privilege {
 
     @Id
@@ -23,11 +25,4 @@ public class Privilege {
         this.setName(name);
     }
 
-    @Override
-    public String toString() {
-        return "Privilege{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
-    }
 }

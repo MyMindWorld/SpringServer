@@ -36,7 +36,7 @@ public class JsonScript {
         super();
     }
 
-    public String paramsToJsonString(){
+    public String paramsToJsonString() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
         try {

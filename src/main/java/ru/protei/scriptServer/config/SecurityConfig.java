@@ -15,8 +15,8 @@ import org.springframework.security.web.authentication.rememberme.PersistentToke
 import org.springframework.web.context.WebApplicationContext;
 import ru.protei.scriptServer.service.CustomUserDetailsService;
 
-import javax.sql.DataSource;
 import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
 
 @Configuration
 @EnableWebSecurity

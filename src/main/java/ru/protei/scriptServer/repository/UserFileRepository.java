@@ -8,8 +8,12 @@ import java.util.List;
 
 public interface UserFileRepository extends JpaRepository<UserFile, Long> {
     UserFile findByNameEquals(String name);
+
     UserFile findByIdEquals(Long id);
+
     UserFile findByFullPathEquals(String fullPath);
+
     UserFile findByNameEqualsAndScriptEquals(@NotBlank String name, String script);
+
     List<UserFile> findAllByScriptIn(List<String> script);
 }

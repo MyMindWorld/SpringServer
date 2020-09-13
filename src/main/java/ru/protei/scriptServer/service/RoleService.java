@@ -7,9 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.protei.scriptServer.model.Privilege;
 import ru.protei.scriptServer.model.Role;
 import ru.protei.scriptServer.model.User;
-import ru.protei.scriptServer.repository.PrivilegeRepository;
 import ru.protei.scriptServer.repository.RoleRepository;
-import ru.protei.scriptServer.repository.UserRepository;
 
 import javax.transaction.Transactional;
 import java.util.Collection;

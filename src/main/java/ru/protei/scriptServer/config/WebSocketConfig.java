@@ -20,7 +20,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic","queue","/user");
+        config.enableSimpleBroker("/topic", "queue", "/user");
         config.setApplicationDestinationPrefixes("/scriptsWS");
     }
 
@@ -45,7 +45,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                             attributes.put("sessionId", session.getId());
                         }
                         return true;
-                    }}).withSockJS();
+                    }
+                }).withSockJS();
     }
 
 }

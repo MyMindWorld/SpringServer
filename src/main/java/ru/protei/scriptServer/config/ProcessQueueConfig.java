@@ -11,7 +11,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Configuration
 public class ProcessQueueConfig {
     @Bean
-    public BlockingQueue<HashMap<RunningScript,Process>> processBlockingQueue() {
+    public BlockingQueue<HashMap<RunningScript, Process>> processBlockingQueue() {
         return new LinkedBlockingQueue<>();
     }
 }

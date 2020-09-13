@@ -1,11 +1,14 @@
 package ru.protei.scriptServer.model;
 
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+
+@ToString
 @Entity
 @Data
 public class LogEntity {
@@ -25,16 +28,4 @@ public class LogEntity {
     private String params;
     @Column(columnDefinition = "LONGTEXT")
     private String errorLog;
-
-    @Override
-    public String toString() {
-        return "LogEntity{" +
-                "triggeredBy='" + triggeredBy + '\'' +
-                ", date=" + date +
-                ", ip='" + ip + '\'' +
-                ", action='" + action + '\'' +
-                ", errorLog='" + errorLog + '\'' +
-                '}';
-    }
-
 }

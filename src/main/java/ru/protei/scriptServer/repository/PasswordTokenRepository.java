@@ -7,5 +7,6 @@ import ru.protei.scriptServer.model.PasswordResetToken;
 @Repository
 public interface PasswordTokenRepository extends JpaRepository<PasswordResetToken, Long> {
     PasswordResetToken findByTokenEquals(String token);
+
     void deleteByTokenEquals(String token);
 }

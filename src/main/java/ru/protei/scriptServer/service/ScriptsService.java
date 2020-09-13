@@ -15,11 +15,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.protei.scriptServer.config.ProcessQueueConfig;
 import ru.protei.scriptServer.controller.ScriptWebSocketController;
-import ru.protei.scriptServer.model.*;
 import ru.protei.scriptServer.model.Enums.ServiceMessage;
 import ru.protei.scriptServer.model.POJO.GitlabGroupsAnswer;
 import ru.protei.scriptServer.model.POJO.JsonScript;
 import ru.protei.scriptServer.model.POJO.RunningScript;
+import ru.protei.scriptServer.model.Script;
+import ru.protei.scriptServer.model.Venv;
 import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.repository.VenvRepository;
 import ru.protei.scriptServer.utils.SystemIntegration.PythonScriptsRunner;
@@ -204,7 +205,7 @@ public class ScriptsService {
     }
 
     public void getScriptsFromGit() {
-        if (scriptsGitUrl.contains("NONE")){
+        if (scriptsGitUrl.contains("NONE")) {
             logger.info("Skipping scripts update");
             return;
         }

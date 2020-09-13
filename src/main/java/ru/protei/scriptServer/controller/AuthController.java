@@ -9,7 +9,10 @@ import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.protei.scriptServer.exception.UserNotFoundException;
 import ru.protei.scriptServer.model.DTO.PasswordDto;
 import ru.protei.scriptServer.model.User;
@@ -53,13 +56,13 @@ public class AuthController {
     @SneakyThrows
     @PostMapping("/user/resetPassword")
     public String resetPassword(HttpServletRequest request,
-                                         @RequestParam("email") String userEmail) {
+                                @RequestParam("email") String userEmail) {
         User user = userService.getUserByEmail(userEmail);
         if (user == null) {
             throw new UserNotFoundException(userEmail);
         }
         String token = UUID.randomUUID().toString();
-        logger.info("Sending email with password reset token to '" + userEmail +"'");
+        logger.info("Sending email with password reset token to '" + userEmail + "'");
         userService.createPasswordResetTokenForUser(user, token);
         mailSender.send(userService.constructResetTokenEmail(utils.getAppUrl(request),
                 request.getLocale(), token, user));
@@ -74,7 +77,7 @@ public class AuthController {
         if (user == null) {
             throw new UserNotFoundException("");
         }
-        return resetPassword(request,user.getEmail());
+        return resetPassword(request, user.getEmail());
     }
 
     @GetMapping("/user/changePassword")
@@ -95,14 +98,14 @@ public class AuthController {
     public String savePassword(final Locale locale, @Valid PasswordDto passwordDto) {
         String result = userService.validatePasswordResetToken(passwordDto.getToken());
 
-        if(result != null) {
+        if (result != null) {
             return "redirect:/login.html?lang="
                     + locale.getLanguage() + "&message=" + messages.getMessage(
                     "auth.message." + result, null, locale);
         }
 
         Optional user = userService.getUserByPasswordResetToken(passwordDto.getToken());
-        if(user.isPresent()) {
+        if (user.isPresent()) {
             userService.changeUserPassword((User) user.get(), passwordDto.getNewPassword());
             userService.removePasswordResetToken(passwordDto.getToken());
             return "redirect:/login.html?lang="

@@ -2,11 +2,12 @@ package ru.protei.scriptServer.model;
 
 import lombok.Data;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
-import java.util.Collection;
 
 @Entity
 @Table(name = "persistent_logins")

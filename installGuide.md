@@ -11,7 +11,7 @@
    Для этого необходимо прописать в tomcat_installation/bin/setenv.sh директорию с файлом конфигурации. 
    Если файл отсутствует - создайте его.
    ```shell script
-    export SPRING_CONFIG_LOCATION=/usr/opt/tomcat/ScriptServerConf/application.properties
+    export SPRING_CONFIG_LOCATION=/opt/tomcat/ScriptServerConf/application.properties
    ``` 
 
 ---
@@ -21,6 +21,19 @@
 ```sql
 CREATE DATABASE ScriptServer DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
 ```
+
+## Установка в tomcat-mysql контейнер
+1. Запустите tomcat-mysql контейнер
+    ```shell script
+    docker run -d --name=script-serverSpring --restart unless-stopped  -p 8585:8080 -p 1313:3306 git.protei.ru:8443/docker/images/tomcat-mysql
+    ```
+2. Создайте директорию для конфигов ScriptServer
+3. Создайте файл `application.properties`
+4. [Отредактируйте конфигурацию](#Конфигурация)
+5. Скачайте последнюю сборку [из Jenkins](https://jenkins.protei.ru/view/all/job/qa/job/ScriptServer/job/ScriptServerPipeline/)
+6. Переименуйте *.war файл в `ScriptServer.war`
+7. Если томкат был остановлен, запустите его через `/opt/tomcat/bin/startup.sh`
+8. Приложение будет доступно по адресу `http://HOST:8585/ScriptServer/`, логи будут в `/opt/tomcat/bin/logs/ScriptServer/`
 
 ## Конфигурация
 

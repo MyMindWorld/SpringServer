@@ -116,4 +116,8 @@ public class FileUploadRestController {
 
 ## TODO
 
-0. Часть [SystemIntegration](./src/main/java/ru/protei/scriptServer/utils/SystemIntegration) молит о рефакторинге и читаемости
+0. В проекте раскиданы //Todo и //legshooting, к ним можно обратиться из вкладки TODO в IntellijIdea на панели внизу слева
+1. Часть [SystemIntegration](./src/main/java/ru/protei/scriptServer/utils/SystemIntegration) молит о рефакторинге и читаемости
+2. Веб часть просит редизайн и вынос js скриптов в отдельные файлы
+3. Тесты на основной функционал
+

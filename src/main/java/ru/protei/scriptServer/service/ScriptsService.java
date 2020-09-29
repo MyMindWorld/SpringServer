@@ -52,7 +52,7 @@ public class ScriptsService {
     @Autowired
     PythonScriptsRunner pythonScriptsRunner;
     @Autowired
-    VenvManager venvManager;
+    VenvService venvService;
     @Autowired
     VenvRepository venvRepository;
     @Autowired
@@ -152,14 +152,14 @@ public class ScriptsService {
 
 
     public Script updateSpecifiedScriptConfigAndDropVenv(Script script) {
-        venvManager.deleteVenv(script.getVenv());
+        venvService.deleteVenv(script.getVenv());
         return updateSpecifiedScriptConfig(script);
     }
 
     public Script updateSpecifiedScriptConfigAndRecreateVenv(Script script) {
-        venvManager.deleteVenv(script.getVenv());
+        venvService.deleteVenv(script.getVenv());
         Script updatedScript = updateSpecifiedScriptConfig(script);
-        venvManager.createVenv(script.getVenv(), script.getRequirements());
+        venvService.createVenv(script.getVenv(), script.getRequirements());
         return updatedScript;
     }
 
@@ -172,11 +172,11 @@ public class ScriptsService {
         Venv venvFromScript = venvRepository.findByNameEquals(script.getVenv());
         if (venvFromScript == null) {
             scriptWebSocketController.sendToSockFromServer(username, "Creating venv...", script.getName(), uniqueSessionId);
-            venvManager.createIfNotExists(script.getVenv(), script.getRequirements());
+            venvService.createIfNotExists(script.getVenv(), script.getRequirements());
             scriptWebSocketController.sendToSockFromServer(username, "Venv creation complete!", script.getName(), uniqueSessionId);
         } else {
             scriptWebSocketController.sendToSockFromServer(username, "Checking venv...", script.getName(), uniqueSessionId);
-            venvManager.checkVenv(script, venvFromScript);
+            venvService.checkVenv(script, venvFromScript);
         }
 
         scriptWebSocketController.sendToSockFromServerService(username, "Starting script '" + script.getDisplayName() + "'", script.getName(), uniqueSessionId, ServiceMessage.Started);

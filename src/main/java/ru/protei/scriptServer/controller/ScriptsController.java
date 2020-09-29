@@ -21,7 +21,7 @@ import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.service.LogService;
 import ru.protei.scriptServer.service.ScriptsService;
 import ru.protei.scriptServer.service.UserService;
-import ru.protei.scriptServer.service.VenvManager;
+import ru.protei.scriptServer.service.VenvService;
 import ru.protei.scriptServer.utils.SystemIntegration.DynamicParamsScriptsRunner;
 import ru.protei.scriptServer.utils.Utils;
 
@@ -44,7 +44,7 @@ public class ScriptsController {
     @Autowired
     LogService logService;
     @Autowired
-    VenvManager venvManager;
+    VenvService venvService;
     @Autowired
     ScriptWebSocketController scriptWebSocketController;
     @Autowired
@@ -73,11 +73,11 @@ public class ScriptsController {
     @RequestMapping(value = "/admin/update_scripts_and_drop_venv", method = RequestMethod.GET)
     public String updateScriptsAndDropVenv(HttpServletRequest request) {
         logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "All Venv deleting", "");
-        venvManager.deleteAllVenvs();
+        venvService.deleteAllVenvs();
         logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Scripts update", "");
         scriptsService.updateAllScriptsConfigs();
         logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Creating default venv", "");
-        venvManager.createDefaultVenv();
+        venvService.createDefaultVenv();
         return "redirect:/admin/scripts";
     }
 

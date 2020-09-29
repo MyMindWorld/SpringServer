@@ -14,7 +14,7 @@ import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.service.LogService;
 import ru.protei.scriptServer.service.ScriptsService;
 import ru.protei.scriptServer.service.UserService;
-import ru.protei.scriptServer.service.VenvManager;
+import ru.protei.scriptServer.service.VenvService;
 import ru.protei.scriptServer.utils.SystemIntegration.DynamicParamsScriptsRunner;
 import ru.protei.scriptServer.utils.Utils;
 
@@ -38,7 +38,7 @@ public class ScriptsRestController {
     @Autowired
     LogService logService;
     @Autowired
-    VenvManager venvManager;
+    VenvService venvService;
     @Autowired
     ScriptWebSocketController scriptWebSocketController;
     @Autowired

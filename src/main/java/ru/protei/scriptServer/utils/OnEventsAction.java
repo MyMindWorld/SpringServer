@@ -26,7 +26,7 @@ public class OnEventsAction {
     @Autowired
     LogService logService;
     @Autowired
-    VenvManager venvManager;
+    VenvService venvService;
     @Autowired
     Utils utils;
     @Autowired
@@ -56,7 +56,7 @@ public class OnEventsAction {
         }
         scriptsService.updateAllScriptsConfigs();
         createAdminUserAndPrivileges();
-        venvManager.createDefaultVenv();
+        venvService.createDefaultVenv();
     }
 
     // Creates two users with default roles for them

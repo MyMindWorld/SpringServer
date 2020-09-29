@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class VenvManager {
-    Logger logger = LoggerFactory.getLogger(VenvManager.class);
+public class VenvService {
+    Logger logger = LoggerFactory.getLogger(VenvService.class);
     @Autowired
     Utils utils;
     @Autowired

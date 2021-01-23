@@ -28,11 +28,11 @@ public class RoleService {
     public Role createRoleIfNotFound(
             String name, List<Privilege> privileges) {
 
-
-        Role role = roleRepository.findByNameEquals(name);
-        if (role == null) {
-            role = new Role(name);
-            role.setPrivileges(privileges);
+        if (roleRepository.findByNameEquals(name) == null) {
+            Role role = Role.builder()
+                    .name(name)
+                    .privileges(privileges)
+                    .build();
             roleRepository.save(role);
             logger.info("New role '" + name + "' created");
             return role;
@@ -43,11 +43,12 @@ public class RoleService {
     @Transactional
     public Role createRoleIfNotFound(
             String name, List<Privilege> privileges, boolean is_protected) {
-        Role role = roleRepository.findByNameEquals(name);
-        if (role == null) {
-            role = new Role(name);
-            role.setPrivileges(privileges);
-            role.set_protected(is_protected);
+        if (roleRepository.findByNameEquals(name) == null) {
+            Role role = Role.builder()
+                    .name(name)
+                    .is_protected(is_protected)
+                    .privileges(privileges)
+                    .build();
             roleRepository.save(role);
             logger.info("New role '" + name + "' created");
             return role;

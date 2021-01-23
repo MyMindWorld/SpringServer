@@ -21,6 +21,8 @@ abstract class BaseServiceTest {
     @Mock
     var roleRepository: RoleRepository = Mockito.mock(RoleRepository::class.java)
 
+
+
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this);

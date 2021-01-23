@@ -210,6 +210,7 @@ public class ScriptsService {
             return;
         }
         try {
+            // todo rewrite to normal client
             InetAddress.getByName("www.git.protei.ru");
             GitlabGroupsAnswer[] response =
                     RestAssured.given()

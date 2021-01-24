@@ -36,7 +36,7 @@ public class OnEventsAction {
     private RoleService roleService;
 
     @Autowired
-    public RoleRepository roleRepository;
+    private RoleRepository roleRepository;
 
     @Autowired
     private PrivilegeService privilegeService;

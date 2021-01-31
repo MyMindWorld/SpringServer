@@ -41,12 +41,12 @@ public class RoleService {
     }
 
     @Transactional
-    public Role createRoleIfNotFound(
-            String name, List<Privilege> privileges, boolean is_protected) {
+    public Role createProtectedRoleIfNotFound(
+            String name, List<Privilege> privileges) {
         if (roleRepository.findByNameEquals(name) == null) {
             Role role = Role.builder()
                     .name(name)
-                    .is_protected(is_protected)
+                    .is_protected(true)
                     .privileges(privileges)
                     .build();
             roleRepository.save(role);
@@ -57,7 +57,7 @@ public class RoleService {
     }
 
     @Transactional
-    public Role updateRole(
+    public Role updateRolePrivileges(
             String name, List<Privilege> privileges) {
 
         Role role = roleRepository.findByNameEquals(name);
@@ -72,30 +72,17 @@ public class RoleService {
     }
 
     @Transactional
-    public Role updateRole(
-            String name, String newName, List<Privilege> privileges) {
+    public Role updateRoleName(
+            String name, String newName) {
 
         Role role = roleRepository.findByNameEquals(name);
         if (role == null) {
             logger.warn("Role '" + name + "' not found!");
             return null;
         }
-        role.setPrivileges(privileges);
         role.setName(newName);
         roleRepository.save(role);
         logger.info("Role '" + name + "' updated, new name : " + newName);
-        return role;
-    }
-
-    @Transactional
-    public Role updateRole(
-            String name, List<Privilege> privileges, boolean is_protected) {
-        Role role = roleRepository.findByNameEquals(name);
-        role.setPrivileges(privileges);
-        role.setName(name);
-        role.set_protected(is_protected);
-        roleRepository.save(role);
-        logger.info("Role '" + name + "' updated");
         return role;
     }
 
@@ -114,7 +101,7 @@ public class RoleService {
 
         for (Role contestant : resultList) {
             if (contestant.getPrivileges().size() == privileges.size() & contestant.getPrivileges().containsAll(privileges)) {
-                logger.info("Role with same privileges  found! '" + contestant.getName() + "'  " + contestant.getPrivileges());
+                logger.info("Role with same privileges found! '" + contestant.getName() + "' " + contestant.getPrivileges());
                 return contestant;
             }
 
@@ -126,8 +113,8 @@ public class RoleService {
     public void updateRoleAllPrivileges() {
         List<Privilege> allPrivileges = privilegeService.returnAllPrivileges();
 
-        Role role_all = createRoleIfNotFound("ALL_PRIVILEGES_ROLE", allPrivileges, true);
+        Role role_all = createProtectedRoleIfNotFound("ALL_PRIVILEGES_ROLE", allPrivileges);
         if (role_all == null)
-            updateRole("ALL_PRIVILEGES_ROLE", allPrivileges, true);
+            updateRolePrivileges("ALL_PRIVILEGES_ROLE", allPrivileges);
     }
 }

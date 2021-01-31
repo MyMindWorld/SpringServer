@@ -8,11 +8,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
-import ru.protei.scriptServer.controller.AdminPageController;
-import ru.protei.scriptServer.model.Privilege;
 import ru.protei.scriptServer.model.User;
 import ru.protei.scriptServer.repository.UserRepository;
 import ru.protei.scriptServer.service.UserService;
@@ -21,59 +17,53 @@ import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
-import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.List;
 
 @Component
 public class CustomLdapAuth implements AuthenticationProvider {
-    Logger logger = LoggerFactory.getLogger(AdminPageController.class);
+    private final Logger logger = LoggerFactory.getLogger(CustomLdapAuth.class);
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
     @Autowired
-    UserService userService;
+    private UserService userService;
     @Value("#{new Boolean('${enableLdapAuth:false}')}")
     private Boolean enableLdapAuth;
+    @Value("${ldapUrl}")
+    private String ldapUrl;
+    @Value("${ldapAuthBase}")
+    private String ldapAuthBase;
 
     @Override
     public Authentication authenticate(Authentication authentication)
             throws AuthenticationException {
-        if (!enableLdapAuth) {
-            logger.debug("Skipping ldap auth.");
+        if (!enableLdapAuth || !ldapAuth(authentication.getName(), authentication.getCredentials().toString())) {
+            logger.info("Skipping ldap auth.");
             return null;
         }
 
-        String username = authentication.getName();
-        boolean authenticated = ldapAuth(username, authentication.getCredentials().toString());
+        User user = getUserRolesOrCreateNew(authentication);
 
+        return new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), user.getAuthorities());
 
-        if (authenticated) {
-            List<GrantedAuthority> grantedAuths = new ArrayList<>();
+    }
 
-            User user = userRepository.findByUsernameEquals(username);
-            if (user != null) {
-                logger.error("Ldap user found in database. Changing user password to LDAP");
-                userService.changeUserPassword(user, authentication.getCredentials().toString());
-                for (Privilege privilege : userService.getAllPrivilegesFromUser(user)) {
-                    grantedAuths.add(new SimpleGrantedAuthority(privilege.getName()));
-                }
-            } else {
-                user = userService.createUser(username, authentication.getCredentials().toString());
-                grantedAuths.add(new SimpleGrantedAuthority("ROLE_USER"));
-            }
-
-            Authentication auth = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), grantedAuths);
-            return auth;
+    public User getUserRolesOrCreateNew(Authentication authentication) {
+        User user = userRepository.findByUsernameEquals(authentication.getName());
+        if (user != null) {
+            logger.error("Ldap user found in database. Changing user password to LDAP");
+            userService.changeUserPassword(user, authentication.getCredentials().toString());
         } else {
-            return null;
+            user = userService.createUser(authentication.getName(), authentication.getCredentials().toString());
         }
+        return user;
     }
 
     public Boolean ldapAuth(String username, String password) {
-        String base = "ou=Users,dc=protei,dc=ru";
-        String dn = "uid=" + username + "," + base;
-        String ldapURL = "ldaps://ldap1.protei.ru";
+        if (ldapUrl == null || ldapAuthBase == null) {
+            throw new IllegalStateException("Ldap is not set up correctly!");
+        }
+        String dn = "uid=" + username + "," + ldapAuthBase;
 
         // Setup environment for authenticating
 
@@ -81,7 +71,7 @@ public class CustomLdapAuth implements AuthenticationProvider {
                 new Hashtable<String, String>();
         environment.put(Context.INITIAL_CONTEXT_FACTORY,
                 "com.sun.jndi.ldap.LdapCtxFactory");
-        environment.put(Context.PROVIDER_URL, ldapURL);
+        environment.put(Context.PROVIDER_URL, ldapUrl);
         environment.put(Context.SECURITY_AUTHENTICATION, "simple");
         environment.put(Context.SECURITY_PRINCIPAL, dn);
         environment.put(Context.SECURITY_CREDENTIALS, password);

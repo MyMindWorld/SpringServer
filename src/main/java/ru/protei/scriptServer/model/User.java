@@ -2,16 +2,25 @@ package ru.protei.scriptServer.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.sql.Date;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
-@Entity
-@Table(name = "Users")
+
 @Data
+@Entity
+@ToString
+@NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "Users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -19,7 +28,7 @@ public class User {
     @NotBlank
     private String username;
     @NotBlank
-    private String ldapName; // replace with LdapName?
+    private String ldapName;
     @NotBlank
     private String email;
     @NotBlank
@@ -36,18 +45,14 @@ public class User {
                     name = "role_id", referencedColumnName = "id"))
     private Collection<Role> roles;
 
-
-    public User() {
-        super();
+    public UserDetails getUserDetails() {
+        return new org.springframework.security.core.userdetails.User(
+                this.getUsername(), this.getPassword(), this.isEnabled(), true, true,
+                true, this.getAuthorities());
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", Username='" + username + '\'' +
-                ", ldapName='" + ldapName + '\'' +
-                ", email='" + email + '\'' +
-                '}';
+    public List<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream().flatMap(role -> role.getAuthorities().stream()).collect(Collectors.toList());
     }
+
 }

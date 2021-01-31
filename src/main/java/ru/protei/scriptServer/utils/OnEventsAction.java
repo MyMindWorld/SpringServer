@@ -78,8 +78,8 @@ public class OnEventsAction {
 
         List<Privilege> adminPrivileges = Arrays.asList(
                 scripts_view, admin_page_usage, scriptsUpdate, rolesAdmin, serverControl, filesUpload, filesEdit);
-        Role adminRole = roleService.createRoleIfNotFound("ROLE_ADMIN", adminPrivileges, true);
-        Role userRole = roleService.createRoleIfNotFound("ROLE_USER", Arrays.asList(scripts_view), false);
+        Role adminRole = roleService.createProtectedRoleIfNotFound("ROLE_ADMIN", adminPrivileges);
+        Role userRole = roleService.createProtectedRoleIfNotFound("ROLE_USER", Arrays.asList(scripts_view));
         Role roleAll = roleRepository.findByNameEquals("ALL_PRIVILEGES_ROLE");
 
         User admin = new User();

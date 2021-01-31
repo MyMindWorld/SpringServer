@@ -110,6 +110,7 @@ public class UserService {
         userToCreate.setLdapName(username);
         userToCreate.setEmail(username + "@protei.ru");
         userToCreate.setEnabled(true);
+        userToCreate.setRoles(Collections.singletonList(roleRepository.findByNameEquals("ROLE_USER")));
 
         User userFromRepo = userRepository.findByUsernameEquals(userToCreate.getUsername());
         if (userFromRepo == null) {

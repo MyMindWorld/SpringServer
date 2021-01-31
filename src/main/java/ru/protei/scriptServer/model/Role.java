@@ -4,10 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Data
@@ -35,7 +39,7 @@ public class Role {
                     name = "privilege_id", referencedColumnName = "id"))
     private Collection<Privilege> privileges;
 
-    public Role(String name) {
-        this.setName(name);
+    public List<? extends GrantedAuthority> getAuthorities() {
+        return this.getPrivileges().stream().map(Privilege::getName).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
     }
 }

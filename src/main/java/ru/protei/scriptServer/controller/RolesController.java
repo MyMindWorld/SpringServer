@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.protei.scriptServer.model.Privilege;
 import ru.protei.scriptServer.model.Role;
-import ru.protei.scriptServer.repository.*;
+import ru.protei.scriptServer.repository.LogRepository;
+import ru.protei.scriptServer.repository.PrivilegeRepository;
+import ru.protei.scriptServer.repository.RoleRepository;
 import ru.protei.scriptServer.service.LogService;
 import ru.protei.scriptServer.service.RoleService;
 import ru.protei.scriptServer.utils.Utils;
@@ -24,10 +26,7 @@ import static ru.protei.scriptServer.utils.Utils.getUsername;
 @Controller
 public class RolesController {
     Logger logger = LoggerFactory.getLogger(RolesController.class);
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    ScriptRepository scriptRepository;
+
     @Autowired
     RoleRepository roleRepository;
     @Autowired
@@ -106,9 +105,9 @@ public class RolesController {
             Role updatedRole;
             if (isRoleNameUpdated) {
                 logger.info("New role name : '" + newRoleName + "'");
-                updatedRole = roleService.updateRole(roleName, newRoleName, privileges);
+                updatedRole = roleService.updateRoleName(roleName, newRoleName);
             } else {
-                updatedRole = roleService.updateRole(roleName, privileges);
+                updatedRole = roleService.updateRolePrivileges(roleName, privileges);
             }
             if (updatedRole != null) {
                 logger.info("Role updated!");
@@ -149,8 +148,8 @@ public class RolesController {
             model.addAttribute("successMessage", "Deleted role '" + roleFromRepo.getName() + "' successfully!");
         } else {
             model.addAttribute("error", true);
-            model.addAttribute("errorMessage", "Role with name with username '" + roleFromRepo.getName() + "' not found!!! Please contact admin");
-            logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Role Delete", roleFromRepo.getName(), "ROLE NOT FOUND!");
+            model.addAttribute("errorMessage", "Role with name '" + role.getName() + "' not found!!! Please contact admin");
+            logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Role Delete", role.getName(), "ROLE NOT FOUND!");
 
         }
         return roles(model);

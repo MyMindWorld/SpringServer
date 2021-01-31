@@ -12,8 +12,8 @@ import java.util.Collection;
 @Data
 @Entity
 @ToString
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class Privilege {
 
     @Id

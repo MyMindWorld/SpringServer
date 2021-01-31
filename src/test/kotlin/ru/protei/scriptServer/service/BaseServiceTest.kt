@@ -9,10 +9,7 @@ import org.springframework.test.context.junit4.SpringRunner
 import ru.protei.scriptServer.repository.RoleRepository
 import ru.protei.scriptServer.repository.UserRepository
 
-//@SpringBootTest
-//@AutoConfigureMockMvc
 @RunWith(SpringRunner::class)
-//@EnableAutoConfiguration(exclude = [DataSourceAutoConfiguration::class, DataSourceTransactionManagerAutoConfiguration::class])
 abstract class BaseServiceTest {
 
     @Mock
@@ -20,8 +17,6 @@ abstract class BaseServiceTest {
 
     @Mock
     var roleRepository: RoleRepository = Mockito.mock(RoleRepository::class.java)
-
-
 
     @Before
     fun init() {

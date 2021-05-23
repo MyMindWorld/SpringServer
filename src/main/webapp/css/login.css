@@ -251,14 +251,25 @@ iframe {
 }
 
 /*---------------------------------------------*/
-.login100-form-avatar {
-  width: 120px;
-  height: 120px;
+/*TODO Fix logo--%>*/
+.login100-form-round-logo {
+  width: 360px;
+  height: 360px;
   border-radius: 50%;
   overflow: hidden;
   margin: 0 auto;
 }
-.login100-form-avatar img {
+.login100-form-round-logo img {
+  width: 100%;
+}
+.login100-form-square-logo {
+  width: 360px;
+  height: 120px;
+  border-radius: 0;
+  overflow: hidden;
+  margin: 0 auto;
+}
+.login100-form-square-logo img {
   width: 100%;
 }
 

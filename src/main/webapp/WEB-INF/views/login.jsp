@@ -55,8 +55,9 @@
     <div class="container-login100" style="background-image: url('images/img-01.jpg');">
         <div class="wrap-login100 p-t-190 p-b-30">
             <form class="login100-form validate-form" action="perform_login" method="post">
-                <div class="login100-form-avatar">
-                    <img src="images/cutLogo.png" alt="ERROR">
+<%--                TODO Fix logo--%>
+                <div class="login100-form-square-logo">
+                    <img src="images/SquareLogoNoMotoNoBg.png" alt="ERROR">
                 </div>
 
                 <span class="login100-form-title p-t-20 p-b-45">

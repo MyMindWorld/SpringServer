@@ -878,7 +878,8 @@
     </c:when>
     <c:otherwise> <%-- Если не выбран, дефолтная страница --%>
         <div class="blank_message">
-            <img src="<c:url value="/images/cutLogo.png"/>" alt="script server logo">
+                <%--                TODO Fix logo--%>
+            <img src="<c:url value="/images/RoundLogoNoBgWithMoto.png"/>" alt="script server logo">
             <br>
             <br>
             <br>

@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 import ru.protei.scriptServer.model.Privilege;
 import ru.protei.scriptServer.model.Role;
 import ru.protei.scriptServer.model.User;
@@ -17,7 +17,7 @@ import ru.protei.scriptServer.service.*;
 import java.util.Arrays;
 import java.util.List;
 
-@Controller
+@Service
 public class OnEventsAction {
 
     Logger logger = LoggerFactory.getLogger(OnEventsAction.class);
@@ -85,7 +85,7 @@ public class OnEventsAction {
         User admin = new User();
         admin.setUsername("admin");
         admin.setLdapName("admin_admin");
-        admin.setPassword(passwordEncoder.encode("admin"));
+        admin.setPassword(passwordEncoder.encode("admin_admin"));
         admin.setEmail("admin@admin.com");
         admin.setRoles(Arrays.asList(adminRole, userRole, roleAll));
         admin.setEnabled(true);

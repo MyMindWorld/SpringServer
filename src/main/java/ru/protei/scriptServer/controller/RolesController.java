@@ -5,10 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import ru.protei.scriptServer.model.Privilege;
 import ru.protei.scriptServer.model.Role;
 import ru.protei.scriptServer.repository.LogRepository;
@@ -20,6 +17,7 @@ import ru.protei.scriptServer.utils.Utils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Optional;
 
 import static ru.protei.scriptServer.utils.Utils.getUsername;
 
@@ -40,7 +38,7 @@ public class RolesController {
     @Autowired
     LogService logService;
 
-    @RequestMapping(value = "/admin/roles", method = RequestMethod.GET)
+    @GetMapping(value = "/admin/roles")
     public String roles(Model model) {
 
         model.addAttribute("roles", roleRepository.findAll());
@@ -50,24 +48,22 @@ public class RolesController {
         return "roles";
     }
 
-    @RequestMapping(value = "/admin/create_role", method = RequestMethod.POST)
+    @PostMapping(value = "/admin/create_role")
     public String createRole(@ModelAttribute("name") String roleName, @RequestParam("privileges") List<Long> privileges_raw, Model model, HttpServletRequest request) {
         roleName = roleName.trim();
-
 
         Iterable<Long> iterable = privileges_raw;
 
         List<Privilege> privileges = privilegeRepository.findAllById(iterable);
 
-
         logger.info("Received create role request from : '" + getUsername() + "' adding " + roleName);
         logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Role add", "Role name : '" + roleName + "', Privileges : " + privileges);
 
-        Role sameRole = roleService.findRoleByPrivileges(privileges);
-        if (sameRole != null) {
+        Optional<Role> sameRole = roleService.findRoleByPrivileges(privileges);
+        if (sameRole.isPresent()) {
             logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Attempt of creating already existing role ", "Role name : '" + roleName + "', Privileges : " + privileges);
             model.addAttribute("error", true);
-            model.addAttribute("errorMessage", "Role with this privileges already exists, it's called '" + sameRole.getName() + "' Try using it for your purposes.");
+            model.addAttribute("errorMessage", "Role with this privileges already exists, it's called '" + sameRole.get().getName() + "' Try using it for your purposes.");
         } else {
             Role createdRole = roleService.createRoleIfNotFound(roleName, privileges);
             if (createdRole != null) {
@@ -86,7 +82,7 @@ public class RolesController {
         return roles(model);
     }
 
-    @RequestMapping(value = "/admin/update_role", method = RequestMethod.POST)
+    @PostMapping(value = "/admin/update_role")
     public String updateRole(@ModelAttribute("name") String roleName, @ModelAttribute("nameNew") String newRoleName, @RequestParam("privilegesUpdate") List<Long> privileges_raw, Model model, HttpServletRequest request) {
         roleName = roleName.trim();
         Iterable<Long> iterable = privileges_raw;
@@ -125,7 +121,7 @@ public class RolesController {
         return roles(model);
     }
 
-    @RequestMapping(value = "/admin/delete_role", method = RequestMethod.POST)
+    @PostMapping(value = "/admin/delete_role")
     public String deleteRole(Role role, Model model, HttpServletRequest request) {
 
         logger.info("Received role delete from : '" + getUsername() + "' deleting role '" + role.getName() + "'");

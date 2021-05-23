@@ -23,8 +23,8 @@ public class Privilege {
     private String name;
 
     @ManyToMany(mappedBy = "privileges")
+    @ToString.Exclude
     private Collection<Role> roles;
-
 
     public Privilege(String name) {
         this.setName(name);

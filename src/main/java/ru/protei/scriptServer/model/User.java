@@ -45,14 +45,4 @@ public class User {
                     name = "role_id", referencedColumnName = "id"))
     private Collection<Role> roles;
 
-    public UserDetails getUserDetails() {
-        return new org.springframework.security.core.userdetails.User(
-                this.getUsername(), this.getPassword(), this.isEnabled(), true, true,
-                true, this.getAuthorities());
-    }
-
-    public List<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream().flatMap(role -> role.getAuthorities().stream()).collect(Collectors.toList());
-    }
-
 }

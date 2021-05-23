@@ -1,8 +1,15 @@
 package ru.protei.scriptServer.service;
 
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import ru.protei.scriptServer.model.Privilege;
 import ru.protei.scriptServer.model.Role;
@@ -12,16 +19,23 @@ import ru.protei.scriptServer.repository.RoleRepository;
 import javax.transaction.Transactional;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
+@Slf4j
+@AllArgsConstructor
 public class RoleService {
-    Logger logger = LoggerFactory.getLogger(RoleService.class);
-
-
-    @Autowired
     private RoleRepository roleRepository;
-    @Autowired
     private PrivilegeService privilegeService;
+
+    public List<? extends GrantedAuthority> getAuthorities(Role role) {
+        return role.getPrivileges().stream().map(Privilege::getName).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+    }
+
+    public List<? extends GrantedAuthority> getAuthorities(Collection<Role> roles) {
+        return roles.stream().map(this::getAuthorities).flatMap(Collection::stream).collect(Collectors.toList());
+    }
 
 
     @Transactional
@@ -34,10 +48,11 @@ public class RoleService {
                     .privileges(privileges)
                     .build();
             roleRepository.save(role);
-            logger.info("New role '" + name + "' created");
+            log.info("New role '" + name + "' created");
             return role;
         }
-        return null;
+        throw new IllegalStateException("Exists!");
+//        return null;
     }
 
     @Transactional
@@ -50,7 +65,7 @@ public class RoleService {
                     .privileges(privileges)
                     .build();
             roleRepository.save(role);
-            logger.info("New role '" + name + "' created");
+            log.info("New role '" + name + "' created");
             return role;
         }
         return null; // null нужен чтобы пометить что роль уже существовала
@@ -62,12 +77,12 @@ public class RoleService {
 
         Role role = roleRepository.findByNameEquals(name);
         if (role == null) {
-            logger.warn("Role '" + name + "' not found!");
+            log.warn("Role '" + name + "' not found!");
             return null;
         }
         role.setPrivileges(privileges);
         roleRepository.save(role);
-        logger.info("Role '" + name + "' updated");
+        log.info("Role '" + name + "' updated");
         return role;
     }
 
@@ -77,36 +92,37 @@ public class RoleService {
 
         Role role = roleRepository.findByNameEquals(name);
         if (role == null) {
-            logger.warn("Role '" + name + "' not found!");
+            log.warn("Role '" + name + "' not found!");
             return null;
         }
         role.setName(newName);
         roleRepository.save(role);
-        logger.info("Role '" + name + "' updated, new name : " + newName);
+        log.info("Role '" + name + "' updated, new name : " + newName);
         return role;
     }
 
     @Transactional
-    public void deleteRoleFromUsers(Role role) {
-        Collection<User> usersWithRole = role.getUsers();
+    public void deleteRoleFromUsers(Role roleToDelete) {
+        Collection<User> usersWithRole = roleToDelete.getUsers();
         for (User userWithRole : usersWithRole) {
-            Collection<Role> userRoles = userWithRole.getRoles();
-            userRoles.remove(role);
+            userWithRole.setRoles(userWithRole.getRoles().stream().filter(userRole -> userRole != roleToDelete).collect(Collectors.toList()));
         }
+        roleToDelete.setUsers(null);
+        roleRepository.delete(roleToDelete);
     }
 
     @Transactional
-    public Role findRoleByPrivileges(List<Privilege> privileges) {
+    public Optional<Role> findRoleByPrivileges(List<Privilege> privileges) {
         List<Role> resultList = roleRepository.findAll();
 
         for (Role contestant : resultList) {
             if (contestant.getPrivileges().size() == privileges.size() & contestant.getPrivileges().containsAll(privileges)) {
-                logger.info("Role with same privileges found! '" + contestant.getName() + "' " + contestant.getPrivileges());
-                return contestant;
+                log.info("Role with same privileges found! '" + contestant.getName() + "' " + contestant.getPrivileges());
+                return Optional.of(contestant);
             }
 
         }
-        return null;
+        return Optional.empty();
     }
 
 
@@ -116,5 +132,9 @@ public class RoleService {
         Role role_all = createProtectedRoleIfNotFound("ALL_PRIVILEGES_ROLE", allPrivileges);
         if (role_all == null)
             updateRolePrivileges("ALL_PRIVILEGES_ROLE", allPrivileges);
+    }
+
+    public Role findByNameEquals(String name) {
+        return roleRepository.findByNameEquals(name);
     }
 }

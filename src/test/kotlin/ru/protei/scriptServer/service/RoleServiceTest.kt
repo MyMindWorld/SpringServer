@@ -1,20 +1,32 @@
 package ru.protei.scriptServer.service
 
 import org.junit.Assert
-import org.junit.Test
-import org.mockito.InjectMocks
-import org.mockito.Mock
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import ru.protei.scriptServer.model.Privilege
 import ru.protei.scriptServer.model.Role
+import ru.protei.scriptServer.repository.RoleRepository
+import ru.protei.scriptServer.testData.dbUser
 import ru.protei.scriptServer.testData.defaultRole
+import ru.protei.scriptServer.testData.ldapUserWithoutDbReference
+import ru.protei.scriptServer.testData.roleWithAdminAndDefaultPrivilege
 
-class RoleServiceTest : BaseServiceTest() {
+@SpringBootTest(classes = [RoleService::class])
+@ExtendWith(SpringExtension::class)
+class RoleServiceTest {
 
-    @Mock
-    var privilegeService: PrivilegeService = Mockito.mock(PrivilegeService::class.java)
+    @MockBean
+    lateinit var privilegeService: PrivilegeService// = Mockito.mock(PrivilegeService::class.java)
 
-    @InjectMocks
+    @MockBean
+    lateinit var roleRepository: RoleRepository// = Mockito.mock(PrivilegeService::class.java)
+
+    @Autowired
     lateinit var roleService: RoleService
 
     @Test
@@ -64,20 +76,35 @@ class RoleServiceTest : BaseServiceTest() {
         Assert.assertEquals(newPrivileges, createdRole.privileges)
     }
 
-    @Test
-    fun testUpdateRole() {
-    }
 
-    @Test
-    fun testUpdateRole1() {
-    }
-
-    @Test
+    @Test // Needs verification
     fun deleteRoleFromUsers() {
+        val roleAssignedToUsers = defaultRole
+        roleAssignedToUsers.users = listOf(dbUser, ldapUserWithoutDbReference)
+
+        roleService.deleteRoleFromUsers(roleAssignedToUsers)
+
+        Mockito.verify(roleRepository).delete(defaultRole)
+
+        Assert.assertEquals(null, defaultRole.users)
     }
 
     @Test
-    fun findRoleByPrivileges() {
+    fun `should return role with same privileges when exists`() {
+        Mockito.`when`(roleRepository.findAll()).thenReturn(listOf(defaultRole))
+
+        val similarRole = roleService.findRoleByPrivileges(defaultRole.privileges.toList())
+
+        Assert.assertEquals(defaultRole, similarRole.get())
+    }
+
+    @Test
+    fun `should not return role with different privileges`() {
+        Mockito.`when`(roleRepository.findAll()).thenReturn(listOf(roleWithAdminAndDefaultPrivilege))
+
+        val similarRole = roleService.findRoleByPrivileges(defaultRole.privileges.toList())
+
+        Assert.assertEquals(false, similarRole.isPresent)
     }
 
     @Test

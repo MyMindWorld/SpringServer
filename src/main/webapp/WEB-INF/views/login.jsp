@@ -111,7 +111,7 @@
         <span class="close" style="
         position: absolute;
         right: 5%;">&times;</span>
-        <h2 class="text-center"><i class="fa fa-lock fa-1x"></i> Forgot Password?</h2>
+        <h2 class="text-center"><i class="fa fa-lock fa-1x"></i> Forgot Password or Username?</h2>
         <h3></h3>
 
         <form name='forgotPassword' class="form__group field" style="width: unset">

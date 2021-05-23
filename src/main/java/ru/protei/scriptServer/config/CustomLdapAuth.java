@@ -1,5 +1,6 @@
 package ru.protei.scriptServer.config;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import javax.naming.directory.InitialDirContext;
 import java.util.Hashtable;
 
 @Component
+@RequiredArgsConstructor
 public class CustomLdapAuth implements AuthenticationProvider {
     private final Logger logger = LoggerFactory.getLogger(CustomLdapAuth.class);
 
@@ -44,7 +46,7 @@ public class CustomLdapAuth implements AuthenticationProvider {
 
         User user = getUserRolesOrCreateNew(authentication);
 
-        return new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), user.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), userService.getAuthorities(user));
 
     }
 

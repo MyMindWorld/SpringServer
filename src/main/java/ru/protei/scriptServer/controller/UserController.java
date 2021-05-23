@@ -79,8 +79,7 @@ public class UserController {
         String newPassword = utils.generateSecurePassword();
         user.setPassword(passwordEncoder.encode(newPassword));
         user.setRoles(roles);
-        mailSender.send(userService.constructInviteEmail(utils.getAppUrl(request),
-                request.getLocale(), user));
+        sendEmailWithInvite(user, request);
 
         userRepository.save(user); // prop register method
 
@@ -89,6 +88,15 @@ public class UserController {
 
 
         return users(model);
+    }
+
+    private void sendEmailWithInvite(User user, HttpServletRequest request) {
+        try {
+            mailSender.send(userService.constructInviteEmail(utils.getAppUrl(request),
+                    request.getLocale(), user));
+        } catch (Exception e) {
+            logger.error("Sending invite email to '" + user.getEmail() + "' failed!", e);
+        }
     }
 
     @RequestMapping(value = "/admin/users", method = RequestMethod.GET)

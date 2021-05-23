@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.protei.scriptServer.model.*;
@@ -17,6 +19,7 @@ import ru.protei.scriptServer.repository.UserRepository;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -35,6 +38,9 @@ public class UserService {
     public RoleRepository roleRepository;
 
     @Autowired
+    public RoleService roleService;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Qualifier("messageSource") // todo verify qualifier
@@ -43,6 +49,16 @@ public class UserService {
 
     @Autowired
     private Environment env;
+
+    public UserDetails getUserDetails(User user) {
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsername(), user.getPassword(), user.isEnabled(), true, true,
+                true, getAuthorities(user));
+    }
+
+    public List<? extends GrantedAuthority> getAuthorities(User user) {
+        return user.getRoles().stream().flatMap(role -> roleService.getAuthorities(role).stream()).collect(Collectors.toList());
+    }
 
     @Transactional
     public boolean checkPrivilege(User user, String privilege) {
@@ -205,4 +221,7 @@ public class UserService {
     }
 
 
+    public User findByUsernameEquals(String username) {
+        return userRepository.findByUsernameEquals(username);
+    }
 }

@@ -1,22 +1,16 @@
 package ru.protei.scriptServer.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Data
 @Entity
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class Role {
@@ -28,6 +22,7 @@ public class Role {
     private String name;
     private boolean is_protected;
     @ManyToMany(mappedBy = "roles")
+    @ToString.Exclude
     private Collection<User> users;
 
     @ManyToMany
@@ -37,9 +32,6 @@ public class Role {
                     name = "role_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(
                     name = "privilege_id", referencedColumnName = "id"))
+    @ToString.Exclude
     private Collection<Privilege> privileges;
-
-    public List<? extends GrantedAuthority> getAuthorities() {
-        return this.getPrivileges().stream().map(Privilege::getName).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-    }
 }

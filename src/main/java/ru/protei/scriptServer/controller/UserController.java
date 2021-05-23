@@ -14,10 +14,7 @@ import org.springframework.web.servlet.ModelAndView;
 import ru.protei.scriptServer.model.Role;
 import ru.protei.scriptServer.model.User;
 import ru.protei.scriptServer.repository.*;
-import ru.protei.scriptServer.service.LogService;
-import ru.protei.scriptServer.service.RoleService;
-import ru.protei.scriptServer.service.ScriptsService;
-import ru.protei.scriptServer.service.UserService;
+import ru.protei.scriptServer.service.*;
 import ru.protei.scriptServer.utils.Utils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,10 +45,11 @@ public class UserController {
     LogService logService;
     @Autowired
     PasswordEncoder passwordEncoder;
-    @Autowired
-    JavaMailSender mailSender;
+
     @Autowired
     UserService userService;
+    @Autowired
+    EmailingService emailingService;
 
     @RequestMapping(value = "/admin/invite_user", method = RequestMethod.POST)
     public ModelAndView sendInvite(User user, @RequestParam("roleVar") List<Long> rolesRaw, Model model, HttpServletRequest request) {
@@ -79,7 +77,7 @@ public class UserController {
         String newPassword = utils.generateSecurePassword();
         user.setPassword(passwordEncoder.encode(newPassword));
         user.setRoles(roles);
-        sendEmailWithInvite(user, request);
+        emailingService.sendInviteUserEmail(user, request);
 
         userRepository.save(user); // prop register method
 
@@ -90,14 +88,7 @@ public class UserController {
         return users(model);
     }
 
-    private void sendEmailWithInvite(User user, HttpServletRequest request) {
-        try {
-            mailSender.send(userService.constructInviteEmail(utils.getAppUrl(request),
-                    request.getLocale(), user));
-        } catch (Exception e) {
-            logger.error("Sending invite email to '" + user.getEmail() + "' failed!", e);
-        }
-    }
+
 
     @RequestMapping(value = "/admin/users", method = RequestMethod.GET)
     public ModelAndView users(Model model) {

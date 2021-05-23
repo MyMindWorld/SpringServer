@@ -3,10 +3,6 @@ package ru.protei.scriptServer.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.MessageSource;
-import org.springframework.core.env.Environment;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -43,12 +39,6 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Qualifier("messageSource") // todo verify qualifier
-    @Autowired
-    private MessageSource messages;
-
-    @Autowired
-    private Environment env;
 
     public UserDetails getUserDetails(User user) {
         return new org.springframework.security.core.userdetails.User(
@@ -63,9 +53,8 @@ public class UserService {
     @Transactional
     public boolean checkPrivilege(User user, String privilege) {
         return user.getRoles()
-                .stream().filter(role -> role.getPrivileges()
-                        .stream().filter(privilegeFromRole -> privilegeFromRole.getName().equals(privilege)).findFirst().isPresent())
-                .findFirst().isPresent();
+                .stream().anyMatch(role -> role.getPrivileges()
+                        .stream().anyMatch(privilegeFromRole -> privilegeFromRole.getName().equals(privilege)));
     }
 
     @Transactional
@@ -75,8 +64,7 @@ public class UserService {
         Collection<Privilege> allPrivilegesFromUser = getAllPrivilegesFromUser(user);
         for (Script script : scriptList) {
             if (allPrivilegesFromUser.stream()
-                    .filter(privilege -> privilege.getName().equals(script.getName()))
-                    .findFirst().isPresent()) {
+                    .anyMatch(privilege -> privilege.getName().equals(script.getName()))) {
                 allowedScripts.add(script);
             }
         }
@@ -101,9 +89,7 @@ public class UserService {
         }
         Collection<Privilege> privilegeCollection = new ArrayList<>();
         for (Role role : userFromRepo.getRoles()) {
-            for (Privilege privilege : role.getPrivileges()) {
-                privilegeCollection.add(privilege);
-            }
+            privilegeCollection.addAll(role.getPrivileges());
         }
         return privilegeCollection;
     }
@@ -124,7 +110,7 @@ public class UserService {
         userToCreate.setUsername(username);
         userToCreate.setPassword(passwordEncoder.encode(password));
         userToCreate.setLdapName(username);
-        userToCreate.setEmail(username + "@protei.ru");
+        userToCreate.setEmail(username + "@scriptServer.io"); // TODO UserCreation Form
         userToCreate.setEnabled(true);
         userToCreate.setRoles(Collections.singletonList(roleRepository.findByNameEquals("ROLE_USER")));
 
@@ -139,13 +125,6 @@ public class UserService {
     public void changeUserPassword(User user, String password) {
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
-    }
-
-    @Transactional
-    public void deleteAll() {
-        logger.warn("Removing all users!!!");
-
-        userRepository.deleteAll();
     }
 
     @Transactional
@@ -193,33 +172,6 @@ public class UserService {
         final Calendar cal = Calendar.getInstance();
         return passToken.getExpiryDate().before(cal.getTime());
     }
-
-    public SimpleMailMessage constructInviteEmail(
-            String contextPath, Locale locale, User user) {
-        String url = contextPath + "/login";
-        String message = messages.getMessage("message.inviteToScriptServer",
-                null, locale);
-        return constructEmail(message, message + " \r\n" + url, user);
-    }
-
-    public SimpleMailMessage constructResetTokenEmail(
-            String contextPath, Locale locale, String token, User user) {
-        String url = contextPath + "/user/changePassword?token=" + token;
-        String message = messages.getMessage("message.resetPassword",
-                null, locale);
-        return constructEmail(message, message + " \r\n" + url, user);
-    }
-
-    private SimpleMailMessage constructEmail(String subject, String body,
-                                             User user) {
-        SimpleMailMessage email = new SimpleMailMessage();
-        email.setSubject(subject);
-        email.setText(body);
-        email.setTo(user.getEmail());
-        email.setFrom(env.getProperty("support.email"));
-        return email;
-    }
-
 
     public User findByUsernameEquals(String username) {
         return userRepository.findByUsernameEquals(username);

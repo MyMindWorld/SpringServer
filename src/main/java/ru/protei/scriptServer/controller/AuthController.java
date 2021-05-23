@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ru.protei.scriptServer.exception.UserNotFoundException;
 import ru.protei.scriptServer.model.DTO.PasswordDto;
 import ru.protei.scriptServer.model.User;
+import ru.protei.scriptServer.service.EmailingService;
 import ru.protei.scriptServer.service.UserService;
 import ru.protei.scriptServer.utils.Utils;
 
@@ -35,9 +36,7 @@ public class AuthController {
     @Autowired
     private MessageSource messages;
     @Autowired
-    private JavaMailSender mailSender;
-    @Autowired
-    private Utils utils;
+    private EmailingService emailingService;
 
     @RequestMapping("/login")
     public String login(Model model, HttpServletRequest request) {
@@ -62,11 +61,10 @@ public class AuthController {
         if (user == null) {
             throw new UserNotFoundException(userEmail);
         }
-        String token = UUID.randomUUID().toString();
+        String token = UUID.randomUUID().toString(); // TODO Creating token properly
         logger.info("Sending email with password reset token to '" + userEmail + "'");
         userService.createPasswordResetTokenForUser(user, token);
-        mailSender.send(userService.constructResetTokenEmail(utils.getAppUrl(request),
-                request.getLocale(), token, user));
+        emailingService.sendResetPasswordEmailWithResetToken(user, token, request);
         logger.info("Email sent successfully");
         return "/login";
     }

@@ -47,7 +47,7 @@
     </div>
 </div>
 
-<sec:authorize access="hasAuthority('SCRIPTS_UPDATE')">
+<sec:authorize access="hasAuthority('SERVER_CONTROL')">
     <div style="float:right;text-align: center;">
             <h4>Maintenance</h4>
             <input class="tgl tgl-ios" id="cb2" type="checkbox"/>

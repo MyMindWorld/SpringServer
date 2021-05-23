@@ -45,14 +45,15 @@
             </c:forEach>
         </ul>
     </fieldset>
-
+    <br>
     <input name="submit" type="submit" class="e" value="Add Role"/>
-
 </form>
 <button id="selectAllButton" class="e" onclick="selectAllCheckBoxesModal('privileges');"> Select All
 </button>
 <button id="deSelectAllButton" class="e" onclick="deSelectAllCheckBoxesModal('privileges');"> DeSelect All
 </button>
+
+
 
 <div class="search-box">
     <input

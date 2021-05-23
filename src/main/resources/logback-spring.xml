@@ -38,8 +38,8 @@
         <appender-ref ref="Console"/>
     </root>
 
-    <!-- LOG "ru.protei*" at TRACE level -->
-    <logger name="ru.protei" level="trace" additivity="false">
+    <!-- LOG at TRACE level -->
+    <logger name="io.scriptServer" level="trace" additivity="false">
         <appender-ref ref="RollingFile"/>
         <appender-ref ref="Console"/>
     </logger>

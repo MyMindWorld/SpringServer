@@ -94,16 +94,16 @@ public class FileUploadRestController {
 Здесь находятся все части проекта подходящие под описание _Вспомогательных_
 
 #### System Integration
-В части [SystemIntegration](./src/main/java/ru/protei/scriptServer/utils/SystemIntegration) находится всё связанное с запуском исполняемых файлов в системе.
+В части [SystemIntegration](src/main/java/io/scriptServer/utils/SystemIntegration) находится всё связанное с запуском исполняемых файлов в системе.
 
 В частности Python скриптов и программ для выпадающих списков (Bash\PowerShell etc)
 
 #### TestLoginDataLoader 
-[TestLoginDataLoader](./src/main/java/ru/protei/scriptServer/utils/TestLoginDataLoader.java)
+[TestLoginDataLoader](src/main/java/io/scriptServer/utils/TestLoginDataLoader.java)
 В этой части находится метод для заполнения бд тестовыми данными (Логами и привилегиями) для удобства разработки.
 
 #### OnEventsAction
-[OnEventsAction](./src/main/java/ru/protei/scriptServer/utils/OnEventsAction.java)
+[OnEventsAction](src/main/java/io/scriptServer/utils/OnEventsAction.java)
 В этой части находится код, который выполняется непосредственно перед стартом приложения.
 
 Тут обновляются скрипты с гита, обновляется роль со всеми правами и создаются дефолтные юзеры
@@ -117,7 +117,7 @@ public class FileUploadRestController {
 ## TODO
 
 0. В проекте раскиданы //Todo и //legshooting, к ним можно обратиться из вкладки TODO в IntellijIdea на панели внизу слева
-1. Часть [SystemIntegration](./src/main/java/ru/protei/scriptServer/utils/SystemIntegration) молит о рефакторинге и читаемости
+1. Часть [SystemIntegration](src/main/java/io/scriptServer/utils/SystemIntegration) молит о рефакторинге и читаемости
 2. Веб часть просит редизайн и вынос js скриптов в отдельные файлы
 3. Тесты на основной функционал
 

@@ -69,7 +69,7 @@ public class UserController {
         }
 
 
-        logger.info("Received add user request from : '" + getUsername() + "' adding " + user.toString());
+        logger.info("Received add user request from : '" + getUsername() + "' adding " + user);
         logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "User add", user.toString());
 
         user.setEmail(user.getUsername() + "@protei.ru");
@@ -87,7 +87,6 @@ public class UserController {
 
         return users(model);
     }
-
 
 
     @RequestMapping(value = "/admin/users", method = RequestMethod.GET)
@@ -109,38 +108,35 @@ public class UserController {
         List<Role> roles = roleRepository.findAllById(iterable);
         User userFromRepo = userRepository.findByUsernameEquals(user.getUsername());
 
-        if (userFromRepo != null) {
+        if (userFromRepo == null) {
+            model.addAttribute("error", true);
+            model.addAttribute("errorMessage", "User with username '" + user.getUsername() + "' not found!!! Please contact admin");
+            logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "User Delete", user.toString(), "USER NOT FOUND!");
+        } else {
             logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "User role update", userFromRepo.toString() + " New roles : " + roles.toString());
             userFromRepo.setRoles(roles);
             userRepository.save(userFromRepo);
             model.addAttribute("success", true);
             model.addAttribute("successMessage", "Updated user '" + userFromRepo.getUsername() + "' roles successfully!");
-        } else {
-            model.addAttribute("error", true);
-            model.addAttribute("errorMessage", "User with username '" + user.getUsername() + "' not found!!! Please contact admin");
-            logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "User Delete", user.toString(), "USER NOT FOUND!");
-
         }
         return users(model);
     }
 
     @RequestMapping(value = "/admin/delete_user", method = RequestMethod.POST)
     public ModelAndView deleteUser(User user, Model model, HttpServletRequest request) {
-
         logger.info("Received user delete from : '" + getUsername() + "' deleting user " + user.getUsername());
         User userFromRepo = userRepository.findByUsernameEquals(user.getUsername());
 
-        if (userFromRepo != null) {
-            logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Delete user", userFromRepo.toString());
-            userService.removeAllUserPasswordResetTokens(userFromRepo);
-            userRepository.delete(userFromRepo);
-            model.addAttribute("success", true);
-            model.addAttribute("successMessage", "Deleted user '" + userFromRepo.getUsername() + "' successfully!");
-        } else {
+        if (userFromRepo == null) {
             model.addAttribute("error", true);
             model.addAttribute("errorMessage", "User with username '" + user.getUsername() + "' not found!!! Please contact admin");
             logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "User Delete", user.toString(), "USER NOT FOUND!");
 
+        } else {
+            logService.logAction(request.getRemoteUser(), request.getRemoteAddr(), "Delete user", userFromRepo.toString());
+            userRepository.delete(userFromRepo);
+            model.addAttribute("success", true);
+            model.addAttribute("successMessage", "Deleted user '" + userFromRepo.getUsername() + "' successfully!");
         }
         return users(model);
     }

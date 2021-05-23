@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,8 +16,8 @@ import ru.protei.scriptServer.exception.UserNotFoundException;
 import ru.protei.scriptServer.model.DTO.PasswordDto;
 import ru.protei.scriptServer.model.User;
 import ru.protei.scriptServer.service.EmailingService;
+import ru.protei.scriptServer.service.ResetPasswordTokenService;
 import ru.protei.scriptServer.service.UserService;
-import ru.protei.scriptServer.utils.Utils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -31,12 +30,17 @@ public class AuthController {
     Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @Autowired
-    UserService userService;
+    private UserService userService;
+
     @Qualifier("messageSource")
     @Autowired
     private MessageSource messages;
+
     @Autowired
     private EmailingService emailingService;
+
+    @Autowired
+    private ResetPasswordTokenService tokenService;
 
     @RequestMapping("/login")
     public String login(Model model, HttpServletRequest request) {
@@ -63,7 +67,7 @@ public class AuthController {
         }
         String token = UUID.randomUUID().toString(); // TODO Creating token properly
         logger.info("Sending email with password reset token to '" + userEmail + "'");
-        userService.createPasswordResetTokenForUser(user, token);
+        tokenService.createPasswordResetTokenForUser(user, token);
         emailingService.sendResetPasswordEmailWithResetToken(user, token, request);
         logger.info("Email sent successfully");
         return "/login";
@@ -82,7 +86,7 @@ public class AuthController {
     @GetMapping("/user/changePassword")
     public String showChangePasswordPage(Locale locale, Model model,
                                          @RequestParam("token") String token) {
-        String result = userService.validatePasswordResetToken(token);
+        String result = tokenService.validatePasswordResetToken(token);
         if (result != null) {
             String message = messages.getMessage("auth.message." + result, null, locale);
             return "redirect:/login.html?lang="
@@ -95,7 +99,7 @@ public class AuthController {
 
     @PostMapping("/user/savePassword")
     public String savePassword(final Locale locale, @Valid PasswordDto passwordDto) {
-        String result = userService.validatePasswordResetToken(passwordDto.getToken());
+        String result = tokenService.validatePasswordResetToken(passwordDto.getToken());
 
         if (result != null) {
             return "redirect:/login.html?lang="
@@ -103,10 +107,10 @@ public class AuthController {
                     "auth.message." + result, null, locale);
         }
 
-        Optional user = userService.getUserByPasswordResetToken(passwordDto.getToken());
+        Optional user = tokenService.getUserByPasswordResetToken(passwordDto.getToken());
         if (user.isPresent()) {
             userService.changeUserPassword((User) user.get(), passwordDto.getNewPassword());
-            userService.removePasswordResetToken(passwordDto.getToken());
+            tokenService.removePasswordResetToken(passwordDto.getToken());
             return "redirect:/login.html?lang="
                     + locale.getLanguage() + "&messageSuccess=" + messages.getMessage(
                     "message.resetPasswordSuc", null, locale);

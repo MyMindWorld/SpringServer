@@ -1,34 +1,34 @@
 package ru.protei.scriptServer.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.protei.scriptServer.model.*;
-import ru.protei.scriptServer.repository.PasswordTokenRepository;
+import ru.protei.scriptServer.model.Privilege;
+import ru.protei.scriptServer.model.Role;
+import ru.protei.scriptServer.model.Script;
+import ru.protei.scriptServer.model.User;
 import ru.protei.scriptServer.repository.RoleRepository;
 import ru.protei.scriptServer.repository.ScriptRepository;
 import ru.protei.scriptServer.repository.UserRepository;
 
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Log4j2
 public class UserService {
-    Logger logger = LoggerFactory.getLogger(UserService.class);
-
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private ScriptRepository scriptRepository;
-
-    @Autowired
-    private PasswordTokenRepository passwordTokenRepository;
 
     @Autowired
     public RoleRepository roleRepository;
@@ -95,9 +95,7 @@ public class UserService {
     }
 
     @Transactional
-    public void createUserIfNotFound(
-            User user) {
-
+    public void createUserIfNotFound(User user) {
         User userFromRepo = userRepository.findByUsernameEquals(user.getUsername());
         if (userFromRepo == null) {
             userRepository.save(user);
@@ -137,41 +135,6 @@ public class UserService {
         return userRepository.findByUsernameEquals(username);
     }
 
-    @Transactional
-    public Optional<User> getUserByPasswordResetToken(String token) {
-        return Optional.ofNullable(passwordTokenRepository.findByTokenEquals(token).getUser());
-    }
-
-    public void createPasswordResetTokenForUser(User user, String token) {
-        PasswordResetToken myToken = new PasswordResetToken(token, user);
-        passwordTokenRepository.save(myToken);
-    }
-
-    public String validatePasswordResetToken(String token) {
-        final PasswordResetToken passToken = passwordTokenRepository.findByTokenEquals(token);
-        return !isTokenFound(passToken) ? "invalidToken"
-                : isTokenExpired(passToken) ? "expired"
-                : null;
-    }
-
-    @Transactional
-    public void removePasswordResetToken(String token) {
-        passwordTokenRepository.deleteByTokenEquals(token);
-    }
-
-    @Transactional
-    public void removeAllUserPasswordResetTokens(User user) {
-        passwordTokenRepository.deleteByUserEquals(user);
-    }
-
-    private boolean isTokenFound(PasswordResetToken passToken) {
-        return passToken != null;
-    }
-
-    private boolean isTokenExpired(PasswordResetToken passToken) {
-        final Calendar cal = Calendar.getInstance();
-        return passToken.getExpiryDate().before(cal.getTime());
-    }
 
     public User findByUsernameEquals(String username) {
         return userRepository.findByUsernameEquals(username);

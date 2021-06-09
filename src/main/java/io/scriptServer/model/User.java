@@ -23,7 +23,6 @@ public class User {
     private Long id;
     @NotBlank
     private String username;
-    @NotBlank
     private String ldapName;
     @NotBlank
     private String email;

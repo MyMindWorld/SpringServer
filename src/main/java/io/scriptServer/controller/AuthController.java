@@ -107,9 +107,9 @@ public class AuthController {
                     "auth.message." + result, null, locale);
         }
 
-        Optional user = tokenService.getUserByPasswordResetToken(passwordDto.getToken());
+        Optional<User> user = tokenService.getUserByPasswordResetToken(passwordDto.getToken());
         if (user.isPresent()) {
-            userService.changeUserPassword((User) user.get(), passwordDto.getNewPassword());
+            userService.changeUserPassword(user.get(), passwordDto.getNewPassword());
             tokenService.removePasswordResetToken(passwordDto.getToken());
             return "redirect:/login.html?lang="
                     + locale.getLanguage() + "&messageSuccess=" + messages.getMessage(

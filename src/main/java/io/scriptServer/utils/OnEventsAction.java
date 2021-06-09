@@ -15,6 +15,7 @@ import io.scriptServer.model.Privilege;
 import io.scriptServer.repository.RoleRepository;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -79,7 +80,7 @@ public class OnEventsAction {
         List<Privilege> adminPrivileges = Arrays.asList(
                 scripts_view, admin_page_usage, scriptsUpdate, rolesAdmin, serverControl, filesUpload, filesEdit);
         Role adminRole = roleService.createProtectedRoleIfNotFound("ROLE_ADMIN", adminPrivileges);
-        Role userRole = roleService.createProtectedRoleIfNotFound("ROLE_USER", Arrays.asList(scripts_view));
+        Role userRole = roleService.createProtectedRoleIfNotFound("ROLE_USER", Collections.singletonList(scripts_view));
         Role roleAll = roleRepository.findByNameEquals("ALL_PRIVILEGES_ROLE");
 
         User admin = new User();

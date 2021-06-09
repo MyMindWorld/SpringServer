@@ -1,5 +1,11 @@
 package io.scriptServer.config
 
+import io.scriptServer.repository.UserRepository
+import io.scriptServer.service.UserService
+import io.scriptServer.testData.dbUser
+import io.scriptServer.testData.dbUserAuthorities
+import io.scriptServer.testData.defaultRoleAuthorities
+import io.scriptServer.testData.ldapUserWithoutDbReference
 import org.junit.Assert.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -13,12 +19,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.util.ReflectionTestUtils
-import io.scriptServer.repository.UserRepository
-import io.scriptServer.service.UserService
-import io.scriptServer.testData.dbUser
-import io.scriptServer.testData.dbUserAuthorities
-import io.scriptServer.testData.defaultRoleAuthorities
-import io.scriptServer.testData.ldapUserWithoutDbReference
 
 
 @SpringBootTest(classes = [CustomLdapAuth::class])
